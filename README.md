@@ -27,6 +27,7 @@ Spring MVC , JPA 복습하며 만들어보는 사이드 프로젝트
 
 ---
 ### ERD
+<img width="70%" src="https://github.com/user-attachments/assets/90ced23a-1da1-4c49-870d-9be48b6c72a7"
 
 ---
 ### 개발 진행 현황
