@@ -27,7 +27,7 @@ Spring MVC , JPA 복습하며 만들어보는 사이드 프로젝트
 
 ---
 ### ERD
-<img width="80%" src="https://github.com/user-attachments/assets/bf71a3d9-f121-4905-8378-2a0944681590">
+<img width="90%" src="https://github.com/user-attachments/assets/bf71a3d9-f121-4905-8378-2a0944681590">
 
 ---
 ### 개발 진행 현황
@@ -45,3 +45,4 @@ Spring MVC , JPA 복습하며 만들어보는 사이드 프로젝트
 - 도메인 주소 저장 방법 조사 -> 도로명 주소 API를 가져와서 활용하면 된다.
 - 회원가입 (중복 아이디 방지)
 - 로그인
+- 카카오 지도 API 활용하여 헬스장 위치 표시
