@@ -42,4 +42,13 @@ public class TrainerRepository {
                 .setParameter("loginId", loginId)
                 .getResultList();
     }
+
+    /**
+     * 특정 헬스장에 있는 트레이너 목록
+     */
+    public List<Trainer> findByGym(Long gymId) {
+        return em.createQuery("select t from Trainer t where t.gymId = :gymId", Trainer.class)
+                .setParameter("gymId", gymId)
+                .getResultList();
+    }
 }
