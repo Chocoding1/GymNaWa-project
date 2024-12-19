@@ -24,4 +24,12 @@ public class Gym {
 
     @OneToMany(mappedBy = "gym")
     private List<Trainer> trainers = new ArrayList<>();
+
+    public Gym() {
+    }
+
+    // 테스트용 생성자
+    public Gym(String name) {
+        this.name = name;
+    }
 }
