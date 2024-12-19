@@ -21,7 +21,7 @@ public class TrainerRepository {
      * 트레이너 이름으로 검색
      */
     public List<Trainer> findByName(String name) {
-        return em.createQuery("select t from Trainer where t.name = :name", Trainer.class)
+        return em.createQuery("select t from Trainer t where t.name = :name", Trainer.class)
                 .setParameter("name", name)
                 .getResultList();
     }
