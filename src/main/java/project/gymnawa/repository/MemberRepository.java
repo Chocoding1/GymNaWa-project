@@ -17,15 +17,24 @@ public class MemberRepository {
         em.persist(member);
     }
 
+    /**
+     * 회원 검색
+     */
     public Member findOne(Long id) {
         return em.find(Member.class, id);
     }
 
+    /**
+     * 전체 회원 검색
+     */
     public List<Member> findAll() {
         return em.createQuery("select m from Member m", Member.class)
                 .getResultList();
     }
 
+    /**
+     * 로그인 아이디 찾기
+     */
     public List<Member> findByLoginId(String loginId) {
         return em.createQuery("select m from Member m where m.loginId = :loginId", Member.class)
                 .setParameter("loginId", loginId)
