@@ -1,9 +1,56 @@
 package project.gymnawa.service;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import project.gymnawa.domain.Trainer;
+import project.gymnawa.repository.TrainerRepository;
+
+import java.util.List;
 
 @Service
+// 서비스에서 DB에 여러 번 접근할 수 있기 때문에 서비스 단에서 한 번에 쿼리를 처리하기 위해 서비스 단에 트랜잭션을 달아준다.
 @Transactional(readOnly = true)
+@RequiredArgsConstructor
 public class TrainerService {
+
+    private final TrainerRepository trainerRepository;
+
+    /**
+     * 회원가입
+     */
+    @Transactional
+    public Long join(Trainer trainer) {
+        validateDuplicateTrainer(trainer); // 중복 회원가입 방지
+        trainerRepository.save(trainer);
+        return trainer.getId();
+    }
+
+    private void validateDuplicateTrainer(Trainer trainer) {
+        List<Trainer> result = trainerRepository.findByLoginId(trainer.getLoginId());
+        if (!result.isEmpty()) {
+            throw new IllegalStateException("이미 존재하는 아이디입니다.");
+        }
+    }
+
+    /**
+     * 이름으로 검색
+     */
+    public List<Trainer> findByName(String name) {
+        return trainerRepository.findByName(name);
+    }
+
+    /**
+     * 트레이너 목록
+     */
+    public List<Trainer> findTrainers() {
+        return trainerRepository.findAll();
+    }
+
+    /**
+     * 특정 헬스장 소속 트레이너 목록
+     */
+    public List<Trainer> findTrainersByGym(Long gymId) {
+        return trainerRepository.findByGym(gymId);
+    }
 }
