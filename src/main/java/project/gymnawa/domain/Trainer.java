@@ -14,6 +14,8 @@ public class Trainer {
     @GeneratedValue
     private Long id;
 
+    private String loginId;
+    private String password;
     private String name;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
