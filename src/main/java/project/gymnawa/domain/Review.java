@@ -13,6 +13,7 @@ public class Review {
     @GeneratedValue
     private Long id;
 
+    @Lob
     private String Content;
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
