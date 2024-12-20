@@ -13,7 +13,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GymService {
 
-    private GymRepository gymRepository;
+    private final GymRepository gymRepository;
 
     @Transactional
     public Long join(Gym gym) {

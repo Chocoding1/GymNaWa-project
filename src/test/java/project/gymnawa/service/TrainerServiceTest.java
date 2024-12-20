@@ -20,6 +20,8 @@ class TrainerServiceTest {
 
     @Autowired
     private TrainerService trainerService;
+    @Autowired
+    private GymService gymService;
 
     @Test
     void join() {
@@ -31,6 +33,20 @@ class TrainerServiceTest {
 
         //then
         assertThat(joinId).isEqualTo(trainer.getId());
+    }
+
+    @Test
+    public void 중복_트레이너_테스트() {
+        //given
+        Trainer trainer1 = new Trainer("jsj012100", "aejhkadf", "조성진");
+        Trainer trainer2 = new Trainer("jsj012100", "aveaadf", "조성진");
+
+        //when
+        trainerService.join(trainer1);
+
+        //then
+        assertThrows(IllegalStateException.class,
+                () -> trainerService.join(trainer2));
     }
 
     @Test
@@ -81,7 +97,8 @@ class TrainerServiceTest {
         Trainer trainer3 = new Trainer("jsj121", "badfas", "조성환");
 
         Gym gym = new Gym("gym1");
-
+        gymService.join(gym);
+        System.out.println("gym.getId() = " + gym.getId());
         trainer1.setGym(gym);
         trainer3.setGym(gym);
 
@@ -90,8 +107,11 @@ class TrainerServiceTest {
         trainerService.join(trainer3);
 
         //when
-//        trainerService.findByGym(gym)
+        List<Trainer> result = trainerService.findByGym(gym.getId());
+
         //then
+        assertThat(result.size()).isEqualTo(2);
+        assertThat(result).contains(trainer1, trainer3);
     }
 
 }
