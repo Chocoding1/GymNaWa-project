@@ -99,6 +99,7 @@ class TrainerServiceTest {
         Gym gym = new Gym("gym1");
         gymService.join(gym);
         System.out.println("gym.getId() = " + gym.getId());
+
         trainer1.setGym(gym);
         trainer3.setGym(gym);
 
@@ -107,11 +108,11 @@ class TrainerServiceTest {
         trainerService.join(trainer3);
 
         //when
-        List<Trainer> result = trainerService.findByGym(gym.getId());
+        List<Trainer> result = trainerService.findByGym(gym);
 
         //then
         assertThat(result.size()).isEqualTo(2);
-        assertThat(result).contains(trainer1, trainer3);
+        assertThat(result).contains(trainer1, trainer2);
     }
 
 }

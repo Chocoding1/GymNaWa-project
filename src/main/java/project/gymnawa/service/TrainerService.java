@@ -3,6 +3,7 @@ package project.gymnawa.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import project.gymnawa.domain.Gym;
 import project.gymnawa.domain.Trainer;
 import project.gymnawa.repository.TrainerRepository;
 
@@ -52,7 +53,7 @@ public class TrainerService {
      * 특정 헬스장 소속 트레이너 목록(이 기능을 GymService에 넣어야 할지 고민 중)
      *  +) GymService에는 Gym 검색 기능이 들어가기 때문에 트레이너 검색은 TrainerService에 들어가는 게 맞다고 판단
      */
-    public List<Trainer> findByGym(Long gymId) {
-        return trainerRepository.findByGym(gymId);
+    public List<Trainer> findByGym(Gym gym) {
+        return trainerRepository.findByGym(gym);
     }
 }

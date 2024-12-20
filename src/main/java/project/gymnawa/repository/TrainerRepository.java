@@ -3,6 +3,7 @@ package project.gymnawa.repository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.stereotype.Repository;
+import project.gymnawa.domain.Gym;
 import project.gymnawa.domain.Trainer;
 
 import java.util.List;
@@ -46,9 +47,9 @@ public class TrainerRepository {
     /**
      * 특정 헬스장에 있는 트레이너 목록
      */
-    public List<Trainer> findByGym(Long gymId) {
-        return em.createQuery("select t from Trainer t where t.gymId = :gymId", Trainer.class)
-                .setParameter("gymId", gymId)
+    public List<Trainer> findByGym(Gym gym) {
+        return em.createQuery("select t from Trainer t where t.gym = :gym", Trainer.class)
+                .setParameter("gym", gym)
                 .getResultList();
     }
 }
