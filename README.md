@@ -60,6 +60,7 @@ Spring MVC , JPA 복습하며 만들어보는 사이드 프로젝트
 - 트레이너 기능 개발 완료
   - 트레이너 테스트 (완료)
     - 체육관 별 트레이너 검색 시 오류 발생 (해결)
+      - org.hibernate.QueryException: could not resolve property
       - JPQL 작성 시, 파라미터를 DB 기준 필드명으로 작성하는 것이 아니라 JPA에서 지정한 필드명으로 지정해야 한다.
       - select t from Trainer t where t.gymId = :gymId   ->   select t from Trainer t where t.gym = :gym
       - gymId를 gym으로 변경
