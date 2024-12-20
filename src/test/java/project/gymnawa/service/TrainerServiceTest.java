@@ -112,7 +112,7 @@ class TrainerServiceTest {
 
         //then
         assertThat(result.size()).isEqualTo(2);
-        assertThat(result).contains(trainer1, trainer2);
+        assertThat(result).contains(trainer1, trainer3);
     }
 
 }
