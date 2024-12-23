@@ -100,8 +100,8 @@ class TrainerServiceTest {
         gymService.join(gym);
         System.out.println("gym.getId() = " + gym.getId());
 
-        trainer1.setGym(gym);
-        trainer3.setGym(gym);
+        trainer1.changeGym(gym);
+        trainer3.changeGym(gym);
 
         trainerService.join(trainer1);
         trainerService.join(trainer2);
