@@ -29,7 +29,7 @@ class GymServiceTest {
         Gym findGym = gymService.findGym(joinId);
 
         //then
-        assertThat(findGym).isEqualTo(gym);
+        assertThat(findGym).isSameAs(gym);
         assertThat(findGym.getName()).isEqualTo("gym1");
 
     }
@@ -48,7 +48,7 @@ class GymServiceTest {
 
         //then
         assertThat(result.size()).isEqualTo(1);
-        assertThat(findGym).isEqualTo(gym);
+        assertThat(findGym).isSameAs(gym);
     }
 
     @Test

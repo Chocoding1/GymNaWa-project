@@ -91,7 +91,7 @@ class MemberServiceTest {
 
         //then
         assertThat(result.size()).isEqualTo(1);
-        assertThat(findMember).isEqualTo(member);
+        assertThat(findMember).isSameAs(member);
         assertThat(findMember.getName()).isEqualTo("조성진");
     }
 }
