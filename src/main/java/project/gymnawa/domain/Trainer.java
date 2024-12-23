@@ -22,8 +22,10 @@ public class Trainer {
     @JoinColumn(name = "GYM_ID")
     private Gym gym;
 
-    @OneToMany(mappedBy = "trainer")
-    private List<Review> reviews = new ArrayList<>();
+    // 우선 단방향 연관관계로만 설계(되도록이면 단방향으로 설계하는게 좋다고 한다.)
+    // 필요하면 나중에 다시 추가하더라도 지금은 일단 단방향으로만 설계하자.
+//    @OneToMany(mappedBy = "trainer")
+//    private List<Review> reviews = new ArrayList<>();
 
     // JPA는 기본 생성자 필수 (객체 동적 생성할 수도 있기 때문)
     public Trainer() {
@@ -37,8 +39,7 @@ public class Trainer {
     }
 
     // 편의 메서드
-    public void setGym(Gym gym) {
+    public void changeGym(Gym gym) {
         this.gym = gym;
-        gym.getTrainers().add(this);
     }
 }
