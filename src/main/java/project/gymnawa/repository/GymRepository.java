@@ -26,4 +26,19 @@ public class GymRepository {
                 .getResultList();
     }
 
+    /**
+     * 헬스장 단 건 조회
+     */
+    public Gym findOne(Long id) {
+        return em.find(Gym.class, id);
+    }
+
+    /**
+     * 헬스장 목록
+     */
+    public List<Gym> findAll() {
+        return em.createQuery("select g from Gym g", Gym.class)
+                .getResultList();
+    }
+
 }

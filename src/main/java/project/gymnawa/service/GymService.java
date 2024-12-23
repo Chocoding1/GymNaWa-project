@@ -42,4 +42,18 @@ public class GymService {
     public List<Gym> findByName(String name) {
         return gymRepository.findByName(name);
     }
+
+    /**
+     * 헬스장 단 건 조회
+     */
+    public Gym findGym(Long id) {
+        return gymRepository.findOne(id);
+    }
+
+    /**
+     * 헬스장 목록
+     */
+    public List<Gym> findGyms() {
+        return gymRepository.findAll();
+    }
 }
