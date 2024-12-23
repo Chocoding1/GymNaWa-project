@@ -64,6 +64,13 @@ Spring MVC , JPA 복습하며 만들어보는 사이드 프로젝트
       - JPQL 작성 시, 파라미터를 DB 기준 필드명으로 작성하는 것이 아니라 JPA에서 지정한 필드명으로 지정해야 한다.
       - select t from Trainer t where t.gymId = :gymId   ->   select t from Trainer t where t.gym = :gym
       - gymId를 gym으로 변경
+
+#### 2024-12-23
+- 도메인 수정
+  - 양방향 연관관계 -> 단방향 연관관계로 변경
+  - 수정 도메인 : Member, Trainer, Gym
+
+- 회원 서비스, 테스트 추가(로그인 아이디로 검색 기능 구현 안 함)
   
 ---
 ### To-Do-List
