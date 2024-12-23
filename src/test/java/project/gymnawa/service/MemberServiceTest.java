@@ -77,4 +77,21 @@ class MemberServiceTest {
         //then
         assertThat(result.size()).isEqualTo(2);
     }
+
+    @Test
+    void findByLoginId() {
+        //given
+        Member member = new Member("jsj012100", "aadfad", "조성진");
+
+        //when
+        memberService.join(member);
+
+        List<Member> result = memberService.findByLoginId("jsj012100");
+        Member findMember = result.get(0);
+
+        //then
+        assertThat(result.size()).isEqualTo(1);
+        assertThat(findMember).isEqualTo(member);
+        assertThat(findMember.getName()).isEqualTo("조성진");
+    }
 }

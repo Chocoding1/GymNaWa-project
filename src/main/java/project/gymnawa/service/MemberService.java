@@ -38,4 +38,8 @@ public class MemberService {
     public List<Member> findMembers() {
         return memberRepository.findAll();
     }
+
+    public List<Member> findByLoginId(String loginId) {
+        return memberRepository.findByLoginId(loginId);
+    }
 }
