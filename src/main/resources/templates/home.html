@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="utf-8">
     <title>지도 생성하기</title>
@@ -38,7 +38,8 @@
 <div id="header">
     <h1>주변 헬스장을 탐색해보세요!</h1>
     <div class="buttons">
-        <button onclick="location.href='#signup'">회원가입</button>
+        <button onclick="location.href='#signup'"
+                th:onclick="|location.href='@{/member/add}'|">회원가입</button>
         <button onclick="location.href='#login'">로그인</button>
     </div>
 </div>
