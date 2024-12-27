@@ -26,6 +26,12 @@ Spring MVC , JPA 복습하며 만들어보는 사이드 프로젝트
 - 해당 트레이너에게 PT를 받은 기록이 있어야 리뷰 작성 가능
 - 리뷰 작성하면 point 지급 (point는 PT 결제 시에 사용 가능)
 
+**<회원>**
+- 마이페이지
+- 회원가입
+- 로그인
+- 정보 수정
+
 ---
 ### ERD
 <img width="90%" src="https://github.com/user-attachments/assets/5347967e-191e-409f-8839-fd19ffc99fec">
