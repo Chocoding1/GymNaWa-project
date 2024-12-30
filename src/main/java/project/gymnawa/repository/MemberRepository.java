@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 import project.gymnawa.domain.Member;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class MemberRepository {
@@ -35,9 +36,9 @@ public class MemberRepository {
     /**
      * 로그인 아이디 찾기
      */
-    public List<Member> findByLoginId(String loginId) {
+    public Optional<Member> findByLoginId(String loginId) {
         return em.createQuery("select m from Member m where m.loginId = :loginId", Member.class)
                 .setParameter("loginId", loginId)
-                .getResultList();
+                .getResultList().stream().findFirst();
     }
 }
