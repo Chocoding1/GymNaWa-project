@@ -1,6 +1,7 @@
 package project.gymnawa.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +13,7 @@ import project.gymnawa.service.MemberService;
 @Controller
 @RequestMapping("/member")
 @RequiredArgsConstructor
+@Slf4j
 public class MemberController {
 
     private final MemberService memberService;
@@ -33,5 +35,21 @@ public class MemberController {
     @GetMapping("/login")
     public String loginForm(@ModelAttribute LoginForm loginForm) {
         return "/member/loginMemberForm";
+    }
+
+    /**
+     * 로그인 성공하면 홈화면으로 redirect
+     * 로그인 실패하면 로그인 화면으로 이동
+     */
+    @PostMapping("/login")
+    public String loginMember(LoginForm loginForm) {
+        Member loginedMember = memberService.login(loginForm.getLoginId(), loginForm.getPassword());
+
+        if (loginedMember == null) {
+            log.info("존재하지 않는 비밀번호입니다.");
+            return "/member/loginMemberForm";
+        }
+
+        return "redirect:/";
     }
 }
