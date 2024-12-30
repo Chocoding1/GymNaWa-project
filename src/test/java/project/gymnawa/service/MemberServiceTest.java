@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 import project.gymnawa.domain.Member;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -86,12 +87,63 @@ class MemberServiceTest {
         //when
         memberService.join(member);
 
-        List<Member> result = memberService.findByLoginId("jsj012100");
-        Member findMember = result.get(0);
+        Optional<Member> result = memberService.findByLoginId("jsj012100");
+        Member findMember = result.get();
 
         //then
-        assertThat(result.size()).isEqualTo(1);
         assertThat(findMember).isSameAs(member);
         assertThat(findMember.getName()).isEqualTo("조성진");
+    }
+
+    /**
+     * 로그인 테스트
+     */
+    @Test
+    void login() {
+        //given
+        Member member = new Member("jsj012100", "aadfad", "조성진");
+
+        memberService.join(member);
+
+        //when
+        Member loginedMember = memberService.login("jsj012100", "aadfad");
+
+        //then
+        assertThat(loginedMember).isSameAs(member);
+        assertThat(loginedMember.getName()).isEqualTo("조성진");
+    }
+
+    /**
+     * 로그인 실패 테스트
+     * 해당 아이디가 존재하지 않음
+     */
+    @Test
+    void 로그인_실패_테스트_아이디() {
+        //given
+        Member member = new Member("jsj012100", "aadfad", "조성진");
+
+        //when
+        memberService.join(member);
+
+        //then
+        assertThrows(IllegalStateException.class,
+                () -> memberService.login("jsj121", "aadfad"));
+    }
+
+    /**
+     * 로그인 실패 테스트
+     * 아이디는 맞으나, 비밀번호가 틀림
+     */
+    @Test
+    void 로그인_실패_테스트_비밀번호() {
+        //given
+        Member member = new Member("jsj012100", "aadfad", "조성진");
+
+        memberService.join(member);
+        //when
+        Member loginedMember = memberService.login("jsj012100", "sdgfhsfgfh");
+
+        //then
+        assertThat(loginedMember).isNull();
     }
 }
