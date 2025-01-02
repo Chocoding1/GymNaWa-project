@@ -70,6 +70,12 @@ Spring MVC , JPA 복습하며 만들어보는 사이드 프로젝트
       - JPQL 작성 시, 파라미터를 DB 기준 필드명으로 작성하는 것이 아니라 JPA에서 지정한 필드명으로 지정해야 한다.
       - select t from Trainer t where t.gymId = :gymId   ->   select t from Trainer t where t.gym = :gym
       - gymId를 gym으로 변경
+ 
+   
+      **+) 2025-01-03**
+        - gymId로 검색 시 오류가 발생한 이유 : 객체 그래프 탐색 방식으로 쿼리를 작성하지 않았기 때문
+        - t.gymId가 아니라 t.gym.id로 작성해야 한다.
+        - 따라서 select t from Trainer t where t.gym.id = :gymId로 작성하면 오류가 발생하지 않는다.
 
 #### 2024-12-23
 - 도메인 수정
