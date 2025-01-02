@@ -58,7 +58,7 @@ public class MemberController {
         Member loginedMember = memberService.login(loginForm.getLoginId(), loginForm.getPassword());
 
         if (loginedMember == null) {
-            log.info("존재하지 않는 비밀번호입니다.");
+            bindingResult.reject("loginFail", "아이디 또는 비밀번호가 맞지 않습니다.");
             return "/member/loginMemberForm";
         }
 

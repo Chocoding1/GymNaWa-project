@@ -43,8 +43,8 @@ public class MemberService {
      * 애초에 초그인 아이디가 존재하지 않을 경우, 즉 findByLoginId의 리턴값이 null일 경우도 예외처리 해줘야 됨
      */
     public Member login(String loginId, String password) {
-        Optional<Member> result = validateLoginId(loginId);
-        return result
+//        Optional<Member> result = validateLoginId(loginId);
+        return memberRepository.findByLoginId(loginId)
                 .filter(m -> m.getPassword().equals(password))
                 .orElse(null);
     }
@@ -52,6 +52,7 @@ public class MemberService {
     /**
      * 로그인 아이디 존재 여부 확인 함수
      */
+/*
     private Optional<Member> validateLoginId(String loginId) {
         Optional<Member> result = memberRepository.findByLoginId(loginId);
         if (result.isEmpty()) {
@@ -59,6 +60,7 @@ public class MemberService {
         }
         return result;
     }
+*/
 
     public Member findOne(Long id) {
         return memberRepository.findOne(id);
