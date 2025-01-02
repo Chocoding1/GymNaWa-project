@@ -1,11 +1,15 @@
 package project.gymnawa.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import project.gymnawa.controller.web.SessionConst;
 import project.gymnawa.domain.Form.LoginForm;
 import project.gymnawa.domain.Form.MemberSaveForm;
 import project.gymnawa.domain.Member;
@@ -48,7 +52,8 @@ public class MemberController {
      * 로그인 실패하면 로그인 화면으로 이동
      */
     @PostMapping("/login")
-    public String loginMember(@Validated LoginForm loginForm, BindingResult bindingResult) {
+    public String loginMember(@Validated LoginForm loginForm, BindingResult bindingResult,
+                              HttpServletRequest request) {
 
         if (bindingResult.hasErrors()) {
             log.info("errors = " + bindingResult);
@@ -62,6 +67,24 @@ public class MemberController {
             return "/member/loginMemberForm";
         }
 
+        HttpSession session = request.getSession();
+        session.setAttribute(SessionConst.LOGIN_MEMBER, loginedMember);
+        log.info("session timeout : " + session.getMaxInactiveInterval());
+
+        return "redirect:/";
+    }
+
+    /**
+     * 로그아웃
+     */
+    @PostMapping("/logout")
+    public String logout(HttpServletRequest request) {
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            // 세션을 아예 다 지우면 다른 정보까지도 지워질 위험이 있지 않은가?
+            // -> 로그아웃은 사용자의 정보를 다 지워야 하는 것이 맞기 때문에 모든 세션을 다 지워도 문제 없다.
+            session.invalidate();
+        }
         return "redirect:/";
     }
 }
