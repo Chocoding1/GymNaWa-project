@@ -51,5 +51,12 @@ public class TrainerRepository {
         return em.createQuery("select t from Trainer t where t.gym = :gym", Trainer.class)
                 .setParameter("gym", gym)
                 .getResultList();
+
+        // 객체 그래프 탐색 기법으로 객체 키값을 사용해서도 탐색 가능
+/*
+        return em.createQuery("select t from Trainer t where t.gym.id = :gymId, Trainer.class")
+                .setParameter("gymId", gymId)
+                .getResultList();
+*/
     }
 }
