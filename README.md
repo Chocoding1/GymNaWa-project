@@ -99,8 +99,14 @@ Spring MVC , JPA 복습하며 만들어보는 사이드 프로젝트
     - JPQL에서 스트림 적용하여 로그인 아이디 비번 검증 코드 추가 완료
   - validation과 쿠키, 세션 사용하여 로그인 처리 예정
  
- - 회원가입 기능 추가
-   - Bean Validation 추가
+- 회원가입 기능 추가
+  - Bean Validation 추가
+
+#### 2025-01-02
+- 로그인 기능 개발 중
+  - @Post : 로그인 기능 추가
+    - Bean Validation 추가
+    - 아이디 or 비밀번호 오류 시, 글로벌 오류 발생하여 로그인 화면으로 redirect
   
 ---
 ### To-Do-List
