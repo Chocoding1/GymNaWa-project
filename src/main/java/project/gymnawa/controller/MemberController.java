@@ -35,7 +35,6 @@ public class MemberController {
         Member member = new Member(memberSaveForm.getLoginId(), memberSaveForm.getPassword(), memberSaveForm.getName());
         Long joinId = memberService.join(member);
 
-//        return "멤버 저장 성공 : " + joinId; //추후 쿠키 사용하여 홈으로 redirect 예정
         return "redirect:/member/login";
     }
 
@@ -49,7 +48,13 @@ public class MemberController {
      * 로그인 실패하면 로그인 화면으로 이동
      */
     @PostMapping("/login")
-    public String loginMember(LoginForm loginForm) {
+    public String loginMember(@Validated LoginForm loginForm, BindingResult bindingResult) {
+
+        if (bindingResult.hasErrors()) {
+            log.info("errors = " + bindingResult);
+            return "/member/loginMemberForm";
+        }
+
         Member loginedMember = memberService.login(loginForm.getLoginId(), loginForm.getPassword());
 
         if (loginedMember == null) {
