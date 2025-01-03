@@ -1,18 +1,18 @@
 package project.gymnawa.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import project.gymnawa.controller.web.SessionConst;
-import project.gymnawa.domain.Form.LoginForm;
-import project.gymnawa.domain.Form.MemberSaveForm;
 import project.gymnawa.domain.Member;
+import project.gymnawa.domain.form.LoginForm;
+import project.gymnawa.domain.form.MemberSaveForm;
 import project.gymnawa.service.MemberService;
 
 @Controller
@@ -86,5 +86,17 @@ public class MemberController {
             session.invalidate();
         }
         return "redirect:/";
+    }
+
+    /**
+     * 마이페이지
+     */
+    @GetMapping("/{id}/mypage")
+    public String mypage(@PathVariable Long id, Model model) {
+        Member findMember = memberService.findOne(id);
+
+        model.addAttribute("member", findMember);
+
+        return "/member/myPage";
     }
 }

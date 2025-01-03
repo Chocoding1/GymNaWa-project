@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>마이페이지</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .menu {
+            list-style: none;
+            padding: 0;
+        }
+        .menu-item {
+            display: block;
+            padding: 10px;
+            text-decoration: none;
+            color: #000;
+            border: 1px solid #ddd;
+            margin-bottom: 5px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .menu-item.text-danger {
+            color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+<div class="container mt-5">
+    <div class="row">
+        <!-- Sidebar -->
+        <nav class="col-md-3">
+            <ul class="menu">
+                <li><a href="/logout" th:href="@{/member/logout}" class="menu-item text-danger">로그아웃</a></li>
+                <li><a href="/delete-account" class="menu-item text-danger">회원 탈퇴</a></li>
+            </ul>
+        </nav>
+
+        <!-- Content -->
+        <div class="col-md-9">
+            <!-- Profile Section -->
+            <div id="profile" th:object="${member}">
+                <h3 class="mb-3">프로필</h3>
+                <div class="mb-2" th:field="*{name}"><strong>이름:</strong> 홍길동</div>
+                <div class="mb-2" th:field="*{loginId}"><strong>아이디:</strong> hong123</div>
+                <div class="mb-2" th:field="*{password}"><strong>비밀번호:</strong> ********</div>
+                <button class="btn btn-primary">정보 수정</button>
+            </div>
+
+            <!-- Reviews Section -->
+            <div id="reviews" class="mt-5">
+                <h3 class="mb-3">작성한 리뷰</h3>
+                <ul class="list-group">
+                    <li class="list-group-item">2024-01-02: "헬스장 시설이 아주 깨끗하고 좋아요!"</li>
+                    <li class="list-group-item">2023-12-20: "트레이너가 친절하고 프로그램이 알찹니다."</li>
+                    <li class="list-group-item">2023-11-15: "주차 공간이 부족해서 아쉬웠어요."</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
