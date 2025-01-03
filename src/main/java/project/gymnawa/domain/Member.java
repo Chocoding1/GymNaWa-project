@@ -3,12 +3,9 @@ package project.gymnawa.domain;
 import jakarta.persistence.*;
 import lombok.Getter;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Entity
 @Getter
-public class Member {
+public class Member extends BaseTime{
 
     @Id
     @GeneratedValue
