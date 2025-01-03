@@ -40,9 +40,9 @@
             <!-- Profile Section -->
             <div id="profile" th:object="${member}">
                 <h3 class="mb-3">프로필</h3>
-                <div class="mb-2" th:field="*{name}"><strong>이름:</strong> 홍길동</div>
-                <div class="mb-2" th:field="*{loginId}"><strong>아이디:</strong> hong123</div>
-                <div class="mb-2" th:field="*{password}"><strong>비밀번호:</strong> ********</div>
+                <div class="mb-2"><strong>이름:</strong> <span th:text="*{name}">홍길동</span></div>
+                <div class="mb-2"><strong>아이디:</strong> <span th:text="*{loginId}">hong123</span></div>
+                <div class="mb-2"><strong>비밀번호:</strong> <span th:text="*{password}">********</span></div>
                 <button class="btn btn-primary">정보 수정</button>
             </div>
 
@@ -50,9 +50,7 @@
             <div id="reviews" class="mt-5">
                 <h3 class="mb-3">작성한 리뷰</h3>
                 <ul class="list-group">
-                    <li class="list-group-item">2024-01-02: "헬스장 시설이 아주 깨끗하고 좋아요!"</li>
-                    <li class="list-group-item">2023-12-20: "트레이너가 친절하고 프로그램이 알찹니다."</li>
-                    <li class="list-group-item">2023-11-15: "주차 공간이 부족해서 아쉬웠어요."</li>
+<!--                    <li class="list-group-item" th:each="review : ${member.reviews}" th:text="${review}">리뷰 내용</li>-->
                 </ul>
             </div>
         </div>
