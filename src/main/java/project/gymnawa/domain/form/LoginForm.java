@@ -1,4 +1,4 @@
-package project.gymnawa.domain.Form;
+package project.gymnawa.domain.form;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
