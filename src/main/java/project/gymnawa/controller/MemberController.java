@@ -53,7 +53,7 @@ public class MemberController {
      */
     @PostMapping("/login")
     public String loginMember(@Validated LoginForm loginForm, BindingResult bindingResult,
-                              HttpServletRequest request) {
+                              HttpServletRequest request, @RequestParam(defaultValue = "/") String redirectURL) {
 
         if (bindingResult.hasErrors()) {
             log.info("errors = " + bindingResult);
@@ -69,9 +69,9 @@ public class MemberController {
 
         HttpSession session = request.getSession();
         session.setAttribute(SessionConst.LOGIN_MEMBER, loginedMember);
-        log.info("session timeout : " + session.getMaxInactiveInterval());
+        log.info("redirectURL: " + redirectURL);
 
-        return "redirect:/";
+        return "redirect:" + redirectURL;
     }
 
     /**
