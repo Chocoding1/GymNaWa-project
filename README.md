@@ -143,6 +143,12 @@ Spring MVC , JPA 복습하며 만들어보는 사이드 프로젝트
 
 #### 2025-01-06
 - 로그인 체크 인터셉터 추가(미로그인 사용자가 url로 마이페이지 들어가는 거 방지)
+- 회원 정보 수정 기능 개발
+  - MemberSaveForm -> MemberForm으로 변경하여 edit 시에도 사용
+  - **Member** : 도메인에 업데이트 메서드 추가
+  - **MemberService** : 업데이트 메서드 추가
+  - **MemberController** : 회원 정보 추가(@Get, @Post)
+    - **로그인 아이디 수정 시, 중복 체크 기능 필요**
 
 ---
 ### To-Do-List
