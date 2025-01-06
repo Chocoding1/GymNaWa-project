@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import project.gymnawa.web.SessionConst;
 import project.gymnawa.domain.Member;
 import project.gymnawa.domain.form.LoginForm;
-import project.gymnawa.domain.form.MemberSaveForm;
+import project.gymnawa.domain.form.MemberForm;
 import project.gymnawa.service.MemberService;
 
 @Controller
@@ -24,19 +24,19 @@ public class MemberController {
     private final MemberService memberService;
 
     @GetMapping("/add")
-    public String createForm(@ModelAttribute MemberSaveForm memberSaveForm) {
+    public String createForm(@ModelAttribute MemberForm memberSaveForm) {
         return "/member/createMemberForm";
     }
 
     @PostMapping("/add")
-    public String addMember(@Validated MemberSaveForm memberSaveForm, BindingResult bindingResult) {
+    public String addMember(@Validated MemberForm memberForm, BindingResult bindingResult) {
 
         if (bindingResult.hasErrors()) {
             log.info("errors = " + bindingResult);
             return "/member/createMemberForm";
         }
 
-        Member member = new Member(memberSaveForm.getLoginId(), memberSaveForm.getPassword(), memberSaveForm.getName());
+        Member member = new Member(memberForm.getLoginId(), memberForm.getPassword(), memberForm.getName());
         Long joinId = memberService.join(member);
 
         return "redirect:/member/login";
@@ -97,5 +97,33 @@ public class MemberController {
         model.addAttribute("member", findMember);
 
         return "/member/myPage";
+    }
+
+    /**
+     * 회원 정보 수정
+     */
+    @GetMapping("/{id}/edit")
+    public String editForm(@PathVariable Long id, Model model) {
+        Member member = memberService.findOne(id);
+
+        MemberForm form = new MemberForm(member.getLoginId(), member.getPassword(), member.getName());
+        model.addAttribute("form", form);
+
+        return "/member/editMemberForm";
+    }
+
+    @PostMapping("/{id}/edit")
+    public String editMember(@Validated @ModelAttribute("form") MemberForm form, BindingResult bindingResult,
+                             @PathVariable Long id) {
+
+        if (bindingResult.hasErrors()) {
+            log.info("errors = " + bindingResult);
+            return "/member/editMemberForm";
+        }
+
+        // 로그인 아이디 중복 체크 필요
+        memberService.updateMember(id, form.getLoginId(), form.getPassword(), form.getName());
+
+        return "redirect:/member/{id}/mypage";
     }
 }

@@ -40,7 +40,7 @@ public class MemberService {
     /**
      * 로그인 검증 함수
      * 로그인 아이디로 회원을 찾아서 그 회원의 비밀번호와 입력받은 비밀번호가 같은지 확인
-     * 애초에 초그인 아이디가 존재하지 않을 경우, 즉 findByLoginId의 리턴값이 null일 경우도 예외처리 해줘야 됨
+     * 애초에 초그인 아이디가 존재하지 않을 경우, 즉 findByLoginId의 리턴값이 null일 경우도 예외처리 해줘야 됨 -> 스트림 사용하여 해결
      */
     public Member login(String loginId, String password) {
 //        Optional<Member> result = validateLoginId(loginId);
@@ -51,6 +51,7 @@ public class MemberService {
 
     /**
      * 로그인 아이디 존재 여부 확인 함수
+     * stream을 사용하여 입력받은 로그인 아이디가 존재하지 않을 경우 null을 반환하도록 했기 때문에 필요 없는 함수
      */
 /*
     private Optional<Member> validateLoginId(String loginId) {
@@ -72,5 +73,12 @@ public class MemberService {
 
     public Optional<Member> findByLoginId(String loginId) {
         return memberRepository.findByLoginId(loginId);
+    }
+
+    @Transactional
+    public void updateMember(Long id, String loginId, String password, String name) {
+        Member member = memberRepository.findOne(id);
+
+        member.updateMember(loginId, password, name);
     }
 }

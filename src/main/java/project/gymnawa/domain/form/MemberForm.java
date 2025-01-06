@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
-public class MemberSaveForm {
+public class MemberForm {
 
     @NotBlank
     private String loginId;
@@ -13,4 +13,9 @@ public class MemberSaveForm {
     @NotBlank
     private String name;
 
+    public MemberForm(String loginId, String password, String name) {
+        this.loginId = loginId;
+        this.password = password;
+        this.name = name;
+    }
 }

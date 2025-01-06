@@ -51,7 +51,7 @@
                 <div class="mb-2"><strong>이름:</strong> <span th:text="*{name}">홍길동</span></div>
                 <div class="mb-2"><strong>아이디:</strong> <span th:text="*{loginId}">hong123</span></div>
                 <div class="mb-2"><strong>비밀번호:</strong> <span th:text="*{password}">********</span></div>
-                <button class="btn btn-primary">정보 수정</button>
+                <a th:href="@{|/member/*{id}/edit|}" class="btn btn-primary">정보 수정</a>
             </div>
 
             <!-- Reviews Section -->
