@@ -9,7 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import project.gymnawa.controller.web.SessionConst;
+import project.gymnawa.web.SessionConst;
 import project.gymnawa.domain.Member;
 import project.gymnawa.domain.form.LoginForm;
 import project.gymnawa.domain.form.MemberSaveForm;
@@ -69,7 +69,6 @@ public class MemberController {
 
         HttpSession session = request.getSession();
         session.setAttribute(SessionConst.LOGIN_MEMBER, loginedMember);
-        log.info("redirectURL: " + redirectURL);
 
         return "redirect:" + redirectURL;
     }
