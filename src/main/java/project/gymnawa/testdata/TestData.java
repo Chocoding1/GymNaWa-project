@@ -1,4 +1,4 @@
-package project.gymnawa.controller.testdata;
+package project.gymnawa.testdata;
 
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;

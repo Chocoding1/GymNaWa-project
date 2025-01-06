@@ -1,9 +1,9 @@
-package project.gymnawa.controller.web.config;
+package project.gymnawa.web.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import project.gymnawa.controller.web.interceptor.LoginCheckInterceptor;
+import project.gymnawa.web.interceptor.LoginCheckInterceptor;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
