@@ -9,6 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import project.gymnawa.domain.Address;
 import project.gymnawa.web.SessionConst;
 import project.gymnawa.domain.Member;
 import project.gymnawa.domain.form.LoginForm;
@@ -24,7 +25,7 @@ public class MemberController {
     private final MemberService memberService;
 
     @GetMapping("/add")
-    public String createForm(@ModelAttribute MemberForm memberSaveForm) {
+    public String createForm(@ModelAttribute MemberForm memberForm) {
         return "/member/createMemberForm";
     }
 
@@ -36,7 +37,12 @@ public class MemberController {
             return "/member/createMemberForm";
         }
 
-        Member member = new Member(memberForm.getLoginId(), memberForm.getPassword(), memberForm.getName());
+        log.info("Address : " + memberForm.getAddress());
+        log.info("Address : " + memberForm.getAddress().getZonecode());
+        log.info("Address : " + memberForm.getAddress().getAddress());
+
+        Member member = new Member();
+        member.createMember(memberForm.getLoginId(), memberForm.getPassword(), memberForm.getName(), memberForm.getAddress());
         Long joinId = memberService.join(member);
 
         return "redirect:/member/login";
@@ -106,14 +112,14 @@ public class MemberController {
     public String editForm(@PathVariable Long id, Model model) {
         Member member = memberService.findOne(id);
 
-        MemberForm form = new MemberForm(member.getLoginId(), member.getPassword(), member.getName());
+        MemberForm form = new MemberForm(member.getLoginId(), member.getPassword(), member.getName(), member.getAddress());
         model.addAttribute("form", form);
 
         return "/member/editMemberForm";
     }
 
     @PostMapping("/{id}/edit")
-    public String editMember(@Validated @ModelAttribute("form") MemberForm form, BindingResult bindingResult,
+    public String editMember(@Validated @ModelAttribute("form") MemberForm memberForm, BindingResult bindingResult,
                              @PathVariable Long id) {
 
         if (bindingResult.hasErrors()) {
@@ -122,7 +128,7 @@ public class MemberController {
         }
 
         // 로그인 아이디 중복 체크 필요
-        memberService.updateMember(id, form.getLoginId(), form.getPassword(), form.getName());
+        memberService.updateMember(id, memberForm.getLoginId(), memberForm.getPassword(), memberForm.getName(), memberForm.getAddress());
 
         return "redirect:/member/{id}/mypage";
     }

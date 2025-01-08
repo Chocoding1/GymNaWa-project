@@ -3,6 +3,7 @@ package project.gymnawa.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import project.gymnawa.domain.Address;
 import project.gymnawa.domain.Member;
 import project.gymnawa.repository.MemberRepository;
 
@@ -76,9 +77,9 @@ public class MemberService {
     }
 
     @Transactional
-    public void updateMember(Long id, String loginId, String password, String name) {
+    public void updateMember(Long id, String loginId, String password, String name, Address address) {
         Member member = memberRepository.findOne(id);
 
-        member.updateMember(loginId, password, name);
+        member.updateMember(loginId, password, name, address);
     }
 }

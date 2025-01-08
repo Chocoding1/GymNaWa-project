@@ -14,7 +14,8 @@ public class Member extends BaseTime{
     private String loginId;
     private String password;
     private String name;
-    //    private Address address;
+    @Embedded
+    private Address address;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "TRAINER_ID")
@@ -36,11 +37,22 @@ public class Member extends BaseTime{
     }
 
     /**
-     * 회원 정보 수정
+     * 회원 객체 생성
      */
-    public void updateMember(String loginId, String password, String name) {
+    public void createMember(String loginId, String password, String name, Address address) {
         this.loginId = loginId;
         this.password = password;
         this.name = name;
+        this.address = address;
+    }
+
+    /**
+     * 회원 정보 수정
+     */
+    public void updateMember(String loginId, String password, String name, Address address) {
+        this.loginId = loginId;
+        this.password = password;
+        this.name = name;
+        this.address = address;
     }
 }
