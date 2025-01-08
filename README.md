@@ -173,6 +173,17 @@ Spring MVC , JPA 복습하며 만들어보는 사이드 프로젝트
  
 - 카카오맵 API
   - 사이트 접속 시, 현 위치(접속 위치)에서 시작하도록 변경
+- 다음 주소 API
+  - 회원가입 시, 주소를 입력받도록 다음 주소 API 적용
+  - Address 임베디드 값 타입 생성(Member뿐 아니라, Gym 객체에도 사용할 예정)
+  - 우선 Member에만 적용
+    - Member
+    - MemberForm
+    - MemberController
+    - createMemberForm.html
+    - MemberService
+  - 그러나 현재 화면에서 입력받은 임베디드 타입 필드들이 컨트롤러로 넘어올 때 null로 넘어온다.
+  - 원인 파익 필요
 
 ---
 ### To-Do-List
