@@ -6,7 +6,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.SessionAttribute;
-import project.gymnawa.service.MapService;
 import project.gymnawa.web.SessionConst;
 import project.gymnawa.domain.Member;
 
@@ -14,15 +13,15 @@ import project.gymnawa.domain.Member;
 @RequiredArgsConstructor
 public class HomeController {
 
-    private final MapService mapService;
+    @Value("${api.key}")
+    private String apiKey;
 
     @GetMapping("/")
-
     public String home(
             @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false) Member loginedMember,
             Model model) {
 
-        model.addAttribute("apikey", mapService.getApiKey());
+        model.addAttribute("apiKey", apiKey);
 
         if (loginedMember == null) {
             return "home";
