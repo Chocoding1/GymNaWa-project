@@ -192,7 +192,7 @@ Spring MVC , JPA 복습하며 만들어보는 사이드 프로젝트
 - 객체를 검증하기로 했으면 해당 객체의 필드만 검사할 수 있도록 하자
 - 회원가입 시, MemberForm에 Address 임베디드 타입을 필드로 넣었으나 현재 해당 필드는 자동 바인딩을 사용하지 않고 컨트롤러에서 직접 Address 객체를 생성하기 때문에 필요 X
   - 그러나 회원 정보 수정 시에는 Address 필드가 필요
-  - 회원 DTO 분리 결정
+  - 따라서 회원 DTO 분리 결정
   - MemberForm -> MemberSaveDto, MemberEditDto로 분리
   - 하는 김에 기존 LoginForm도 명칭 통일
   - LoginForm -> MemberLoginDto
