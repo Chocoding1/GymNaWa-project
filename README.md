@@ -185,6 +185,9 @@ Spring MVC , JPA 복습하며 만들어보는 사이드 프로젝트
   - 그러나 현재 화면에서 입력받은 임베디드 타입 필드들이 컨트롤러로 넘어올 때 null로 넘어온다.
   - 원인 파익 필요
 
+#### 2025-01-10
+- Caused by: org.springframework.beans.NotReadablePropertyException: Invalid property 'address' of bean class [project.gymnawa.domain.form.MemberSaveDto]: Bean property 'address' is not readable or has an invalid getter method: Does the return type of the getter match the parameter type of the setter?
+
 ---
 ### To-Do-List
 - 도메인 주소 저장 방법 조사 -> 도로명 주소 API를 가져와서 활용하면 된다. (O)
