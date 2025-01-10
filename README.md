@@ -186,16 +186,23 @@ Spring MVC , JPA 복습하며 만들어보는 사이드 프로젝트
   - 원인 파익 필요
 
 #### 2025-01-10
-- Caused by: org.springframework.beans.NotReadablePropertyException: Invalid property 'address' of bean class [project.gymnawa.domain.Dto.MemberSaveDto]: Bean property 'address' is not readable or has an invalid getter method: Does the return type of the getter match the parameter type of the setter?
-- 컨트롤러에서 MemberDto 앞에 @Validated를 붙이며 검증 실시
-- address 필드는 MemberDto의 필드가 아닌데, th:errorclass를 붙이며 검증을 시도하려고 했기 때문에 읽을 수 없다고 오류 발생한 것
-- 객체를 검증하기로 했으면 해당 객체의 필드만 검사할 수 있도록 하자
+- 다음 주소 API를 사용하여 입력받은 주소 DB에 저장 성공
+  - 그러나 내가 원하는대로 @ModelAttribute를 이용하여 자동으로 임베디드 타입 값이 바인딩시키지는 못 했다.
+  - 차선책으로 요청 파라미터에서 직접 데이터를 꺼내(request.getParameter) Address 필드를 직접 생성했다.
+  - 따라서 MemberSaveDto에 Address 임베디드 필드를 제거했다.
 - 회원가입 시, MemberForm에 Address 임베디드 타입을 필드로 넣었으나 현재 해당 필드는 자동 바인딩을 사용하지 않고 컨트롤러에서 직접 Address 객체를 생성하기 때문에 필요 X
   - 그러나 회원 정보 수정 시에는 Address 필드가 필요
   - 따라서 회원 DTO 분리 결정
   - MemberForm -> MemberSaveDto, MemberEditDto로 분리
   - 하는 김에 기존 LoginForm도 명칭 통일
   - LoginForm -> MemberLoginDto
+
+- 트러블 슈팅
+  - Caused by: org.springframework.beans.NotReadablePropertyException: Invalid property 'address' of bean class [project.gymnawa.domain.Dto.MemberSaveDto]: Bean property 'address' is not readable or has an invalid getter method: Does the return type of the getter match the parameter type of the setter?
+  - 회원가입 시, 주소를 꼭 입력하게 하기 위해 컨트롤러에서 MemberDto 앞에 @Validated를 붙이며 검증 실시
+  - html 파일에서는 address 부분에 오류 메시지를 출력하도록 th:errorclass를 추가
+  - address 필드는 MemberDto의 필드가 아닌데, th:errorclass를 붙이며 검증을 시도하려고 했기 때문에 읽을 수 없다고 오류 발생한 것
+  - 객체를 검증하기로 했으면 해당 객체의 필드만 검사할 수 있도록 하자
 
 
 ---
