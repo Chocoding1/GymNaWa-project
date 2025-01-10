@@ -21,7 +21,7 @@
                     <h4>로그인</h4>
                 </div>
                 <div class="card-body">
-                    <form th:action th:object="${loginForm}" method="post">
+                    <form th:action th:object="${memberLoginDto}" method="post">
                         <!-- 글로벌 오류 메시지 -->
                         <div th:if="${#fields.hasGlobalErrors()}">
                             <p class="field-error" th:each="err : ${#fields.globalErrors()}"
