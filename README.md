@@ -186,7 +186,7 @@ Spring MVC , JPA 복습하며 만들어보는 사이드 프로젝트
   - 원인 파익 필요
 
 #### 2025-01-10
-- Caused by: org.springframework.beans.NotReadablePropertyException: Invalid property 'address' of bean class [project.gymnawa.domain.form.MemberSaveDto]: Bean property 'address' is not readable or has an invalid getter method: Does the return type of the getter match the parameter type of the setter?
+- Caused by: org.springframework.beans.NotReadablePropertyException: Invalid property 'address' of bean class [project.gymnawa.domain.Dto.MemberSaveDto]: Bean property 'address' is not readable or has an invalid getter method: Does the return type of the getter match the parameter type of the setter?
 - 컨트롤러에서 MemberDto 앞에 @Validated를 붙이며 검증 실시
 - address 필드는 MemberDto의 필드가 아닌데, th:errorclass를 붙이며 검증을 시도하려고 했기 때문에 읽을 수 없다고 오류 발생한 것
 - 객체를 검증하기로 했으면 해당 객체의 필드만 검사할 수 있도록 하자

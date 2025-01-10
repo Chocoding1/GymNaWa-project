@@ -10,10 +10,11 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import project.gymnawa.domain.Address;
+import project.gymnawa.domain.Dto.MemberLoginDto;
+import project.gymnawa.domain.Dto.MemberSaveDto;
 import project.gymnawa.web.SessionConst;
 import project.gymnawa.domain.Member;
-import project.gymnawa.domain.form.LoginForm;
-import project.gymnawa.domain.form.MemberForm;
+import project.gymnawa.domain.Dto.MemberEditDto;
 import project.gymnawa.service.MemberService;
 
 @Controller
@@ -25,31 +26,30 @@ public class MemberController {
     private final MemberService memberService;
 
     @GetMapping("/add")
-    public String createForm(@ModelAttribute MemberForm memberForm) {
+    public String createForm(@ModelAttribute MemberSaveDto memberSaveDto) {
         return "/member/createMemberForm";
     }
 
     @PostMapping("/add")
-    public String addMember(@Validated MemberForm memberForm, BindingResult bindingResult) {
+    public String addMember(@Validated MemberSaveDto memberSaveDto, BindingResult bindingResult, HttpServletRequest request) {
 
         if (bindingResult.hasErrors()) {
             log.info("errors = " + bindingResult);
             return "/member/createMemberForm";
         }
 
-        log.info("Address : " + memberForm.getAddress());
-        log.info("Address : " + memberForm.getAddress().getZonecode());
-        log.info("Address : " + memberForm.getAddress().getAddress());
+        // @ModelAttribute로 임베디드 타입도 자동으로 바인딩이 될 줄 알았는데, 계속 null로 들어와서 일단 요청 파라미터로 반환 값 가져와서 임베디드값 따로 생성
+        Address address = new Address(request.getParameter("zoneCode"), request.getParameter("address"), request.getParameter("detailAddress"), request.getParameter("buildingName"));
 
         Member member = new Member();
-        member.createMember(memberForm.getLoginId(), memberForm.getPassword(), memberForm.getName(), memberForm.getAddress());
-        Long joinId = memberService.join(member);
+        member.createMember(memberSaveDto.getLoginId(), memberSaveDto.getPassword(), memberSaveDto.getName(), address);
+        memberService.join(member);
 
         return "redirect:/member/login";
     }
 
     @GetMapping("/login")
-    public String loginForm(@ModelAttribute LoginForm loginForm) {
+    public String loginForm(@ModelAttribute MemberLoginDto memberLoginDto) {
         return "/member/loginMemberForm";
     }
 
@@ -58,7 +58,7 @@ public class MemberController {
      * 로그인 실패하면 로그인 화면으로 이동
      */
     @PostMapping("/login")
-    public String loginMember(@Validated LoginForm loginForm, BindingResult bindingResult,
+    public String loginMember(@Validated MemberLoginDto memberLoginDto, BindingResult bindingResult,
                               HttpServletRequest request, @RequestParam(defaultValue = "/") String redirectURL) {
 
         if (bindingResult.hasErrors()) {
@@ -66,7 +66,7 @@ public class MemberController {
             return "/member/loginMemberForm";
         }
 
-        Member loginedMember = memberService.login(loginForm.getLoginId(), loginForm.getPassword());
+        Member loginedMember = memberService.login(memberLoginDto.getLoginId(), memberLoginDto.getPassword());
 
         if (loginedMember == null) {
             bindingResult.reject("loginFail", "아이디 또는 비밀번호가 맞지 않습니다.");
@@ -112,14 +112,14 @@ public class MemberController {
     public String editForm(@PathVariable Long id, Model model) {
         Member member = memberService.findOne(id);
 
-        MemberForm form = new MemberForm(member.getLoginId(), member.getPassword(), member.getName(), member.getAddress());
+        MemberEditDto form = new MemberEditDto(member.getLoginId(), member.getPassword(), member.getName(), member.getAddress());
         model.addAttribute("form", form);
 
         return "/member/editMemberForm";
     }
 
     @PostMapping("/{id}/edit")
-    public String editMember(@Validated @ModelAttribute("form") MemberForm memberForm, BindingResult bindingResult,
+    public String editMember(@Validated @ModelAttribute("form") MemberEditDto memberEditDto, BindingResult bindingResult,
                              @PathVariable Long id) {
 
         if (bindingResult.hasErrors()) {
@@ -128,7 +128,7 @@ public class MemberController {
         }
 
         // 로그인 아이디 중복 체크 필요
-        memberService.updateMember(id, memberForm.getLoginId(), memberForm.getPassword(), memberForm.getName(), memberForm.getAddress());
+        memberService.updateMember(id, memberEditDto.getLoginId(), memberEditDto.getPassword(), memberEditDto.getName(), memberEditDto.getAddress());
 
         return "redirect:/member/{id}/mypage";
     }

@@ -1,22 +1,25 @@
 package project.gymnawa.domain;
 
 import jakarta.persistence.Embeddable;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 
 @Embeddable
 @Getter
 public class Address {
 
-    private String zonecode;
+    private String zoneCode;
     private String address;
-    private String addressType;
+    private String detailAddress;
+    private String buildingName;
 
     public Address() {
     }
 
-    public Address(String zonecode, String address, String addressType) {
-        this.zonecode = zonecode;
+    public Address(String zoneCode, String address, String detailAddress, String buildingName) {
+        this.zoneCode = zoneCode;
         this.address = address;
-        this.addressType = addressType;
+        this.detailAddress = detailAddress;
+        this.buildingName = buildingName;
     }
 }
