@@ -51,6 +51,12 @@
                 <div class="mb-2"><strong>이름:</strong> <span th:text="*{name}">홍길동</span></div>
                 <div class="mb-2"><strong>아이디:</strong> <span th:text="*{loginId}">hong123</span></div>
                 <div class="mb-2"><strong>비밀번호:</strong> <span th:text="*{password}">********</span></div>
+                <div class="mb-2">
+                    <h4>주소</h4>
+                    <div><strong>주소:</strong> <span th:text="*{address.address}">서울특별시 강남구 테헤란로</span></div>
+                    <div><strong>건물명:</strong> <span th:text="*{address.buildingName}">테헤란빌딩</span></div>
+                    <div><strong>상세주소:</strong> <span th:text="*{address.detailAddress}">101호</span></div>
+                </div>
                 <a th:href="@{|/member/*{id}/edit|}" class="btn btn-primary">정보 수정</a>
             </div>
 
