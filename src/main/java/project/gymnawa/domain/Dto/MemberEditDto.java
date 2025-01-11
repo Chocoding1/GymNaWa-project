@@ -17,13 +17,9 @@ public class MemberEditDto {
     @NotBlank
     private String name;
 
-    @Embedded
-    private Address address;
-
-    public MemberEditDto(String loginId, String password, String name, Address address) {
+    public MemberEditDto(String loginId, String password, String name) {
         this.loginId = loginId;
         this.password = password;
         this.name = name;
-        this.address = address;
     }
 }
