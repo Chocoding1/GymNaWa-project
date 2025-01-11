@@ -22,4 +22,14 @@ public class Address {
         this.detailAddress = detailAddress;
         this.buildingName = buildingName;
     }
+
+    @Override
+    public String toString() {
+        return "Address{" +
+                "zoneCode='" + zoneCode + '\'' +
+                ", address='" + address + '\'' +
+                ", detailAddress='" + detailAddress + '\'' +
+                ", buildingName='" + buildingName + '\'' +
+                '}';
+    }
 }
