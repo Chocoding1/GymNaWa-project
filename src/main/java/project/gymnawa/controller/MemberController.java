@@ -112,7 +112,7 @@ public class MemberController {
     public String editForm(@PathVariable Long id, Model model) {
         Member member = memberService.findOne(id);
 
-        MemberEditDto form = new MemberEditDto(member.getLoginId(), member.getPassword(), member.getName(), member.getAddress());
+        MemberEditDto form = new MemberEditDto(member.getLoginId(), member.getPassword(), member.getName());
         model.addAttribute("form", form);
 
         return "/member/editMemberForm";
@@ -120,15 +120,16 @@ public class MemberController {
 
     @PostMapping("/{id}/edit")
     public String editMember(@Validated @ModelAttribute("form") MemberEditDto memberEditDto, BindingResult bindingResult,
-                             @PathVariable Long id) {
+                             @PathVariable Long id, HttpServletRequest request) {
 
         if (bindingResult.hasErrors()) {
             log.info("errors = " + bindingResult);
             return "/member/editMemberForm";
         }
 
+        Address address = new Address(request.getParameter("zoneCode"), request.getParameter("address"), request.getParameter("detailAddress"), request.getParameter("buildingName"));
         // 로그인 아이디 중복 체크 필요
-        memberService.updateMember(id, memberEditDto.getLoginId(), memberEditDto.getPassword(), memberEditDto.getName(), memberEditDto.getAddress());
+        memberService.updateMember(id, memberEditDto.getLoginId(), memberEditDto.getPassword(), memberEditDto.getName(), address);
 
         return "redirect:/member/{id}/mypage";
     }
