@@ -10,11 +10,11 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import project.gymnawa.domain.Address;
-import project.gymnawa.domain.Dto.MemberLoginDto;
-import project.gymnawa.domain.Dto.MemberSaveDto;
+import project.gymnawa.domain.dto.member.MemberLoginDto;
+import project.gymnawa.domain.dto.member.MemberSaveDto;
 import project.gymnawa.web.SessionConst;
 import project.gymnawa.domain.Member;
-import project.gymnawa.domain.Dto.MemberEditDto;
+import project.gymnawa.domain.dto.member.MemberEditDto;
 import project.gymnawa.service.MemberService;
 
 @Controller
@@ -25,14 +25,18 @@ public class MemberController {
 
     private final MemberService memberService;
 
-    @GetMapping("/add")
+    @GetMapping("/add/select")
     public String createForm(@ModelAttribute MemberSaveDto memberSaveDto) {
+        return "/member/memberTypeSelectForm";
+    }
+
+    @GetMapping("/add")
+    public String createMemberForm(@ModelAttribute MemberSaveDto memberSaveDto) {
         return "/member/createMemberForm";
     }
 
     @PostMapping("/add")
     public String addMember(@Validated MemberSaveDto memberSaveDto, BindingResult bindingResult, HttpServletRequest request) {
-
         if (bindingResult.hasErrors()) {
             log.info("errors = " + bindingResult);
             return "/member/createMemberForm";
