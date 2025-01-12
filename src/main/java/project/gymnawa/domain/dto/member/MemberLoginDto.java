@@ -1,4 +1,4 @@
-package project.gymnawa.domain.Dto;
+package project.gymnawa.domain.dto.member;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;

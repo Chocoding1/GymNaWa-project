@@ -1,9 +1,7 @@
-package project.gymnawa.domain.Dto;
+package project.gymnawa.domain.dto.member;
 
-import jakarta.persistence.Embedded;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
-import project.gymnawa.domain.Address;
 
 @Data
 public class MemberEditDto {
