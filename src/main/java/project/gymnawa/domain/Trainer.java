@@ -15,6 +15,9 @@ public class Trainer extends BaseTime{
     private String password;
     private String name;
 
+    @Embedded
+    private Address address;
+
     @ManyToOne(fetch = FetchType.LAZY) // 트레이너가 탈퇴했을 때, 헬스장도 같이 사라지면 안 되기 때문에 cascade 속성 제거
     @JoinColumn(name = "GYM_ID")
     private Gym gym;
