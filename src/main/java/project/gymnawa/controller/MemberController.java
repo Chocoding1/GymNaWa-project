@@ -26,7 +26,7 @@ public class MemberController {
     private final MemberService memberService;
 
     @GetMapping("/add/select")
-    public String createForm(@ModelAttribute MemberSaveDto memberSaveDto) {
+    public String selectMemberType() {
         return "/member/memberTypeSelectForm";
     }
 
