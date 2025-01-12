@@ -3,9 +3,9 @@ package project.gymnawa.domain;
 import jakarta.persistence.*;
 import lombok.Getter;
 
-@Entity
+//@Entity
 @Getter
-public class Trainer extends BaseTime{
+public class Trainer extends BaseInfo{
 
     @Id
     @GeneratedValue
@@ -36,6 +36,13 @@ public class Trainer extends BaseTime{
         this.loginId = loginId;
         this.password = password;
         this.name = name;
+    }
+
+    public void createTrainer(String loginId, String password, String name, Address address) {
+        this.loginId = loginId;
+        this.password = password;
+        this.name = name;
+        this.address = address;
     }
 
     // 편의 메서드

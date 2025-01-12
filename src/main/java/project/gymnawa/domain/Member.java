@@ -3,7 +3,7 @@ package project.gymnawa.domain;
 import jakarta.persistence.*;
 import lombok.Getter;
 
-@Entity
+//@Entity
 @Getter
 public class Member extends BaseTime{
 
