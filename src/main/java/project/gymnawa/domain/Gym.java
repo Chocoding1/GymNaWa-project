@@ -1,11 +1,12 @@
 package project.gymnawa.domain;
 
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import lombok.Getter;
 
-//@Entity
+@Entity
 @Getter
 public class Gym {
 
@@ -14,14 +15,11 @@ public class Gym {
     private Long id;
 
     private String name;
-//    private Address address;
+
+    @Embedded
+    private Address address;
     private String runtime;
     private String runday;
-
-    // 우선 단방향 연관관계로만 설계(되도록이면 단방향으로 설계하는게 좋다고 한다.)
-    // 필요하면 나중에 다시 추가하더라도 지금은 일단 단방향으로만 설계하자.
-//    @OneToMany(mappedBy = "gym")
-//    private List<Trainer> trainers = new ArrayList<>();
 
     public Gym() {
     }

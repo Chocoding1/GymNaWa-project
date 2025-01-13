@@ -38,9 +38,9 @@
 <div id="header">
     <h1>주변 헬스장을 탐색해보세요!</h1>
     <div class="buttons">
-        <span class="welcome-message" th:text="|환영합니다. ${member.name}님!|">로그인 사용자 이름</span>
+        <span class="welcome-message" th:text="|환영합니다. ${normalMember.name}님!|">로그인 사용자 이름</span>
         <button onclick="location.href='#mypage'"
-                th:onclick="|location.href='@{|/member/${member.id}/mypage|}'|">마이페이지</button>
+                th:onclick="|location.href='@{|/member/${normalMember.id}/mypage|}'|">마이페이지</button>
         <form th:action="@{/member/logout}" method="post">
             <button type="submit">로그아웃</button>
         </form>

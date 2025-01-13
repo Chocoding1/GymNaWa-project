@@ -10,15 +10,15 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import project.gymnawa.domain.Address;
-import project.gymnawa.domain.TestMember;
+import project.gymnawa.domain.Member;
+import project.gymnawa.domain.NorMember;
 import project.gymnawa.domain.dto.member.MemberLoginDto;
 import project.gymnawa.domain.dto.member.MemberSaveDto;
 import project.gymnawa.web.SessionConst;
-import project.gymnawa.domain.Member;
 import project.gymnawa.domain.dto.member.MemberEditDto;
 import project.gymnawa.service.MemberService;
 
-//@Controller
+@Controller
 @RequestMapping("/member")
 @RequiredArgsConstructor
 @Slf4j
@@ -29,28 +29,6 @@ public class MemberController {
     @GetMapping("/add/select")
     public String selectMemberType() {
         return "/member/memberTypeSelectForm";
-    }
-
-    @GetMapping("/add")
-    public String createMemberForm(@ModelAttribute MemberSaveDto memberSaveDto) {
-        return "/member/createMemberForm";
-    }
-
-    @PostMapping("/add")
-    public String addMember(@Validated MemberSaveDto memberSaveDto, BindingResult bindingResult, HttpServletRequest request) {
-        if (bindingResult.hasErrors()) {
-            log.info("errors = " + bindingResult);
-            return "/member/createMemberForm";
-        }
-
-        // @ModelAttribute로 임베디드 타입도 자동으로 바인딩이 될 줄 알았는데, 계속 null로 들어와서 일단 요청 파라미터로 반환 값 가져와서 임베디드값 따로 생성
-        Address address = new Address(request.getParameter("zoneCode"), request.getParameter("address"), request.getParameter("detailAddress"), request.getParameter("buildingName"));
-
-        Member member = new Member();
-        member.createMember(memberSaveDto.getLoginId(), memberSaveDto.getPassword(), memberSaveDto.getName(), address);
-        memberService.join(member);
-
-        return "redirect:/member/login";
     }
 
     @GetMapping("/login")
@@ -96,46 +74,5 @@ public class MemberController {
             session.invalidate();
         }
         return "redirect:/";
-    }
-
-    /**
-     * 마이페이지
-     */
-    @GetMapping("/{id}/mypage")
-    public String mypage(@PathVariable Long id, Model model) {
-        Member findMember = memberService.findOne(id);
-
-        model.addAttribute("member", findMember);
-
-        return "/member/myPage";
-    }
-
-    /**
-     * 회원 정보 수정
-     */
-    @GetMapping("/{id}/edit")
-    public String editForm(@PathVariable Long id, Model model) {
-        Member member = memberService.findOne(id);
-
-        MemberEditDto form = new MemberEditDto(member.getLoginId(), member.getPassword(), member.getName());
-        model.addAttribute("form", form);
-
-        return "/member/editMemberForm";
-    }
-
-    @PostMapping("/{id}/edit")
-    public String editMember(@Validated @ModelAttribute("form") MemberEditDto memberEditDto, BindingResult bindingResult,
-                             @PathVariable Long id, HttpServletRequest request) {
-
-        if (bindingResult.hasErrors()) {
-            log.info("errors = " + bindingResult);
-            return "/member/editMemberForm";
-        }
-
-        Address address = new Address(request.getParameter("zoneCode"), request.getParameter("address"), request.getParameter("detailAddress"), request.getParameter("buildingName"));
-        // 로그인 아이디 중복 체크 필요
-        memberService.updateMember(id, memberEditDto.getLoginId(), memberEditDto.getPassword(), memberEditDto.getName(), address);
-
-        return "redirect:/member/{id}/mypage";
     }
 }

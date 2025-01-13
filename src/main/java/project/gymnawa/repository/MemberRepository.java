@@ -4,6 +4,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.stereotype.Repository;
 import project.gymnawa.domain.Member;
+import project.gymnawa.domain.NorMember;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,10 +14,6 @@ public class MemberRepository {
 
     @PersistenceContext
     private EntityManager em;
-
-    public void save(Member member) {
-        em.persist(member);
-    }
 
     /**
      * 회원 검색

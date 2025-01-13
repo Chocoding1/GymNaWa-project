@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
+import project.gymnawa.domain.Address;
 import project.gymnawa.domain.Gym;
 import project.gymnawa.domain.Trainer;
 
@@ -26,7 +27,7 @@ class TrainerServiceTest {
     @Test
     void join() {
         //given
-        Trainer trainer = new Trainer("jsj012100", "aejhkadf", "조성진");
+        Trainer trainer = new Trainer("jsj012100", "aadfad", "조성진", new Address("서울", "강서구", "마곡동", "힐스테이트"));
 
         //when
         Long joinId = trainerService.join(trainer);
@@ -38,8 +39,8 @@ class TrainerServiceTest {
     @Test
     public void 중복_트레이너_테스트() {
         //given
-        Trainer trainer1 = new Trainer("jsj012100", "aejhkadf", "조성진");
-        Trainer trainer2 = new Trainer("jsj012100", "aveaadf", "조성진");
+        Trainer trainer1 = new Trainer("jsj012100", "aadfad", "조성진", new Address("서울", "강서구", "마곡동", "힐스테이트"));
+        Trainer trainer2 = new Trainer("jsj012100", "aadfad", "조성진", new Address("서울", "강서구", "마곡동", "힐스테이트"));
 
         //when
         trainerService.join(trainer1);
@@ -52,9 +53,9 @@ class TrainerServiceTest {
     @Test
     void findByName() {
         //given
-        Trainer trainer1 = new Trainer("jsj012100", "aejhkadf", "조성진");
-        Trainer trainer2 = new Trainer("jsj0121", "aveaadf", "조성진");
-        Trainer trainer3 = new Trainer("jsj121", "badfas", "조성환");
+        Trainer trainer1 = new Trainer("jsj012100", "aadfad", "조성진", new Address("서울", "강서구", "마곡동", "힐스테이트"));
+        Trainer trainer2 = new Trainer("jsj0121", "aadfad", "조성진", new Address("서울", "강서구", "마곡동", "힐스테이트"));
+        Trainer trainer3 = new Trainer("jsj121", "aadfad", "조성진", new Address("서울", "강서구", "마곡동", "힐스테이트"));
 
         trainerService.join(trainer1);
         trainerService.join(trainer2);
@@ -70,9 +71,9 @@ class TrainerServiceTest {
     @Test
     void findTrainers() {
         //given
-        Trainer trainer1 = new Trainer("jsj012100", "aejhkadf", "조성진");
-        Trainer trainer2 = new Trainer("jsj0121", "aveaadf", "조성진");
-        Trainer trainer3 = new Trainer("jsj121", "badfas", "조성환");
+        Trainer trainer1 = new Trainer("jsj012100", "aadfad", "조성진", new Address("서울", "강서구", "마곡동", "힐스테이트"));
+        Trainer trainer2 = new Trainer("jsj0121", "aadfad", "조성진", new Address("서울", "강서구", "마곡동", "힐스테이트"));
+        Trainer trainer3 = new Trainer("jsj121", "aadfad", "조성진", new Address("서울", "강서구", "마곡동", "힐스테이트"));
 
         trainerService.join(trainer1);
         trainerService.join(trainer2);
@@ -92,9 +93,9 @@ class TrainerServiceTest {
     @Test
     void findTrainersByGym() {
         //given
-        Trainer trainer1 = new Trainer("jsj012100", "aejhkadf", "조성진");
-        Trainer trainer2 = new Trainer("jsj0121", "aveaadf", "조성진");
-        Trainer trainer3 = new Trainer("jsj121", "badfas", "조성환");
+        Trainer trainer1 = new Trainer("jsj012100", "aadfad", "조성진", new Address("서울", "강서구", "마곡동", "힐스테이트"));
+        Trainer trainer2 = new Trainer("jsj0121", "aadfad", "조성진", new Address("서울", "강서구", "마곡동", "힐스테이트"));
+        Trainer trainer3 = new Trainer("jsj012100", "aadfad", "조성진", new Address("서울", "강서구", "마곡동", "힐스테이트"));
 
         Gym gym = new Gym("gym1");
         gymService.join(gym);

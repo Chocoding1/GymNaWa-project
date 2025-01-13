@@ -3,7 +3,9 @@ package project.gymnawa.domain;
 import jakarta.persistence.*;
 import lombok.Getter;
 
-//@Entity
+@Entity
+@DiscriminatorColumn
+@Inheritance
 @Getter
 public class Member extends BaseTime{
 
@@ -14,42 +16,21 @@ public class Member extends BaseTime{
     private String loginId;
     private String password;
     private String name;
+
     @Embedded
     private Address address;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "TRAINER_ID")
-    private Trainer trainer;
-
-    // 우선 단방향 연관관계로만 설계(되도록이면 단방향으로 설계하는게 좋다고 한다.)
-    // 필요하면 나중에 다시 추가하더라도 지금은 일단 단방향으로만 설계하자.
-//    @OneToMany(mappedBy = "member")
-//    private List<Review> reviews = new ArrayList<>();
 
     public Member() {
     }
 
-    // 회원가입 테스트용 생성자
-    public Member(String loginId, String password, String name) {
-        this.loginId = loginId;
-        this.password = password;
-        this.name = name;
-    }
-
-    /**
-     * 회원 객체 생성
-     */
-    public void createMember(String loginId, String password, String name, Address address) {
+    public Member(String loginId, String password, String name, Address address) {
         this.loginId = loginId;
         this.password = password;
         this.name = name;
         this.address = address;
     }
 
-    /**
-     * 회원 정보 수정
-     */
-    public void updateMember(String loginId, String password, String name, Address address) {
+    public void updateInfo(String loginId, String password, String name, Address address) {
         this.loginId = loginId;
         this.password = password;
         this.name = name;

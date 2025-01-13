@@ -14,8 +14,18 @@ public class TrainerRepository {
     @PersistenceContext
     private EntityManager em;
 
+    /**
+     * 트레이너 회원 저장
+     */
     public void save(Trainer trainer) {
         em.persist(trainer);
+    }
+
+    /**
+     * 트레이너 단건 조회
+     */
+    public Trainer findOne(Long id) {
+        return em.find(Trainer.class, id);
     }
 
     /**
@@ -32,15 +42,6 @@ public class TrainerRepository {
      */
     public List<Trainer> findAll() {
         return em.createQuery("select t from Trainer t", Trainer.class)
-                .getResultList();
-    }
-
-    /**
-     * 로그인 아이디 찾기
-     */
-    public List<Trainer> findByLoginId(String loginId) {
-        return em.createQuery("select t from Trainer t where t.loginId = :loginId", Trainer.class)
-                .setParameter("loginId", loginId)
                 .getResultList();
     }
 

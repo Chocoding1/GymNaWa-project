@@ -46,7 +46,7 @@
         <!-- Content -->
         <div class="col-md-9">
             <!-- Profile Section -->
-            <div id="profile" th:object="${member}">
+            <div id="profile" th:object="${trainer}">
                 <h3 class="mb-3">프로필</h3>
                 <div class="mb-2"><strong>이름:</strong> <span th:text="*{name}">홍길동</span></div>
                 <div class="mb-2"><strong>아이디:</strong> <span th:text="*{loginId}">hong123</span></div>
@@ -64,7 +64,7 @@
             <div id="reviews" class="mt-5">
                 <h3 class="mb-3">작성한 리뷰</h3>
                 <ul class="list-group">
-                    <!-- <li class="list-group-item" th:each="review : ${member.reviews}" th:text="${review}">리뷰 내용</li> -->
+                    <!-- <li class="list-group-item" th:each="review : ${normalMember.reviews}" th:text="${review}">리뷰 내용</li> -->
                 </ul>
             </div>
         </div>

@@ -3,11 +3,15 @@ package project.gymnawa.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import project.gymnawa.domain.Address;
 import project.gymnawa.domain.Gym;
+import project.gymnawa.domain.Member;
 import project.gymnawa.domain.Trainer;
+import project.gymnawa.repository.MemberRepository;
 import project.gymnawa.repository.TrainerRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 // 서비스에서 DB에 여러 번 접근할 수 있기 때문에 서비스 단에서 한 번에 쿼리를 처리하기 위해 서비스 단에 트랜잭션을 달아준다.
@@ -17,6 +21,7 @@ import java.util.List;
 public class TrainerService {
 
     private final TrainerRepository trainerRepository;
+    private final MemberRepository memberRepository;
 
     /**
      * 회원가입
@@ -29,10 +34,17 @@ public class TrainerService {
     }
 
     private void validateDuplicateTrainer(Trainer trainer) {
-        List<Trainer> result = trainerRepository.findByLoginId(trainer.getLoginId());
+        Optional<Member> result = memberRepository.findByLoginId(trainer.getLoginId());
         if (!result.isEmpty()) {
             throw new IllegalStateException("이미 존재하는 아이디입니다.");
         }
+    }
+
+    /**
+     * 트레이너 단건 조회
+     */
+    public Trainer findOne(Long id) {
+        return trainerRepository.findOne(id);
     }
 
     /**
@@ -55,5 +67,14 @@ public class TrainerService {
      */
     public List<Trainer> findByGym(Gym gym) {
         return trainerRepository.findByGym(gym);
+    }
+
+    /**
+     * 트레이너 정보 수정
+     */
+    public void updateTrainer(Long id, String loginId, String password, String name, Address address) {
+        Trainer trainer = trainerRepository.findOne(id);
+
+        trainer.updateInfo(loginId, password, name, address);
     }
 }

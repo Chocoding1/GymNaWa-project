@@ -53,13 +53,13 @@
                         <div class="mb-3">
                             <label class="form-label">주소</label>
                             <div class="input-group mb-2">
-                                <input type="text" id="zoneCode" name="zoneCode" class="form-control" placeholder="우편번호" readonly>
+                                <input type="text" th:field="*{zoneCode}" id="zoneCode" name="zoneCode" class="form-control" placeholder="우편번호" readonly>
                                 <button type="button" class="btn btn-outline-secondary" onclick="sample6_execDaumPostcode()">우편번호 찾기</button>
                             </div>
-                            <input type="text" id="address" name="address" class="form-control mb-2" placeholder="주소">
-                            <input type="text" id="detailAddress" name="detailAddress" class="form-control mb-2" placeholder="상세주소">
+                            <input type="text" th:field="*{address}" id="address" name="address" class="form-control mb-2" placeholder="주소">
+                            <input type="text" th:field="*{detailAddress}" id="detailAddress" name="detailAddress" class="form-control mb-2" placeholder="상세주소">
                             <input type="text" id="sample6_extraAddress" class="form-control" placeholder="참고항목">
-                            <input type="hidden" id="buildingName" name="buildingName">
+                            <input type="hidden" th:field="*{buildingName}" id="buildingName" name="buildingName">
                         </div>
                         <!-- 회원가입 버튼 -->
                         <div class="d-grid">

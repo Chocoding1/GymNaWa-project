@@ -198,7 +198,7 @@ Spring MVC , JPA 복습하며 만들어보는 사이드 프로젝트
   - LoginForm -> MemberLoginDto
 
 - 트러블 슈팅
-  - Caused by: org.springframework.beans.NotReadablePropertyException: Invalid property 'address' of bean class [project.gymnawa.domain.dto.member.MemberSaveDto]: Bean property 'address' is not readable or has an invalid getter method: Does the return type of the getter match the parameter type of the setter?
+  - Caused by: org.springframework.beans.NotReadablePropertyException: Invalid property 'address' of bean class [project.gymnawa.domain.dto.normalMember.MemberSaveDto]: Bean property 'address' is not readable or has an invalid getter method: Does the return type of the getter match the parameter type of the setter?
   - 회원가입 시, 주소를 꼭 입력하게 하기 위해 컨트롤러에서 MemberDto 앞에 @Validated를 붙이며 검증 실시
   - html 파일에서는 address 부분에 오류 메시지를 출력하도록 th:errorclass를 추가
   - address 필드는 MemberDto의 필드가 아닌데, th:errorclass를 붙이며 검증을 시도하려고 했기 때문에 읽을 수 없다고 오류 발생한 것

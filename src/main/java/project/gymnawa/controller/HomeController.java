@@ -6,11 +6,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.SessionAttribute;
-import project.gymnawa.web.SessionConst;
 import project.gymnawa.domain.Member;
+import project.gymnawa.web.SessionConst;
 
 @Controller
-@RequiredArgsConstructor
 public class HomeController {
 
     @Value("${api.key}")

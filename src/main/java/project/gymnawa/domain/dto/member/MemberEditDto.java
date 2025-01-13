@@ -15,9 +15,21 @@ public class MemberEditDto {
     @NotBlank
     private String name;
 
-    public MemberEditDto(String loginId, String password, String name) {
+    @NotBlank
+    private String zoneCode;
+
+    @NotBlank
+    private String address;
+    private String detailAddress;
+    private String buildingName;
+
+    public MemberEditDto(String loginId, String password, String name, String zoneCode, String address, String detailAddress, String buildingName) {
         this.loginId = loginId;
         this.password = password;
         this.name = name;
+        this.zoneCode = zoneCode;
+        this.address = address;
+        this.detailAddress = detailAddress;
+        this.buildingName = buildingName;
     }
 }

@@ -1,24 +1,22 @@
 package project.gymnawa.service;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-import project.gymnawa.domain.Member;
+import project.gymnawa.domain.Address;
+import project.gymnawa.domain.NorMember;
 
-import java.util.List;
-import java.util.Optional;
-
-import static org.assertj.core.api.Assertions.*;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
 class MemberServiceTest {
-
     @Autowired
     private MemberService memberService;
+    @Autowired
+    private NorMemberService norMemberService;
 
     /**
      * 회원가입 Test
@@ -27,53 +25,53 @@ class MemberServiceTest {
     @Test
     void join() {
         //given
-        Member member = new Member("jsj012100", "aadfad", "조성진");
+        NorMember normalMember = new NorMember("jsj012100", "aadfad", "조성진", new Address("서울", "강서구", "마곡동", "힐스테이트"));
 
         //when
-        Long loginMemberId = memberService.join(member);
+        Long loginMemberId = norMemberService.join(normalMember);
 
         //then
-        assertThat(loginMemberId).isEqualTo(member.getId());
+        assertThat(loginMemberId).isEqualTo(normalMember.getId());
     }
 
     @Test
     void 중복_회원_테스트() {
         //given
-        Member member = new Member("jsj012100", "aadfad", "조성진");
-        Member dupliMember = new Member("jsj012100", "aadfad", "조성진");
+        NorMember normalMember = new NorMember("jsj012100", "aadfad", "조성진", new Address("서울", "강서구", "마곡동", "힐스테이트"));
+        NorMember dupliNormalMember = new NorMember("jsj012100", "aadfad", "조성진", new Address("서울", "강서구", "마곡동", "힐스테이트"));
 
         //when
-        memberService.join(member);
+        memberService.join(normalMember);
 
         //then
         assertThrows(IllegalStateException.class,
-                () -> memberService.join(dupliMember));
+                () -> memberService.join(dupliNormalMember));
     }
 
     @Test
     void findOne() {
         //given
-        Member member = new Member("jsj012100", "aadfad", "조성진");
+        NorMember normalMember = new NorMember("jsj012100", "aadfad", "조성진", new Address("서울", "강서구", "마곡동", "힐스테이트"));
 
         //when
-        memberService.join(member);
-        Member findMember = memberService.findOne(member.getId());
+        memberService.join(normalMember);
+        NorMember findNormalMember = memberService.findOne(normalMember.getId());
 
         //then
-        assertThat(findMember.getName()).isEqualTo("조성진");
+        assertThat(findNormalMember.getName()).isEqualTo("조성진");
     }
 
     @Test
     void findMembers() {
         //given
-        Member member1 = new Member("jsj012100", "aadfad", "조성진");
-        Member member2 = new Member("jsj121", "brevedd", "조상현");
+        NorMember normalMember1 = new NorMember("jsj012100", "aadfad", "조성진", new Address("서울", "강서구", "마곡동", "힐스테이트"));
+        NorMember normalMember2 = new NorMember("jsj121", "ㅁㅇㅎㅁㅎㄷ규", "조성모", new Address("서울", "강서구", "마곡동", "힐스테이트"));
 
         //when
-        memberService.join(member1);
-        memberService.join(member2);
+        memberService.join(normalMember1);
+        memberService.join(normalMember2);
 
-        List<Member> result = memberService.findMembers();
+        List<NorMember> result = memberService.findMembers();
 
         //then
         assertThat(result.size()).isEqualTo(2);
@@ -82,17 +80,17 @@ class MemberServiceTest {
     @Test
     void findByLoginId() {
         //given
-        Member member = new Member("jsj012100", "aadfad", "조성진");
+        NorMember normalMember = new NorMember("jsj012100", "aadfad", "조성진", new Address("서울", "강서구", "마곡동", "힐스테이트"));
 
         //when
-        memberService.join(member);
+        memberService.join(normalMember);
 
-        Optional<Member> result = memberService.findByLoginId("jsj012100");
-        Member findMember = result.get();
+        Optional<NorMember> result = memberService.findByLoginId("jsj012100");
+        NorMember findNormalMember = result.get();
 
         //then
-        assertThat(findMember).isSameAs(member);
-        assertThat(findMember.getName()).isEqualTo("조성진");
+        assertThat(findNormalMember).isSameAs(normalMember);
+        assertThat(findNormalMember.getName()).isEqualTo("조성진");
     }
 
     /**
@@ -101,16 +99,16 @@ class MemberServiceTest {
     @Test
     void login() {
         //given
-        Member member = new Member("jsj012100", "aadfad", "조성진");
+        NorMember normalMember = new NorMember("jsj012100", "aadfad", "조성진", new Address("서울", "강서구", "마곡동", "힐스테이트"));
 
-        memberService.join(member);
+        memberService.join(normalMember);
 
         //when
-        Member loginedMember = memberService.login("jsj012100", "aadfad");
+        NorMember loginedNormalMember = memberService.login("jsj012100", "aadfad");
 
         //then
-        assertThat(loginedMember).isSameAs(member);
-        assertThat(loginedMember.getName()).isEqualTo("조성진");
+        assertThat(loginedNormalMember).isSameAs(normalMember);
+        assertThat(loginedNormalMember.getName()).isEqualTo("조성진");
     }
 
     /**
@@ -120,10 +118,10 @@ class MemberServiceTest {
     @Test
     void 로그인_실패_테스트_아이디() {
         //given
-        Member member = new Member("jsj012100", "aadfad", "조성진");
+        NorMember normalMember = new NorMember("jsj012100", "aadfad", "조성진", new Address("서울", "강서구", "마곡동", "힐스테이트"));
 
         //when
-        memberService.join(member);
+        memberService.join(normalMember);
 
         //then
         assertThrows(IllegalStateException.class,
@@ -137,13 +135,140 @@ class MemberServiceTest {
     @Test
     void 로그인_실패_테스트_비밀번호() {
         //given
-        Member member = new Member("jsj012100", "aadfad", "조성진");
+        NorMember normalMember = new NorMember("jsj012100", "aadfad", "조성진", new Address("서울", "강서구", "마곡동", "힐스테이트"));
 
-        memberService.join(member);
+        memberService.join(normalMember);
         //when
-        Member loginedMember = memberService.login("jsj012100", "sdgfhsfgfh");
+        NorMember loginedNormalMember = memberService.login("jsj012100", "sdgfhsfgfh");
 
         //then
-        assertThat(loginedMember).isNull();
+        assertThat(loginedNormalMember).isNull();
+    }
+
+    /**
+     * 회원가입 Test
+     * 중복 아이디 검증
+     */
+    @Test
+    void join() {
+        //given
+        NorMember normalMember = new NorMember("jsj012100", "aadfad", "조성진", new Address("서울", "강서구", "마곡동", "힐스테이트"));
+
+        //when
+        Long loginMemberId = memberService.join(normalMember);
+
+        //then
+        assertThat(loginMemberId).isEqualTo(normalMember.getId());
+    }
+
+    @Test
+    void 중복_회원_테스트() {
+        //given
+        NorMember normalMember = new NorMember("jsj012100", "aadfad", "조성진", new Address("서울", "강서구", "마곡동", "힐스테이트"));
+        NorMember dupliNormalMember = new NorMember("jsj012100", "aadfad", "조성진", new Address("서울", "강서구", "마곡동", "힐스테이트"));
+
+        //when
+        memberService.join(normalMember);
+
+        //then
+        assertThrows(IllegalStateException.class,
+                () -> memberService.join(dupliNormalMember));
+    }
+
+    @Test
+    void findOne() {
+        //given
+        NorMember normalMember = new NorMember("jsj012100", "aadfad", "조성진", new Address("서울", "강서구", "마곡동", "힐스테이트"));
+
+        //when
+        memberService.join(normalMember);
+        NorMember findNormalMember = memberService.findOne(normalMember.getId());
+
+        //then
+        assertThat(findNormalMember.getName()).isEqualTo("조성진");
+    }
+
+    @Test
+    void findMembers() {
+        //given
+        NorMember normalMember1 = new NorMember("jsj012100", "aadfad", "조성진", new Address("서울", "강서구", "마곡동", "힐스테이트"));
+        NorMember normalMember2 = new NorMember("jsj121", "ㅁㅇㅎㅁㅎㄷ규", "조성모", new Address("서울", "강서구", "마곡동", "힐스테이트"));
+
+        //when
+        memberService.join(normalMember1);
+        memberService.join(normalMember2);
+
+        List<NorMember> result = memberService.findMembers();
+
+        //then
+        assertThat(result.size()).isEqualTo(2);
+    }
+
+    @Test
+    void findByLoginId() {
+        //given
+        NorMember normalMember = new NorMember("jsj012100", "aadfad", "조성진", new Address("서울", "강서구", "마곡동", "힐스테이트"));
+
+        //when
+        memberService.join(normalMember);
+
+        Optional<NorMember> result = memberService.findByLoginId("jsj012100");
+        NorMember findNormalMember = result.get();
+
+        //then
+        assertThat(findNormalMember).isSameAs(normalMember);
+        assertThat(findNormalMember.getName()).isEqualTo("조성진");
+    }
+
+    /**
+     * 로그인 테스트
+     */
+    @Test
+    void login() {
+        //given
+        NorMember normalMember = new NorMember("jsj012100", "aadfad", "조성진", new Address("서울", "강서구", "마곡동", "힐스테이트"));
+
+        memberService.join(normalMember);
+
+        //when
+        NorMember loginedNormalMember = memberService.login("jsj012100", "aadfad");
+
+        //then
+        assertThat(loginedNormalMember).isSameAs(normalMember);
+        assertThat(loginedNormalMember.getName()).isEqualTo("조성진");
+    }
+
+    /**
+     * 로그인 실패 테스트
+     * 해당 아이디가 존재하지 않음
+     */
+    @Test
+    void 로그인_실패_테스트_아이디() {
+        //given
+        NorMember normalMember = new NorMember("jsj012100", "aadfad", "조성진", new Address("서울", "강서구", "마곡동", "힐스테이트"));
+
+        //when
+        memberService.join(normalMember);
+
+        //then
+        assertThrows(IllegalStateException.class,
+                () -> memberService.login("jsj121", "aadfad"));
+    }
+
+    /**
+     * 로그인 실패 테스트
+     * 아이디는 맞으나, 비밀번호가 틀림
+     */
+    @Test
+    void 로그인_실패_테스트_비밀번호() {
+        //given
+        NorMember normalMember = new NorMember("jsj012100", "aadfad", "조성진", new Address("서울", "강서구", "마곡동", "힐스테이트"));
+
+        memberService.join(normalMember);
+        //when
+        NorMember loginedNormalMember = memberService.login("jsj012100", "sdgfhsfgfh");
+
+        //then
+        assertThat(loginedNormalMember).isNull();
     }
 }
