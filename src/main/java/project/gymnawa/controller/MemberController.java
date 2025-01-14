@@ -5,17 +5,12 @@ import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import project.gymnawa.domain.Address;
 import project.gymnawa.domain.Member;
-import project.gymnawa.domain.NorMember;
 import project.gymnawa.domain.dto.member.MemberLoginDto;
-import project.gymnawa.domain.dto.member.MemberSaveDto;
 import project.gymnawa.web.SessionConst;
-import project.gymnawa.domain.dto.member.MemberEditDto;
 import project.gymnawa.service.MemberService;
 
 @Controller

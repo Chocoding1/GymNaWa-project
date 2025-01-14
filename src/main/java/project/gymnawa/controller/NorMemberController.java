@@ -1,7 +1,6 @@
 package project.gymnawa.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -11,8 +10,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import project.gymnawa.domain.Address;
 import project.gymnawa.domain.NorMember;
-import project.gymnawa.domain.dto.member.MemberEditDto;
-import project.gymnawa.domain.dto.member.MemberSaveDto;
+import project.gymnawa.domain.dto.normember.MemberEditDto;
+import project.gymnawa.domain.dto.normember.MemberSaveDto;
 import project.gymnawa.service.NorMemberService;
 
 @Controller
@@ -29,7 +28,7 @@ public class NorMemberController {
      */
     @GetMapping("/add")
     public String join(@ModelAttribute MemberSaveDto memberSaveDto) {
-        return "/member/createMemberForm";
+        return "/normember/createMemberForm";
     }
 
     /**
@@ -40,7 +39,7 @@ public class NorMemberController {
 
         if (bindingResult.hasErrors()) {
             log.info("errors = " + bindingResult);
-            return "/member/createMemberForm";
+            return "/normember/createMemberForm";
         }
 
         // @ModelAttribute로 임베디드 타입도 자동으로 바인딩이 될 줄 알았는데, 계속 null로 들어와서 일단 요청 파라미터로 반환 값 가져와서 임베디드값 따로 생성
@@ -75,9 +74,9 @@ public class NorMemberController {
                 norMember.getAddress().getZoneCode(), norMember.getAddress().getAddress(), norMember.getAddress().getDetailAddress(),
                 norMember.getAddress().getBuildingName());
 
-        model.addAttribute("form", memberEditDto);
+        model.addAttribute("memberEditDto", memberEditDto);
 
-        return "/member/editMemberForm";
+        return "/normember/editMemberForm";
     }
 
     /**
@@ -89,7 +88,7 @@ public class NorMemberController {
 
         if (bindingResult.hasErrors()) {
             log.info("errors = " + bindingResult);
-            return "/member/editMemberForm";
+            return "/normember/editMemberForm";
         }
         Address address = new Address(memberEditDto.getZoneCode(), memberEditDto.getAddress(), memberEditDto.getDetailAddress(), memberEditDto.getBuildingName());
 

@@ -1,10 +1,10 @@
-package project.gymnawa.domain.dto.member;
+package project.gymnawa.domain.dto.trainer;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
-public class MemberEditDto {
+public class TrainerEditDto {
 
     @NotBlank
     private String loginId;
@@ -23,7 +23,7 @@ public class MemberEditDto {
     private String detailAddress;
     private String buildingName;
 
-    public MemberEditDto(String loginId, String password, String name, String zoneCode, String address, String detailAddress, String buildingName) {
+    public TrainerEditDto(String loginId, String password, String name, String zoneCode, String address, String detailAddress, String buildingName) {
         this.loginId = loginId;
         this.password = password;
         this.name = name;

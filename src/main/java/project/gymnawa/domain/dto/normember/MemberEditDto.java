@@ -1,10 +1,10 @@
-package project.gymnawa.domain.dto.member;
+package project.gymnawa.domain.dto.normember;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
-public class MemberSaveDto {
+public class MemberEditDto {
 
     @NotBlank
     private String loginId;
@@ -17,15 +17,13 @@ public class MemberSaveDto {
 
     @NotBlank
     private String zoneCode;
+
     @NotBlank
     private String address;
     private String detailAddress;
     private String buildingName;
 
-    public MemberSaveDto() {
-    }
-
-    public MemberSaveDto(String loginId, String password, String name, String zoneCode, String address, String detailAddress, String buildingName) {
+    public MemberEditDto(String loginId, String password, String name, String zoneCode, String address, String detailAddress, String buildingName) {
         this.loginId = loginId;
         this.password = password;
         this.name = name;

@@ -72,6 +72,7 @@ public class TrainerService {
     /**
      * 트레이너 정보 수정
      */
+    @Transactional
     public void updateTrainer(Long id, String loginId, String password, String name, Address address) {
         Trainer trainer = trainerRepository.findOne(id);
 
