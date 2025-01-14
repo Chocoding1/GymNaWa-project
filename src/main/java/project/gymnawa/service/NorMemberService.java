@@ -17,6 +17,8 @@ public class NorMemberService {
 
     private final NorMemberRepository norMemberRepository;
     private final MemberRepository memberRepository;
+    // service 계층에서 다른 repository를 의존해도 상관 없다고는 한다. service가 다른 service를 의존해도 된다.
+    // Facade Pattern이라는 것도 있지만, 지금은 규모가 작은 프로젝트이기 때문에 굳이 사용하지 않겠다.
 
     /**
      * 회원가입 함수
