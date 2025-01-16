@@ -45,7 +45,7 @@ public class NorMemberController {
         // @ModelAttribute로 임베디드 타입도 자동으로 바인딩이 될 줄 알았는데, 계속 null로 들어와서 일단 요청 파라미터로 반환 값 가져와서 임베디드값 따로 생성
         Address address = new Address(memberSaveDto.getZoneCode(), memberSaveDto.getAddress(), memberSaveDto.getDetailAddress(), memberSaveDto.getBuildingName());
 
-        NorMember normalMember = new NorMember(memberSaveDto.getLoginId(), memberSaveDto.getPassword(), memberSaveDto.getName(), address);
+        NorMember normalMember = new NorMember(memberSaveDto.getLoginId(), memberSaveDto.getPassword(), memberSaveDto.getName(), memberSaveDto.getEmail(), address);
         norMemberService.join(normalMember);
 
         return "redirect:/member/login";
