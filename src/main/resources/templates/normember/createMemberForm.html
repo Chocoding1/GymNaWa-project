@@ -22,6 +22,28 @@
                 </div>
                 <div class="card-body">
                     <form th:action th:object="${memberSaveDto}" method="post">
+                        <!-- 이메일 -->
+                        <div class="mb-3">
+                            <label th:for="email" class="form-label">이메일</label>
+                            <div class="input-group">
+                                <input type="email" th:field="*{email}" id="email" class="form-control"
+                                       placeholder="이메일을 입력하세요">
+                                <button type="button" class="btn btn-outline-secondary" onclick="sendEmailCode()">이메일 인증</button>
+                            </div>
+                            <div class="field-error" th:errors="*{email}">
+                                이메일 오류
+                            </div>
+                        </div>
+                        <!-- 이메일 인증코드 -->
+                        <div id="emailVerification" class="mb-3 hidden">
+                            <label th:for="code" class="form-label">이메일 인증코드</label>
+                            <div class="input-group">
+                                <input type="text" id="code" class="form-control"
+                                       placeholder="인증코드를 입력하세요">
+                                <button type="button" class="btn btn-outline-secondary" onclick="verifyEmailCode()">확인</button>
+                            </div>
+                            <div id="verificationMessage" class="text-danger mt-1"></div>
+                        </div>
                         <!-- 아이디 -->
                         <div class="mb-3">
                             <label th:for="loginId" class="form-label">아이디</label>
@@ -81,6 +103,7 @@
 <!-- 다음 주소 API -->
 <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <script>
+    <!-- 입력된 주소 데이터 처리 함수 -->
     function sample6_execDaumPostcode() {
         new daum.Postcode({
             oncomplete: function(data) {
@@ -128,6 +151,65 @@
                 document.getElementById("detailAddress").focus();
             }
         }).open();
+    }
+
+    <!-- 입력된 이메일로 인증코드 발송 함수 -->
+    function sendEmailCode() {
+        const email = document.getElementById('email').value;
+        if (!email) {
+            alert('이메일을 입력하세요.');
+            return;
+        }
+        // 서버에 인증 코드 요청
+        fetch('/email/send-code', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('인증 코드가 전송되었습니다.');
+                document.getElementById('emailVerification').classList.remove('hidden');
+            } else {
+                alert(data.message || '인증 코드 전송에 실패했습니다.');
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+
+    <!-- 인증코드 검증 함수 -->
+    function verifyEmailCode() {
+        const email = document.getElementById('email').value;
+        const code = document.getElementById('code').value;
+        if (!code) {
+            alert('인증코드를 입력하세요.');
+            return;
+        }
+        // 서버에 인증 코드 확인 요청
+        fetch('/email/verify-code', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email, code })
+        })
+        .then(response => response.json())
+        .then(data => {
+            const messageElem = document.getElementById('verificationMessage');
+            if (data.success) {
+                messageElem.innerText = '인증 성공!';
+                messageElem.classList.remove('text-danger');
+                messageElem.classList.add('text-success');
+            } else {
+                messageElem.innerText = data.message || '인증 실패';
+                messageElem.classList.remove('text-success');
+                messageElem.classList.add('text-danger');
+            }
+        })
+        .catch(error => console.error('Error:', error));
     }
 </script>
 </body>
