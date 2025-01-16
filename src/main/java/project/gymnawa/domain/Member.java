@@ -16,6 +16,7 @@ public class Member extends BaseTime{
     private String loginId;
     private String password;
     private String name;
+    private String email;
 
     @Embedded
     private Address address;
@@ -23,10 +24,11 @@ public class Member extends BaseTime{
     public Member() {
     }
 
-    public Member(String loginId, String password, String name, Address address) {
+    public Member(String loginId, String password, String name, String email, Address address) {
         this.loginId = loginId;
         this.password = password;
         this.name = name;
+        this.email = email;
         this.address = address;
     }
 

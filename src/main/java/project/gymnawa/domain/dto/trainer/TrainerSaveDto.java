@@ -16,6 +16,9 @@ public class TrainerSaveDto {
     private String name;
 
     @NotBlank
+    private String email;
+
+    @NotBlank
     private String zoneCode;
     @NotBlank
     private String address;
