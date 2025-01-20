@@ -12,6 +12,7 @@ import project.gymnawa.domain.Address;
 import project.gymnawa.domain.NorMember;
 import project.gymnawa.domain.dto.normember.MemberEditDto;
 import project.gymnawa.domain.dto.normember.MemberSaveDto;
+import project.gymnawa.service.EmailService;
 import project.gymnawa.service.NorMemberService;
 
 @Controller
@@ -21,7 +22,7 @@ import project.gymnawa.service.NorMemberService;
 public class NorMemberController {
 
     private final NorMemberService norMemberService;
-
+    private final EmailService emailService;
 
     /**
      * 회원가입
@@ -39,6 +40,12 @@ public class NorMemberController {
 
         if (bindingResult.hasErrors()) {
             log.info("errors = " + bindingResult);
+            return "/normember/createMemberForm";
+        }
+
+        if (!emailService.isEmailVerified(memberSaveDto.getEmail(), request.getParameter("code"))) {
+            log.info("code : " + request.getParameter("code"));
+            bindingResult.rejectValue("email", "verified", "이메일 인증이 필요합니다.");
             return "/normember/createMemberForm";
         }
 
