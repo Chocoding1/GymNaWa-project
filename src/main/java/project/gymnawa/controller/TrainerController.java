@@ -12,6 +12,7 @@ import project.gymnawa.domain.Address;
 import project.gymnawa.domain.Trainer;
 import project.gymnawa.domain.dto.trainer.TrainerEditDto;
 import project.gymnawa.domain.dto.trainer.TrainerSaveDto;
+import project.gymnawa.service.EmailService;
 import project.gymnawa.service.TrainerService;
 
 @Controller
@@ -21,6 +22,7 @@ import project.gymnawa.service.TrainerService;
 public class TrainerController {
 
     private final TrainerService trainerService;
+    private final EmailService emailService;
 
     /**
      * 회원가입
@@ -38,7 +40,13 @@ public class TrainerController {
 
         if (bindingResult.hasErrors()) {
             log.info("errors = " + bindingResult);
-            return "/member/createTrainerForm";
+            return "/trainer/createTrainerForm";
+        }
+
+        if (!emailService.isEmailVerified(trainerSaveDto.getEmail(), request.getParameter("code"))) {
+            log.info("code : " + request.getParameter("code"));
+            bindingResult.rejectValue("email", "verified", "이메일 인증이 필요합니다.");
+            return "/trainer/createTrainerForm";
         }
 
         // @ModelAttribute로 임베디드 타입도 자동으로 바인딩이 될 줄 알았는데, 계속 null로 들어와서 일단 요청 파라미터로 반환 값 가져와서 임베디드값 따로 생성
