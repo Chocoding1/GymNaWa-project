@@ -7,7 +7,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import project.gymnawa.domain.Member;
+import project.gymnawa.repository.MemberRepository;
 
+import java.util.Optional;
 import java.util.Random;
 
 @Service
@@ -18,8 +21,11 @@ public class EmailService {
 
     private final JavaMailSender mailSender;
     private final RedisService redisService;
+    private final MemberRepository memberRepository;
 
     public void sendMail(String toEmail) throws MessagingException {
+        validateDuplicateEmail(toEmail);
+
         String code = createCode();
         MimeMessage emailForm = createEmailForm(toEmail, code);
         try {
@@ -30,6 +36,13 @@ public class EmailService {
         }
 
         redisService.setData(toEmail + code, code);
+    }
+
+    private void validateDuplicateEmail(String email) {
+        Optional<Member> result = memberRepository.findByEmail(email);
+        if (result.isPresent()) {
+            throw new IllegalStateException("해당 이메일로 가입한 이력이 있습니다.");
+        }
     }
 
     private MimeMessage createEmailForm(String toEmail, String code) throws MessagingException {
