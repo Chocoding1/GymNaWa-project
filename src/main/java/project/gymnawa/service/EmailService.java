@@ -61,12 +61,16 @@ public class EmailService {
 
     public boolean verifyCode(String email, String code) {
         String findCode = redisService.getData(email + code);
-        boolean result = findCode.equals(code);
+        if (findCode == null) {
+            return false;
+        } else {
+            boolean result = findCode.equals(code);
 
-        if (result) {
-            redisService.setData(email + code + "verified", "verified");
+            if (result) {
+                redisService.setData(email + code + "verified", "verified");
+            }
+            return result;
         }
-        return result;
     }
 
     public boolean isEmailVerified(String email, String code) {
