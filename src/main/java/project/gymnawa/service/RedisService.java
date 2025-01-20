@@ -24,8 +24,4 @@ public class RedisService {
         valueOperations.set(key, value);
         redisTemplate.expire(key, EXPIRATION, TimeUnit.SECONDS);
     }
-
-    public void deleteData(String key) {
-        redisTemplate.delete(key);
-    }
 }
