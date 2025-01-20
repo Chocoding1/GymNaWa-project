@@ -4,7 +4,6 @@ import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,6 +40,7 @@ public class EmailService {
         String text = "";
         text += "<h3>인증코드</h3>";
         text += "<h1>" + code + "</h1>";
+        text += "<p>감사합니다.</p>";
         message.setText(text, "UTF-8", "html");
 
         return message;
@@ -61,6 +61,20 @@ public class EmailService {
 
     public boolean verifyCode(String email, String code) {
         String findCode = redisService.getData(email + code);
-        return findCode.equals(code);
+        boolean result = findCode.equals(code);
+
+        if (result) {
+            redisService.setData(email + code + "verified", "verified");
+        }
+        return result;
+    }
+
+    public boolean isEmailVerified(String email, String code) {
+        String data = redisService.getData(email + code + "verified");
+        if (data == null) {
+            return false;
+        } else {
+            return data.equals("verified");
+        }
     }
 }
