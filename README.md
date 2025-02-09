@@ -293,7 +293,7 @@ Spring MVC , JPA 복습하며 만들어보는 사이드 프로젝트
 - 그리고 너무 다양한 기능들을 생각하다 보니 뭐부터 해야할 지 갈피를 못 잡는 상황도 생겼다.
 - 내가 처음에 생각한 문제점을 해결할 수 있는 최소한의 기능들을 정하고, 그것들을 먼저 구현해야겠다고 생각했다.
 - 그래서 우선 요구사항 정의와 상세 기술 구현 사항을 노션에 정리했다.
-  - https://www.notion.so/Gymnawa-19530a2dedab802cacbbe1e4431007cd?pvs=4
+  - [https://www.notion.so/Gymnawa-19530a2dedab802cacbbe1e4431007cd?pvs=4](https://spectacular-taurus-e63.notion.site/Gymnawa-19530a2dedab802cacbbe1e4431007cd)
 - 이를 바탕으로 일단 최소 기능만 돌아가는 초기 버전을 완성해야겠다. (우선 공부가 목적이기 때문에 너무 완벽하게 하려고 하지 말자..!)
 ---
 ### To-Do-List
