@@ -84,7 +84,7 @@ class GymRepositoryTest {
         gymRepository.save(gym3);
 
         //when
-        List<Gym> result = gymRepository.findByName("스포애니");
+        List<Gym> result = gymRepository.findByStoreName("스포애니");
 
         //then
         assertThat(result.size()).isEqualTo(2);
