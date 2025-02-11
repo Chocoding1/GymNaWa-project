@@ -13,10 +13,10 @@ import static org.junit.jupiter.api.Assertions.*;
 //@SpringBootTest
 @Transactional
 class MemberServiceTest {
-    @Autowired
-    private MemberService memberService;
-    @Autowired
-    private NorMemberService norMemberService;
+//    @Autowired
+//    private MemberService memberService;
+//    @Autowired
+//    private NorMemberService norMemberService;
 
     /**
      * 회원가입 Test
