@@ -21,6 +21,7 @@ public interface TrainerRepository extends JpaRepository<Trainer, Long> {
     /**
      * 트레이너 이름으로 조회
      */
+    List<Trainer> findByName(String name);
 
     /**
      * 트레이너 전체 조회
