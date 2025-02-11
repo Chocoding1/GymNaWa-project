@@ -1,29 +1,29 @@
 package project.gymnawa.repository;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import project.gymnawa.domain.NorMember;
 import project.gymnawa.domain.Review;
+import project.gymnawa.domain.Trainer;
 
 import java.util.List;
 
-@Repository
-public class ReviewRepository {
-
-    @PersistenceContext
-    private EntityManager em;
-
-    public void save(Review review) {
-        em.persist(review);
-    }
+public interface ReviewRepository extends JpaRepository<Review, Long> {
 
     /**
-     * 특정 일반 회원이 작성한 리뷰 검색
+     * 리뷰 저장
      */
-    public List<Review> findByMember(NorMember normalMember) {
-        return em.createQuery("select r from Review r where r.normalMember = :normalMember", Review.class)
-                .setParameter("normalMember", normalMember)
-                .getResultList();
-    }
+
+    /**
+     * 특정 회원이 작성한 리뷰 조회
+     */
+    @Query("select r from Review r where r.normalMember = :normalMember")
+    List<Review> findByMember(@Param("normalMember") NorMember norMember);
+
+    /**
+     * 특정 트레이너의 리뷰 조회
+     */
+    @Query("select r from Review r where r.trainer = :trainer")
+    List<Review> findByTrainer(@Param("trainer") Trainer trainer);
 }

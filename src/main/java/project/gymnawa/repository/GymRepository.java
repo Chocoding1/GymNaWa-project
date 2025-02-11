@@ -1,44 +1,29 @@
 package project.gymnawa.repository;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import project.gymnawa.domain.Gym;
 
 import java.util.List;
 
-@Repository
-public class GymRepository {
-
-    @PersistenceContext
-    private EntityManager em;
-
-    public void save(Gym gym) {
-        em.persist(gym);
-    }
+public interface GymRepository extends JpaRepository<Gym, Long> {
 
     /**
-     * 헬스장 이름으로 검색
+     * 헬스장 저장
      */
-    public List<Gym> findByName(String name) {
-        return em.createQuery("select g from Gym g where g.name = :name", Gym.class)
-                .setParameter("name", name)
-                .getResultList();
-    }
+
+    /**
+     * 헬스장 이름으로 조회
+     */
+    @Query("select g from Gym g where g.storeName = :storeName")
+    List<Gym> findByName(@Param("storeName") String storeName);
 
     /**
      * 헬스장 단 건 조회
      */
-    public Gym findOne(Long id) {
-        return em.find(Gym.class, id);
-    }
 
     /**
      * 헬스장 목록
      */
-    public List<Gym> findAll() {
-        return em.createQuery("select g from Gym g", Gym.class)
-                .getResultList();
-    }
-
 }

@@ -1,50 +1,31 @@
 package project.gymnawa.repository;
 
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import project.gymnawa.domain.Member;
-import project.gymnawa.domain.NorMember;
 
-import java.util.List;
 import java.util.Optional;
 
-@Repository
-public class MemberRepository {
-
-    @PersistenceContext
-    private EntityManager em;
+public interface MemberRepository extends JpaRepository<Member, Long> {
 
     /**
-     * 회원 검색
+     * 회원 조회
      */
-    public Member findOne(Long id) {
-        return em.find(Member.class, id);
-    }
 
     /**
-     * 전체 회원 검색
+     * 전체 회원 조회
      */
-    public List<Member> findAll() {
-        return em.createQuery("select m from Member m", Member.class)
-                .getResultList();
-    }
 
     /**
-     * 로그인 아이디 찾기
+     * 로그인 아이디로 회원 조회
      */
-    public Optional<Member> findByLoginId(String loginId) {
-        return em.createQuery("select m from Member m where m.loginId = :loginId", Member.class)
-                .setParameter("loginId", loginId)
-                .getResultList().stream().findAny();
-    }
+    @Query("select m from Member m where m.loginId = :loginId")
+    Optional<Member> findByLoginId(@Param("loginId") String loginId);
 
     /**
-     * 이메일 찾기
+     * 이메일로 회원 조회
      */
-    public Optional<Member> findByEmail(String email) {
-        return em.createQuery("select m from Member m where m.email =: email", Member.class)
-                .setParameter("email", email)
-                .getResultList().stream().findAny();
-    }
+    @Query("select m from Member m where m.email = :email")
+    Optional<Member> findByEmail(@Param("email") String email);
 }
