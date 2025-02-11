@@ -22,11 +22,17 @@ public class Gym {
 
     @Embedded
     private Address address;
-    private String runtime;
-    private String runday;
 
-    // 테스트용 생성자
-    public Gym(String storeName) {
+    public Gym(String storeName, String storePhone, Address address, String runday, String runtime) {
         this.storeName = storeName;
+        this.storePhone = storePhone;
+        this.address = address;
+        this.runday = runday;
+        this.runtime = runtime;
     }
+
+    private String runday;
+    private String runtime;
+
+
 }
