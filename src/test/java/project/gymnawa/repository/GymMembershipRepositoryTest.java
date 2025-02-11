@@ -35,14 +35,14 @@ class GymMembershipRepositoryTest {
         gymRepository.save(gym);
 
         GymMembership gymMembership = new GymMembership(member, gym, LocalDate.of(2025, 2, 11), LocalDate.of(2025, 3, 11), 400000);
-        gymMembershipRepository.save(gymMembership);
+
 
         //when
-        GymMembership findGymMembership = gymMembershipRepository.findById(gymMembership.getId()).orElse(null);
+        GymMembership savedGymMembership = gymMembershipRepository.save(gymMembership);
 
         //then
-        assertThat(findGymMembership).isEqualTo(gymMembership);
-        assertThat(findGymMembership.getEndDate()).isEqualTo(LocalDate.of(2025, 3, 11));
+        assertThat(savedGymMembership).isEqualTo(gymMembership);
+        assertThat(savedGymMembership.getEndDate()).isEqualTo(LocalDate.of(2025, 3, 11));
     }
 
     @Test
