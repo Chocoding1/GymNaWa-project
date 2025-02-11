@@ -18,6 +18,7 @@ public class Gym {
     private Long id;
 
     private String storeName;
+    private String storePhone;
 
     @Embedded
     private Address address;
