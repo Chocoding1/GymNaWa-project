@@ -26,5 +26,15 @@ public class GymTrainer {
 
     private LocalDate hireDate;
     private LocalDate contractExpireDate;
-    private String contractActive; // 계약 상태 [유효, 만료]
+
+    @Enumerated(value = EnumType.STRING)
+    private ContractStatus contractStatus; // 계약 상태 [유효, 만료]
+
+    public GymTrainer(Trainer trainer, Gym gym, LocalDate hireDate, LocalDate contractExpireDate, ContractStatus contractStatus) {
+        this.trainer = trainer;
+        this.gym = gym;
+        this.hireDate = hireDate;
+        this.contractExpireDate = contractExpireDate;
+        this.contractStatus = contractStatus;
+    }
 }
