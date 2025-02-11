@@ -11,11 +11,11 @@ public interface NorMemberRepository extends JpaRepository<NorMember, Long> {
      */
 
     /**
-     * 일반 회원 검색
+     * 일반 회원 조회
      */
 
     /**
-     * 전체 일반 회원 검색
+     * 전체 일반 회원 조회
      */
 
     /**

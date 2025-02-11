@@ -19,11 +19,11 @@ public interface TrainerRepository extends JpaRepository<Trainer, Long> {
      */
 
     /**
-     * 트레이너 이름으로 검색
+     * 트레이너 이름으로 조회
      */
 
     /**
-     * 트레이너 전체 검색
+     * 트레이너 전체 조회
      */
 
     // 이건 이제 트레이너 고용 저장소에서 해야할 기능
@@ -34,7 +34,6 @@ public interface TrainerRepository extends JpaRepository<Trainer, Long> {
 //    List<Trainer> findByGym(@Param("gym") Gym gym);
 
     /**
-     *
      * 트레이너 삭제
      */
 }
