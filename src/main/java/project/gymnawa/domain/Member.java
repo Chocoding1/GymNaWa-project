@@ -20,25 +20,27 @@ public class Member extends BaseTime{
     private String password;
     private String name;
     private String email;
-    private String sex;
+
+    @Enumerated(value = EnumType.STRING)
+    private Gender gender;
 
     @Embedded
     private Address address;
 
-    public Member(String loginId, String password, String name, String email, Address address, String sex) {
+    public Member(String loginId, String password, String name, String email, Address address, Gender gender) {
         this.loginId = loginId;
         this.password = password;
         this.name = name;
         this.email = email;
         this.address = address;
-        this.sex =  sex;
+        this.gender = gender;
     }
 
-    public void updateInfo(String loginId, String password, String name, Address address, String sex) {
+    public void updateInfo(String loginId, String password, String name, Address address, Gender gender) {
         this.loginId = loginId;
         this.password = password;
         this.name = name;
         this.address = address;
-        this.sex = sex;
+        this.gender = gender;
     }
 }
