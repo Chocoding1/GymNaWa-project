@@ -36,14 +36,13 @@ class GymTrainerRepositoryTest {
         gymRepository.save(gym);
 
         GymTrainer gymTrainer = new GymTrainer(trainer, gym, LocalDate.of(2025, 2, 11), LocalDate.of(2026, 2, 11), ContractStatus.ACTIVE);
-        gymTrainerRepository.save(gymTrainer);
 
         //when
-        GymTrainer findGymTrainer = gymTrainerRepository.findById(gymTrainer.getId()).orElse(null);
+        GymTrainer savedGymTrainer = gymTrainerRepository.save(gymTrainer);
 
         //then
-        assertThat(findGymTrainer).isEqualTo(gymTrainer);
-        assertThat(findGymTrainer.getTrainer().getName()).isEqualTo("조성민");
+        assertThat(savedGymTrainer).isEqualTo(gymTrainer);
+        assertThat(savedGymTrainer.getTrainer().getName()).isEqualTo("조성민");
     }
 
     @Test
