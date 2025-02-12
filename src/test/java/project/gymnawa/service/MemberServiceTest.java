@@ -1,163 +1,200 @@
 package project.gymnawa.service;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import project.gymnawa.domain.Address;
-import project.gymnawa.domain.NorMember;
+import project.gymnawa.domain.Gender;
+import project.gymnawa.domain.Member;
+import project.gymnawa.repository.MemberRepository;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import java.util.*;
+
+import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
-//@SpringBootTest
-@Transactional
-class MemberServiceTest {
-//    @Autowired
-//    private MemberService memberService;
-//    @Autowired
-//    private NorMemberService norMemberService;
+@ExtendWith(MockitoExtension.class)
+public class MemberServiceTest {
 
-    /**
-     * 회원가입 Test
-     * 중복 아이디 검증
-     */
-/*
+    @Mock
+    MemberRepository memberRepository;
+
+    @InjectMocks
+    MemberService memberService;
+
     @Test
-    void join() {
+    @DisplayName("회원 조회")
+    void findMember() {
         //given
-        NorMember normalMember = new NorMember("jsj012100", "aadfad", "조성진", new Address("서울", "강서구", "마곡동", "힐스테이트"));
+        Long memberId = 1L;
+        Address address = new Address("12345", "서울", "강서구", "마곡동");
+        Member member = new Member("jsj012100", "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
+
+        when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
 
         //when
-        Long loginMemberId = norMemberService.join(normalMember);
+        Member findMember = memberService.findOne(memberId);
 
         //then
-        assertThat(loginMemberId).isEqualTo(normalMember.getId());
+        assertThat(findMember).isNotNull();
+        assertThat(findMember).isEqualTo(member);
+        verify(memberRepository, times(1)).findById(memberId);
     }
-*/
 
-/*
     @Test
-    void 중복_회원_테스트() {
+    @DisplayName("존재하지 않는 회원 조회")
+    void findEmptyMember() {
         //given
-        NorMember normalMember = new NorMember("jsj012100", "aadfad", "조성진", new Address("서울", "강서구", "마곡동", "힐스테이트"));
-        NorMember dupliNormalMember = new NorMember("jsj012100", "aadfad", "조성진", new Address("서울", "강서구", "마곡동", "힐스테이트"));
+        Long memberId = 1L;
 
-        //when
-        memberService.join(normalMember);
+        when(memberRepository.findById(memberId)).thenReturn(Optional.empty());
 
-        //then
-        assertThrows(IllegalStateException.class,
-                () -> memberService.join(dupliNormalMember));
+        //when & then
+        assertThrows(NoSuchElementException.class, () -> memberService.findOne(1L));
+        verify(memberRepository, times(1)).findById(memberId);
     }
-*/
 
-/*
     @Test
-    void findOne() {
-        //given
-        NorMember normalMember = new NorMember("jsj012100", "aadfad", "조성진", new Address("서울", "강서구", "마곡동", "힐스테이트"));
-
-        //when
-        memberService.join(normalMember);
-        NorMember findNormalMember = memberService.findOne(normalMember.getId());
-
-        //then
-        assertThat(findNormalMember.getName()).isEqualTo("조성진");
-    }
-*/
-
-/*
-    @Test
+    @DisplayName("회원 전체 조회")
     void findMembers() {
         //given
-        NorMember normalMember1 = new NorMember("jsj012100", "aadfad", "조성진", new Address("서울", "강서구", "마곡동", "힐스테이트"));
-        NorMember normalMember2 = new NorMember("jsj121", "ㅁㅇㅎㅁㅎㄷ규", "조성모", new Address("서울", "강서구", "마곡동", "힐스테이트"));
+        Address address = new Address("12345", "서울", "강서구", "마곡동");
+        Member member1 = new Member("jsj012100", "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
+        Member member2 = new Member("jsj121", "123456", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
+        Member member3 = new Member("jsj012", "1234567", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
+
+        List<Member> members = Arrays.asList(member1, member2, member3);
+
+        when(memberRepository.findAll()).thenReturn(members);
 
         //when
-        memberService.join(normalMember1);
-        memberService.join(normalMember2);
-
-        List<NorMember> result = memberService.findMembers();
+        List<Member> result = memberService.findMembers();
 
         //then
-        assertThat(result.size()).isEqualTo(2);
+        assertThat(result.size()).isEqualTo(3);
+        verify(memberRepository, times(1)).findAll();
     }
-*/
 
-/*
     @Test
-    void findByLoginId() {
+    @DisplayName("로그인 아이디로 회원 조회")
+    void findMemberByLoginId() {
         //given
-        NorMember normalMember = new NorMember("jsj012100", "aadfad", "조성진", new Address("서울", "강서구", "마곡동", "힐스테이트"));
+        String loginId = "jsj012100";
+        Address address = new Address("12345", "서울", "강서구", "마곡동");
+        Member member = new Member(loginId, "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
+
+        when(memberRepository.findByLoginId(loginId)).thenReturn(Optional.of(member));
 
         //when
-        memberService.join(normalMember);
-
-        Optional<NorMember> result = memberService.findByLoginId("jsj012100");
-        NorMember findNormalMember = result.get();
+        Member findMember = memberService.findByLoginId(loginId);
 
         //then
-        assertThat(findNormalMember).isSameAs(normalMember);
-        assertThat(findNormalMember.getName()).isEqualTo("조성진");
+        assertThat(findMember).isNotNull();
+        assertThat(findMember).isEqualTo(member);
+        verify(memberRepository, times(1)).findByLoginId(loginId);
     }
-*/
 
-    /**
-     * 로그인 테스트
-     */
-/*
     @Test
-    void login() {
+    @DisplayName("존재하지 않는 아이디로 회원 조회")
+    void findMemberByEmptyLoginId() {
         //given
-        NorMember normalMember = new NorMember("jsj012100", "aadfad", "조성진", new Address("서울", "강서구", "마곡동", "힐스테이트"));
+        String loginId = "jsj012100";
 
-        memberService.join(normalMember);
+        when(memberRepository.findByLoginId(loginId)).thenReturn(Optional.empty());
 
-        //when
-        NorMember loginedNormalMember = memberService.login("jsj012100", "aadfad");
-
-        //then
-        assertThat(loginedNormalMember).isSameAs(normalMember);
-        assertThat(loginedNormalMember.getName()).isEqualTo("조성진");
+        //when & then
+        assertThrows(NoSuchElementException.class, () -> memberService.findByLoginId(loginId));
+        verify(memberRepository, times(1)).findByLoginId(loginId);
     }
-*/
 
-    /**
-     * 로그인 실패 테스트
-     * 해당 아이디가 존재하지 않음
-     */
-/*
     @Test
-    void 로그인_실패_테스트_아이디() {
+    @DisplayName("이메일로 회원 조회")
+    void findMemberByEmail() {
         //given
-        NorMember normalMember = new NorMember("jsj012100", "aadfad", "조성진", new Address("서울", "강서구", "마곡동", "힐스테이트"));
+        String email = "galmeagi2@naver.com";
+        Address address = new Address("12345", "서울", "강서구", "마곡동");
+        Member member = new Member("jsj012100", "1234", "조성진", email, address, Gender.MALE);
+
+        when(memberRepository.findByEmail(email)).thenReturn(Optional.of(member));
 
         //when
-        memberService.join(normalMember);
+        Member findMember = memberService.findByEmail(email);
 
         //then
-        assertThrows(IllegalStateException.class,
-                () -> memberService.login("jsj121", "aadfad"));
+        assertThat(findMember).isNotNull();
+        assertThat(findMember).isEqualTo(member);
+        verify(memberRepository, times(1)).findByEmail(email);
     }
-*/
 
-    /**
-     * 로그인 실패 테스트
-     * 아이디는 맞으나, 비밀번호가 틀림
-     */
-/*
     @Test
-    void 로그인_실패_테스트_비밀번호() {
+    @DisplayName("존재하지 않는 이메일로 회원 조회")
+    void findMemberByEmptyEmail() {
         //given
-        NorMember normalMember = new NorMember("jsj012100", "aadfad", "조성진", new Address("서울", "강서구", "마곡동", "힐스테이트"));
+        String email = "galmeagi2@naver.com";
 
-        memberService.join(normalMember);
+        when(memberRepository.findByEmail(email)).thenReturn(Optional.empty());
+
+        //when & then
+        assertThrows(NoSuchElementException.class, () -> memberService.findByEmail(email));
+        verify(memberRepository, times(1)).findByEmail(email);
+    }
+
+    @Test
+    @DisplayName("로그인 성공")
+    void loginSuccess() {
+        //given
+        String loginId = "jsj012100";
+        String password = "1234";
+        Address address = new Address("12345", "서울", "강서구", "마곡동");
+        Member member = new Member(loginId, password, "조성진", "galmeagi2@naver.com", address, Gender.MALE);
+
+        when(memberRepository.findByLoginId(loginId)).thenReturn(Optional.of(member));
+
         //when
-        NorMember loginedNormalMember = memberService.login("jsj012100", "sdgfhsfgfh");
+        Member loginedMember = memberService.login(loginId, password);
 
         //then
-        assertThat(loginedNormalMember).isNull();
+        assertThat(loginedMember).isNotNull();
+        verify(memberRepository, times(1)).findByLoginId(loginId);
     }
-*/
+
+    @Test
+    @DisplayName("로그인 실패 - 존재하지 않는 아이디")
+    void loginFail_WrongLoginId() {
+        //given
+        String loginId = "jsj012100";
+        String password = "1234";
+
+        when(memberRepository.findByLoginId(loginId)).thenReturn(Optional.empty());
+
+        //when
+        Member loginedMember = memberService.login(loginId, password);
+
+        //then
+        assertThat(loginedMember).isNull();
+        verify(memberRepository, times(1)).findByLoginId(loginId);
+    }
+
+    @Test
+    @DisplayName("로그인 실패 - 잘못된 비밀번호")
+    void loginFail_WrongPassword() {
+        //given
+        String loginId = "jsj012100";
+        String password = "1234";
+        Address address = new Address("12345", "서울", "강서구", "마곡동");
+        Member member = new Member(loginId, "123456", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
+
+        when(memberRepository.findByLoginId(loginId)).thenReturn(Optional.of(member));
+
+        //when
+        Member loginedMember = memberService.login(loginId, password);
+
+        //then
+        assertThat(loginedMember).isNull();
+        verify(memberRepository, times(1)).findByLoginId(loginId);
+    }
 }
