@@ -1,6 +1,5 @@
 package project.gymnawa.repository;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,11 +15,11 @@ import static org.assertj.core.api.Assertions.*;
 class GymMembershipRepositoryTest {
 
     @Autowired
-    private GymMembershipRepository gymMembershipRepository;
+    GymMembershipRepository gymMembershipRepository;
     @Autowired
-    private NorMemberRepository norMemberRepository;
+    NorMemberRepository norMemberRepository;
     @Autowired
-    private GymRepository gymRepository;
+    GymRepository gymRepository;
 
     @Test
     @DisplayName("헬스장 등록 정보 저장 테스트")

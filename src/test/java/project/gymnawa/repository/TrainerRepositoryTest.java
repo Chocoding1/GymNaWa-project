@@ -11,13 +11,12 @@ import project.gymnawa.domain.Trainer;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 class TrainerRepositoryTest {
 
     @Autowired
-    private TrainerRepository trainerRepository;
+    TrainerRepository trainerRepository;
 
     @Test
     @DisplayName("트레이너 저장 테스트")

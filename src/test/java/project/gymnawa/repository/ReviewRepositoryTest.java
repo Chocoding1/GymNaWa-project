@@ -9,17 +9,16 @@ import project.gymnawa.domain.*;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 class ReviewRepositoryTest {
 
     @Autowired
-    private ReviewRepository reviewRepository;
+    ReviewRepository reviewRepository;
     @Autowired
-    private NorMemberRepository norMemberRepository;
+    NorMemberRepository norMemberRepository;
     @Autowired
-    private TrainerRepository trainerRepository;
+    TrainerRepository trainerRepository;
 
     @Test
     @DisplayName("리뷰 저장 테스트")
@@ -59,7 +58,7 @@ class ReviewRepositoryTest {
         reviewRepository.save(review2);
 
         //when
-        List<Review> result = reviewRepository.findByMember(norMember);
+        List<Review> result = reviewRepository.findByNorMember(norMember);
 
         //then
         assertThat(result.size()).isEqualTo(2);
@@ -71,7 +70,7 @@ class ReviewRepositoryTest {
         //given
         Address address = new Address("12345", "서울", "강서구", "마곡동");
         NorMember norMember1 = new NorMember("jsj012100", "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
-        NorMember norMember2 = new NorMember("jsj121", "123456", "조성als", "galmeagi2@gmail.com", address, Gender.MALE);
+        NorMember norMember2 = new NorMember("jsj121", "123456", "조성민", "galmeagi2@gmail.com", address, Gender.MALE);
         norMemberRepository.save(norMember1);
         norMemberRepository.save(norMember2);
 

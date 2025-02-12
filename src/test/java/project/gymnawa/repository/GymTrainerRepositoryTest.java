@@ -1,6 +1,5 @@
 package project.gymnawa.repository;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,17 +10,16 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 class GymTrainerRepositoryTest {
 
     @Autowired
-    private GymTrainerRepository gymTrainerRepository;
+    GymTrainerRepository gymTrainerRepository;
     @Autowired
-    private TrainerRepository trainerRepository;
+    TrainerRepository trainerRepository;
     @Autowired
-    private GymRepository gymRepository;
+    GymRepository gymRepository;
 
     @Test
     @DisplayName("계약 정보 저장 테스트")

@@ -1,6 +1,5 @@
 package project.gymnawa.repository;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,13 +11,12 @@ import project.gymnawa.domain.NorMember;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
 class NorMemberRepositoryTest {
 
     @Autowired
-    private NorMemberRepository norMemberRepository;
+    NorMemberRepository norMemberRepository;
 
     @Test
     @DisplayName("일반 회원 저장 테스트")
