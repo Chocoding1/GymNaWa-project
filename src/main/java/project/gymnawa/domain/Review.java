@@ -19,15 +19,15 @@ public class Review extends BaseTime{
 
     @ManyToOne(fetch = FetchType.LAZY) // 리뷰가 삭제된다고 해서 회원 정보도 삭제되면 안 되기 때문에 cascade 속성 제거
     @JoinColumn(name = "MEMBER_ID")
-    private NorMember normalMember;
+    private NorMember norMember;
 
     @ManyToOne(fetch = FetchType.LAZY)  // 리뷰가 삭제된다고 해서 트레이너 정보도 삭제되면 안 되기 때문에 cascade 속성 제거
     @JoinColumn(name = "TRAINER_ID")
     private Trainer trainer;
 
-    public Review(String content, NorMember normalMember, Trainer trainer) {
+    public Review(String content, NorMember norMember, Trainer trainer) {
         this.content = content;
-        this.normalMember = normalMember;
+        this.norMember = norMember;
         this.trainer = trainer;
     }
 }

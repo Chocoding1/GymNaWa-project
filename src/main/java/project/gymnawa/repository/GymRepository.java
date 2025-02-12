@@ -17,8 +17,6 @@ public interface GymRepository extends JpaRepository<Gym, Long> {
      * 헬스장 이름으로 조회
      */
     List<Gym> findByStoreName(String storeName);
-//    @Query("select g from Gym g where g.storeName = :storeName")
-//    List<Gym> findByName(@Param("storeName") String storeName);
 
     /**
      * 헬스장 단 건 조회

@@ -20,12 +20,10 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
     /**
      * 로그인 아이디로 회원 조회
      */
-    @Query("select m from Member m where m.loginId = :loginId")
-    Optional<Member> findByLoginId(@Param("loginId") String loginId);
+    Optional<Member> findByLoginId(String loginId);
 
     /**
      * 이메일로 회원 조회
      */
-    @Query("select m from Member m where m.email = :email")
-    Optional<Member> findByEmail(@Param("email") String email);
+    Optional<Member> findByEmail(String email);
 }

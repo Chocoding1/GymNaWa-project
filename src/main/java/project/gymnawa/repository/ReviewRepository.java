@@ -18,12 +18,10 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     /**
      * 특정 회원이 작성한 리뷰 조회
      */
-    @Query("select r from Review r where r.normalMember = :normalMember")
-    List<Review> findByMember(@Param("normalMember") NorMember norMember);
+    List<Review> findByNorMember(NorMember norMember);
 
     /**
      * 특정 트레이너의 리뷰 조회
      */
-    @Query("select r from Review r where r.trainer = :trainer")
-    List<Review> findByTrainer(@Param("trainer") Trainer trainer);
+    List<Review> findByTrainer(Trainer trainer);
 }
