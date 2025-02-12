@@ -99,7 +99,7 @@ public class MemberServiceTest {
     }
 
     @Test
-    @DisplayName("존재하지 않는 아이디로 회원 조회")
+    @DisplayName("존재하지 않는 로그인 아이디로 회원 조회")
     void findMemberByEmptyLoginId() {
         //given
         String loginId = "jsj012100";
