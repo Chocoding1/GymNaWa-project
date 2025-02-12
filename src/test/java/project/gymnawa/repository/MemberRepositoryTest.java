@@ -10,11 +10,15 @@ import project.gymnawa.domain.Gender;
 import project.gymnawa.domain.Member;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * @DataJpaTest
+ * JPA 관련 테스트 설정만 로드
+ * 실제 데이터베이스가 아닌 내장 데이터베이스 사용
+ * 기본적으로 @Transactional을 포함하고 있어 테스트가 완료되면 자동으로 rollback
+ */
 @DataJpaTest
 class MemberRepositoryTest {
 
