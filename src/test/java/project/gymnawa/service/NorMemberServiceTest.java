@@ -33,7 +33,7 @@ class NorMemberServiceTest {
 
     @Test
     @DisplayName("회원가입 성공")
-    void join() {
+    void joinSuccess() {
         //given
         Address address = new Address("12345", "서울", "강서구", "마곡동");
         NorMember norMember = NorMember.builder()
@@ -64,7 +64,7 @@ class NorMemberServiceTest {
 
     @Test
     @DisplayName("회원가입 실패 - 중복 아이디는 입력 불가")
-    void join_duplicate_loginId() {
+    void joinFail() {
         //given
         NorMember norMember = createNorMember("jsj012100", "aadfad", "조성진");
         NorMember dupliMember = createNorMember("jsj012100", "aadfad", "조성진");
