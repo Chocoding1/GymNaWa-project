@@ -30,7 +30,7 @@ class GymMembershipRepositoryTest {
         NorMember member = createNorMember("jsj012100", "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
         norMemberRepository.save(member);
 
-        Gym gym = new Gym("라온짐", "02-1234-5678", address, "매일", "06:00 ~ 22:00");
+        Gym gym = createGym("라온짐", "02-1234-5678", address, "매일", "06:00 ~ 22:00");
         gymRepository.save(gym);
 
         GymMembership gymMembership = new GymMembership(member, gym, LocalDate.of(2025, 2, 11), LocalDate.of(2025, 3, 11), 400000);
@@ -56,7 +56,7 @@ class GymMembershipRepositoryTest {
         norMemberRepository.save(member1);
         norMemberRepository.save(member2);
 
-        Gym gym = new Gym("라온짐", "02-1234-5678", address, "매일", "06:00 ~ 22:00");
+        Gym gym = createGym("라온짐", "02-1234-5678", address, "매일", "06:00 ~ 22:00");
         gymRepository.save(gym);
 
         GymMembership gymMembership1 = new GymMembership(member1, gym, LocalDate.of(2025, 2, 11), LocalDate.of(2025, 3, 11), 400000);
@@ -85,7 +85,7 @@ class GymMembershipRepositoryTest {
         norMemberRepository.save(member1);
         norMemberRepository.save(member2);
 
-        Gym gym = new Gym("라온짐", "02-1234-5678", address, "매일", "06:00 ~ 22:00");
+        Gym gym = createGym("라온짐", "02-1234-5678", address, "매일", "06:00 ~ 22:00");
         gymRepository.save(gym);
 
         GymMembership gymMembership1 = new GymMembership(member1, gym, LocalDate.of(2025, 2, 11), LocalDate.of(2025, 3, 11), 400000);
@@ -111,6 +111,16 @@ class GymMembershipRepositoryTest {
                 .email(email)
                 .address(address)
                 .gender(gender)
+                .build();
+    }
+
+    private Gym createGym(String storeName, String storephone, Address address, String runday, String runtime) {
+        return Gym.builder()
+                .storeName(storeName)
+                .storePhone(storephone)
+                .address(address)
+                .runday(runday)
+                .runtime(runtime)
                 .build();
     }
 }

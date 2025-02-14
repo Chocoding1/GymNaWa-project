@@ -30,7 +30,7 @@ class GymTrainerRepositoryTest {
         Trainer trainer = createTrainer("jsj121", "123456", "조성민", "galmeagi2@gmail.com", address, Gender.MALE);
         trainerRepository.save(trainer);
 
-        Gym gym = new Gym("라온짐", "02-1234-5678", address, "매일", "06:00 ~ 22:00");
+        Gym gym = createGym("라온짐", "02-1234-5678", address, "매일", "06:00 ~ 22:00");
         gymRepository.save(gym);
 
         GymTrainer gymTrainer = new GymTrainer(trainer, gym, LocalDate.of(2025, 2, 11), LocalDate.of(2026, 2, 11), ContractStatus.ACTIVE);
@@ -52,8 +52,8 @@ class GymTrainerRepositoryTest {
         Trainer trainer = createTrainer("jsj121", "123456", "조성민", "galmeagi2@gmail.com", address, Gender.MALE);
         trainerRepository.save(trainer);
 
-        Gym gym1 = new Gym("라온짐", "02-1234-5678", address, "매일", "06:00 ~ 22:00");
-        Gym gym2 = new Gym("스포애니", "02-5678-1234", address, "매일", "06:00 ~ 22:00");
+        Gym gym1 = createGym("라온짐", "02-1234-5678", address, "매일", "06:00 ~ 22:00");
+        Gym gym2 = createGym("스포애니", "02-5678-1234", address, "매일", "06:00 ~ 22:00");
 
         gymRepository.save(gym1);
         gymRepository.save(gym2);
@@ -84,8 +84,8 @@ class GymTrainerRepositoryTest {
         trainerRepository.save(trainer1);
         trainerRepository.save(trainer2);
 
-        Gym gym1 = new Gym("라온짐", "02-1234-5678", address, "매일", "06:00 ~ 22:00");
-        Gym gym2 = new Gym("스포애니", "02-5678-1234", address, "매일", "06:00 ~ 22:00");
+        Gym gym1 = createGym("라온짐", "02-1234-5678", address, "매일", "06:00 ~ 22:00");
+        Gym gym2 = createGym("스포애니", "02-5678-1234", address, "매일", "06:00 ~ 22:00");
 
         gymRepository.save(gym1);
         gymRepository.save(gym2);
@@ -114,6 +114,16 @@ class GymTrainerRepositoryTest {
                 .email(email)
                 .address(address)
                 .gender(gender)
+                .build();
+    }
+
+    private Gym createGym(String storeName, String storephone, Address address, String runday, String runtime) {
+        return Gym.builder()
+                .storeName(storeName)
+                .storePhone(storephone)
+                .address(address)
+                .runday(runday)
+                .runtime(runtime)
                 .build();
     }
 }

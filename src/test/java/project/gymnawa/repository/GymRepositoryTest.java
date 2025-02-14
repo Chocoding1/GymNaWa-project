@@ -22,7 +22,7 @@ class GymRepositoryTest {
     void save() {
         //given
         Address address = new Address("12345", "서울", "강서구", "마곡동");
-        Gym gym = new Gym("라온짐", "02-1234-5678", address, "매일", "06:00 ~ 22:00");
+        Gym gym = createGym("라온짐", "02-1234-5678", address, "매일", "06:00 ~ 22:00");
 
         //when
         Gym savedGym = gymRepository.save(gym);
@@ -37,7 +37,7 @@ class GymRepositoryTest {
     void findById() {
         //given
         Address address = new Address("12345", "서울", "강서구", "마곡동");
-        Gym gym = new Gym("라온짐", "02-1234-5678", address, "매일", "06:00 ~ 22:00");
+        Gym gym = createGym("라온짐", "02-1234-5678", address, "매일", "06:00 ~ 22:00");
 
         gymRepository.save(gym);
 
@@ -54,8 +54,8 @@ class GymRepositoryTest {
     void findAll() {
         //given
         Address address = new Address("12345", "서울", "강서구", "마곡동");
-        Gym gym1 = new Gym("라온짐", "02-1234-5678", address, "매일", "06:00 ~ 22:00");
-        Gym gym2 = new Gym("스포애니", "02-9876-5432", address, "매일", "06:00 ~ 22:00");
+        Gym gym1 = createGym("라온짐", "02-1234-5678", address, "매일", "06:00 ~ 22:00");
+        Gym gym2 = createGym("스포애니", "02-9876-5432", address, "매일", "06:00 ~ 22:00");
 
         gymRepository.save(gym1);
         gymRepository.save(gym2);
@@ -73,9 +73,9 @@ class GymRepositoryTest {
     void findByName() {
         //given
         Address address = new Address("12345", "서울", "강서구", "마곡동");
-        Gym gym1 = new Gym("라온짐", "02-1234-5678", address, "매일", "06:00 ~ 22:00");
-        Gym gym2 = new Gym("스포애니", "02-9876-5432", address, "매일", "06:00 ~ 22:00");
-        Gym gym3 = new Gym("스포애니", "02-7600-7470", address, "매일", "06:00 ~ 22:00");
+        Gym gym1 = createGym("라온짐", "02-1234-5678", address, "매일", "06:00 ~ 22:00");
+        Gym gym2 = createGym("스포애니", "02-9876-5432", address, "매일", "06:00 ~ 22:00");
+        Gym gym3 = createGym("스포애니", "02-7600-7470", address, "매일", "06:00 ~ 22:00");
 
         gymRepository.save(gym1);
         gymRepository.save(gym2);
@@ -87,5 +87,15 @@ class GymRepositoryTest {
         //then
         assertThat(result.size()).isEqualTo(2);
         assertThat(result).contains(gym2, gym3);
+    }
+
+    private Gym createGym(String storeName, String storephone, Address address, String runday, String runtime) {
+        return Gym.builder()
+                .storeName(storeName)
+                .storePhone(storephone)
+                .address(address)
+                .runday(runday)
+                .runtime(runtime)
+                .build();
     }
 }
