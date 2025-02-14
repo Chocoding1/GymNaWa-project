@@ -27,9 +27,9 @@ class NorMemberServiceTest {
     private NorMemberService norMemberService;
 
     @Mock
-    private NorMemberRepository norMemberRepository;
+    NorMemberRepository norMemberRepository;
     @Mock
-    private MemberRepository memberRepository;
+    MemberRepository memberRepository;
 
     @Test
     @DisplayName("회원가입 성공")
