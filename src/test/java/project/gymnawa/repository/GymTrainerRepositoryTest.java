@@ -27,7 +27,7 @@ class GymTrainerRepositoryTest {
         //given
         Address address = new Address("12345", "서울", "강서구", "마곡동");
 
-        Trainer trainer = new Trainer("jsj121", "123456", "조성민", "galmeagi2@gmail.com", address, Gender.MALE);
+        Trainer trainer = createTrainer("jsj121", "123456", "조성민", "galmeagi2@gmail.com", address, Gender.MALE);
         trainerRepository.save(trainer);
 
         Gym gym = new Gym("라온짐", "02-1234-5678", address, "매일", "06:00 ~ 22:00");
@@ -49,7 +49,7 @@ class GymTrainerRepositoryTest {
         //given
         Address address = new Address("12345", "서울", "강서구", "마곡동");
 
-        Trainer trainer = new Trainer("jsj121", "123456", "조성민", "galmeagi2@gmail.com", address, Gender.MALE);
+        Trainer trainer = createTrainer("jsj121", "123456", "조성민", "galmeagi2@gmail.com", address, Gender.MALE);
         trainerRepository.save(trainer);
 
         Gym gym1 = new Gym("라온짐", "02-1234-5678", address, "매일", "06:00 ~ 22:00");
@@ -78,8 +78,8 @@ class GymTrainerRepositoryTest {
         //given
         Address address = new Address("12345", "서울", "강서구", "마곡동");
 
-        Trainer trainer1 = new Trainer("jsj012100", "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
-        Trainer trainer2 = new Trainer("jsj121", "123456", "조성민", "galmeagi2@gmail.com", address, Gender.MALE);
+        Trainer trainer1 = createTrainer("jsj012100", "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
+        Trainer trainer2 = createTrainer("jsj121", "123456", "조성민", "galmeagi2@gmail.com", address, Gender.MALE);
 
         trainerRepository.save(trainer1);
         trainerRepository.save(trainer2);
@@ -104,5 +104,16 @@ class GymTrainerRepositoryTest {
         //then
         assertThat(result.size()).isEqualTo(2);
         assertThat(result).contains(gymTrainer2, gymTrainer3);
+    }
+
+    private Trainer createTrainer(String loginId, String password, String name, String email, Address address, Gender gender) {
+        return Trainer.builder()
+                .loginId(loginId)
+                .password(password)
+                .name(name)
+                .email(email)
+                .address(address)
+                .gender(gender)
+                .build();
     }
 }

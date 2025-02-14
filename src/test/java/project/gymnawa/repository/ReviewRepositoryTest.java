@@ -25,10 +25,10 @@ class ReviewRepositoryTest {
     void save() {
         //given
         Address address = new Address("12345", "서울", "강서구", "마곡동");
-        NorMember norMember = new NorMember("jsj012100", "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
+        NorMember norMember = createNorMember("jsj012100", "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
         norMemberRepository.save(norMember);
 
-        Trainer trainer = new Trainer("jsj121", "123456", "조성민", "galmeagi2@gmail.com", address, Gender.MALE);
+        Trainer trainer = createTrainer("jsj121", "123456", "조성민", "galmeagi2@gmail.com", address, Gender.MALE);
         trainerRepository.save(trainer);
 
         Review review = new Review("저의 몸 상태에 맞게 운동을 알려주셔서 체형 개선도 되고 너무 좋아요.", norMember, trainer);
@@ -46,10 +46,10 @@ class ReviewRepositoryTest {
     void findByMember() {
         //given
         Address address = new Address("12345", "서울", "강서구", "마곡동");
-        NorMember norMember = new NorMember("jsj012100", "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
+        NorMember norMember = createNorMember("jsj012100", "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
         norMemberRepository.save(norMember);
 
-        Trainer trainer = new Trainer("jsj121", "123456", "조성민", "galmeagi2@gmail.com", address, Gender.MALE);
+        Trainer trainer = createTrainer("jsj121", "123456", "조성민", "galmeagi2@gmail.com", address, Gender.MALE);
         trainerRepository.save(trainer);
 
         Review review1 = new Review("저의 몸 상태에 맞게 운동을 알려주셔서 체형 개선도 되고 너무 좋아요.", norMember, trainer);
@@ -69,12 +69,12 @@ class ReviewRepositoryTest {
     void findByTrainer() {
         //given
         Address address = new Address("12345", "서울", "강서구", "마곡동");
-        NorMember norMember1 = new NorMember("jsj012100", "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
-        NorMember norMember2 = new NorMember("jsj121", "123456", "조성민", "galmeagi2@gmail.com", address, Gender.MALE);
+        NorMember norMember1 = createNorMember("jsj012100", "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
+        NorMember norMember2 = createNorMember("jsj121", "123456", "조성민", "galmeagi2@gmail.com", address, Gender.MALE);
         norMemberRepository.save(norMember1);
         norMemberRepository.save(norMember2);
 
-        Trainer trainer = new Trainer("jsj121", "123456", "조성민", "galmeagi2@gmail.com", address, Gender.MALE);
+        Trainer trainer = createTrainer("jsj121", "123456", "조성민", "galmeagi2@gmail.com", address, Gender.MALE);
         trainerRepository.save(trainer);
 
         Review review1 = new Review("저의 몸 상태에 맞게 운동을 알려주셔서 체형 개선도 되고 너무 좋아요.", norMember1, trainer);
@@ -89,5 +89,27 @@ class ReviewRepositoryTest {
 
         //then
         assertThat(result.size()).isEqualTo(3);
+    }
+
+    private NorMember createNorMember(String loginId, String password, String name, String email, Address address, Gender gender) {
+        return NorMember.builder()
+                .loginId(loginId)
+                .password(password)
+                .name(name)
+                .email(email)
+                .address(address)
+                .gender(gender)
+                .build();
+    }
+
+    private Trainer createTrainer(String loginId, String password, String name, String email, Address address, Gender gender) {
+        return Trainer.builder()
+                .loginId(loginId)
+                .password(password)
+                .name(name)
+                .email(email)
+                .address(address)
+                .gender(gender)
+                .build();
     }
 }

@@ -26,10 +26,10 @@ class PtMembershipRepositoryTest {
         //given
         Address address = new Address("12345", "서울", "강서구", "마곡동");
 
-        Trainer trainer = new Trainer("jsj012100", "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
+        Trainer trainer = createTrainer("jsj012100", "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
         trainerRepository.save(trainer);
 
-        NorMember member = new NorMember("jsj012100", "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
+        NorMember member = createNorMember("jsj012100", "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
         norMemberRepository.save(member);
 
         PtMembership ptMembership = new PtMembership(member, trainer, 10, 300000);
@@ -48,12 +48,12 @@ class PtMembershipRepositoryTest {
         //given
         Address address = new Address("12345", "서울", "강서구", "마곡동");
 
-        Trainer trainer1 = new Trainer("jsj012100", "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
-        Trainer trainer2 = new Trainer("jsj121", "123456", "조성민", "galmeagi2@gmail.com", address, Gender.MALE);
+        Trainer trainer1 = createTrainer("jsj012100", "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
+        Trainer trainer2 = createTrainer("jsj121", "123456", "조성민", "galmeagi2@gmail.com", address, Gender.MALE);
         trainerRepository.save(trainer1);
         trainerRepository.save(trainer2);
 
-        NorMember member = new NorMember("jsj012100", "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
+        NorMember member = createNorMember("jsj012100", "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
         norMemberRepository.save(member);
 
         PtMembership ptMembership1 = new PtMembership(member, trainer1, 10, 300000);
@@ -75,13 +75,13 @@ class PtMembershipRepositoryTest {
         //given
         Address address = new Address("12345", "서울", "강서구", "마곡동");
 
-        Trainer trainer1 = new Trainer("jsj012100", "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
-        Trainer trainer2 = new Trainer("jsj121", "123456", "조성민", "galmeagi2@gmail.com", address, Gender.MALE);
+        Trainer trainer1 = createTrainer("jsj012100", "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
+        Trainer trainer2 = createTrainer("jsj121", "123456", "조성민", "galmeagi2@gmail.com", address, Gender.MALE);
         trainerRepository.save(trainer1);
         trainerRepository.save(trainer2);
 
-        NorMember member1 = new NorMember("jsj", "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
-        NorMember member2 = new NorMember("jsj000", "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
+        NorMember member1 = createNorMember("jsj", "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
+        NorMember member2 = createNorMember("jsj000", "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
         norMemberRepository.save(member1);
         norMemberRepository.save(member2);
 
@@ -98,5 +98,27 @@ class PtMembershipRepositoryTest {
         //then
         assertThat(result.size()).isEqualTo(2);
         assertThat(result).contains(ptMembership2, ptMembership3);
+    }
+
+    private NorMember createNorMember(String loginId, String password, String name, String email, Address address, Gender gender) {
+        return NorMember.builder()
+                .loginId(loginId)
+                .password(password)
+                .name(name)
+                .email(email)
+                .address(address)
+                .gender(gender)
+                .build();
+    }
+
+    private Trainer createTrainer(String loginId, String password, String name, String email, Address address, Gender gender) {
+        return Trainer.builder()
+                .loginId(loginId)
+                .password(password)
+                .name(name)
+                .email(email)
+                .address(address)
+                .gender(gender)
+                .build();
     }
 }

@@ -27,7 +27,7 @@ class GymMembershipRepositoryTest {
         //given
         Address address = new Address("12345", "서울", "강서구", "마곡동");
 
-        NorMember member = new NorMember("jsj012100", "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
+        NorMember member = createNorMember("jsj012100", "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
         norMemberRepository.save(member);
 
         Gym gym = new Gym("라온짐", "02-1234-5678", address, "매일", "06:00 ~ 22:00");
@@ -50,8 +50,8 @@ class GymMembershipRepositoryTest {
         //given
         Address address = new Address("12345", "서울", "강서구", "마곡동");
 
-        NorMember member1 = new NorMember("jsj012100", "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
-        NorMember member2 = new NorMember("jsj121", "123456", "조성민", "galmeagi2@gmail.com", address, Gender.MALE);
+        NorMember member1 = createNorMember("jsj012100", "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
+        NorMember member2 = createNorMember("jsj121", "123456", "조성민", "galmeagi2@gmail.com", address, Gender.MALE);
 
         norMemberRepository.save(member1);
         norMemberRepository.save(member2);
@@ -79,8 +79,8 @@ class GymMembershipRepositoryTest {
         //given
         Address address = new Address("12345", "서울", "강서구", "마곡동");
 
-        NorMember member1 = new NorMember("jsj012100", "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
-        NorMember member2 = new NorMember("jsj121", "123456", "조성민", "galmeagi2@gmail.com", address, Gender.MALE);
+        NorMember member1 = createNorMember("jsj012100", "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
+        NorMember member2 = createNorMember("jsj121", "123456", "조성민", "galmeagi2@gmail.com", address, Gender.MALE);
 
         norMemberRepository.save(member1);
         norMemberRepository.save(member2);
@@ -101,5 +101,16 @@ class GymMembershipRepositoryTest {
         assertThat(result.size()).isEqualTo(1);
         assertThat(result).contains(gymMembership1);
         assertThat(result.get(0).getNorMember().getLoginId()).isEqualTo("jsj012100");
+    }
+
+    private NorMember createNorMember(String loginId, String password, String name, String email, Address address, Gender gender) {
+        return NorMember.builder()
+                .loginId(loginId)
+                .password(password)
+                .name(name)
+                .email(email)
+                .address(address)
+                .gender(gender)
+                .build();
     }
 }

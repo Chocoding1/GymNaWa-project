@@ -29,7 +29,7 @@ class MemberRepositoryTest {
     void save() {
         //given
         Address address = new Address("12345", "서울", "강서구", "마곡동");
-        Member member = new Member("jsj012100", "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
+        Member member = createMember("jsj012100", "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
 
         memberRepository.save(member);
 
@@ -46,8 +46,8 @@ class MemberRepositoryTest {
     void findAll() {
         //given
         Address address = new Address("12345", "서울", "강서구", "마곡동");
-        Member member1 = new Member("jsj012100", "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
-        Member member2 = new Member("jsj121", "123456", "조성민", "galmeagi2@gmail.com", address, Gender.MALE);
+        Member member1 = createMember("jsj012100", "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
+        Member member2 = createMember("jsj121", "123456", "조성민", "galmeagi2@gmail.com", address, Gender.MALE);
 
         memberRepository.save(member1);
         memberRepository.save(member2);
@@ -64,8 +64,8 @@ class MemberRepositoryTest {
     void findByLoginId() {
         //given
         Address address = new Address("12345", "서울", "강서구", "마곡동");
-        Member member1 = new Member("jsj012100", "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
-        Member member2 = new Member("jsj121", "123456", "조성민", "galmeagi2@gmail.com", address, Gender.MALE);
+        Member member1 = createMember("jsj012100", "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
+        Member member2 = createMember("jsj121", "123456", "조성민", "galmeagi2@gmail.com", address, Gender.MALE);
 
         memberRepository.save(member1);
         memberRepository.save(member2);
@@ -83,8 +83,8 @@ class MemberRepositoryTest {
     void findByEmail() {
         //given
         Address address = new Address("12345", "서울", "강서구", "마곡동");
-        Member member1 = new Member("jsj012100", "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
-        Member member2 = new Member("jsj121", "123456", "조성민", "galmeagi2@gmail.com", address, Gender.MALE);
+        Member member1 = createMember("jsj012100", "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
+        Member member2 = createMember("jsj121", "123456", "조성민", "galmeagi2@gmail.com", address, Gender.MALE);
 
         memberRepository.save(member1);
         memberRepository.save(member2);
@@ -95,5 +95,16 @@ class MemberRepositoryTest {
         //then
         assertThat(findMember).isEqualTo(member2);
         assertThat(findMember.getLoginId()).isEqualTo("jsj121");
+    }
+
+    private Member createMember(String loginId, String password, String name, String email, Address address, Gender gender) {
+        return Member.builder()
+                .loginId(loginId)
+                .password(password)
+                .name(name)
+                .email(email)
+                .address(address)
+                .gender(gender)
+                .build();
     }
 }

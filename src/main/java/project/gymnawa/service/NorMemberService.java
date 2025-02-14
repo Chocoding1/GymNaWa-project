@@ -13,6 +13,7 @@
 //
 //@Service
 //@RequiredArgsConstructor
+//@Transactional(readOnly = true)
 //public class NorMemberService {
 //
 //    private final NorMemberRepository norMemberRepository;
