@@ -13,7 +13,7 @@ import java.util.List;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class GymMMembershipService {
+public class GymMembershipService {
 
     private final GymMembershipRepository gymMembershipRepository;
 
