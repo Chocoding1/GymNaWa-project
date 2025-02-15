@@ -4,6 +4,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -16,6 +17,7 @@ import project.gymnawa.repository.GymMembershipRepository;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -98,6 +100,29 @@ class GymMembershipServiceTest {
         assertThat(result.size()).isEqualTo(2);
 
         verify(gymMembershipRepository, times(1)).findByNorMember(norMember);
+    }
+
+    @Test
+    @DisplayName("헬스장 등록 정보 삭제")
+    void deleteMembership() {
+        //given
+        GymMembership gymMembership = GymMembership.builder()
+                .id(1L)
+                .norMember(NorMember.builder().build())
+                .gym(Gym.builder().build())
+                .build();
+
+        when(gymMembershipRepository.findById(1L)).thenReturn(Optional.of(gymMembership));
+
+        //when
+        gymMembershipService.deleteMembership(1L);
+
+        verify(gymMembershipRepository, times(1)).findById(1L);
+        verify(gymMembershipRepository, times(1)).delete(gymMembership);
+
+        InOrder inOrder = inOrder(gymMembershipRepository);
+        inOrder.verify(gymMembershipRepository).findById(1L);
+        inOrder.verify(gymMembershipRepository).delete(gymMembership);
     }
 
     private static GymMembership createGymMembership(NorMember norMember, Gym gym) {

@@ -9,6 +9,7 @@ import project.gymnawa.domain.NorMember;
 import project.gymnawa.repository.GymMembershipRepository;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 @Transactional(readOnly = true)
@@ -37,5 +38,15 @@ public class GymMembershipService {
      */
     public List<GymMembership> findMembershipByMember(NorMember norMember) {
         return gymMembershipRepository.findByNorMember(norMember);
+    }
+
+    /**
+     * 등록 정보 삭제
+     */
+    public void deleteMembership(Long id) {
+        GymMembership gymMembership = gymMembershipRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("존재하지 등록 정보입니다."));
+
+        gymMembershipRepository.delete(gymMembership);
     }
 }
