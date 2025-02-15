@@ -2,6 +2,7 @@ package project.gymnawa.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -28,11 +29,16 @@ public class GymMembership {
     private LocalDate endDate;
     private int price;
 
-    public GymMembership(NorMember norMember, Gym gym, LocalDate startDate, LocalDate endDate, int price) {
+    @Enumerated(EnumType.STRING)
+    private ContractStatus contractStatus;
+
+    @Builder
+    public GymMembership(NorMember norMember, Gym gym, LocalDate startDate, LocalDate endDate, int price, ContractStatus contractStatus) {
         this.norMember = norMember;
         this.gym = gym;
         this.startDate = startDate;
         this.endDate = endDate;
         this.price = price;
+        this.contractStatus = contractStatus;
     }
 }
