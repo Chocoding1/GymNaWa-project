@@ -33,7 +33,8 @@ public class GymMembership {
     private ContractStatus contractStatus;
 
     @Builder
-    public GymMembership(NorMember norMember, Gym gym, LocalDate startDate, LocalDate endDate, int price, ContractStatus contractStatus) {
+    public GymMembership(Long id, NorMember norMember, Gym gym, LocalDate startDate, LocalDate endDate, int price, ContractStatus contractStatus) {
+        this.id = id;
         this.norMember = norMember;
         this.gym = gym;
         this.startDate = startDate;
