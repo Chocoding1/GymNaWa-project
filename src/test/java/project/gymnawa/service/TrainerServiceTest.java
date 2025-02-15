@@ -197,6 +197,30 @@ class TrainerServiceTest {
         verify(trainerRepository, times(1)).findById(1L);
     }
 
+    @Test
+    @DisplayName("트레이너 탈퇴")
+    void deleteTrainer() {
+        //given
+        Trainer trainer = Trainer.builder()
+                .id(1L)
+                .loginId("jsj012100")
+                .password("1234")
+                .email("galmeagi2@naver.com")
+                .build();
+
+        when(trainerRepository.findById(1L)).thenReturn(Optional.of(trainer));
+
+        //when
+        trainerService.deleteOne(1L);
+
+        verify(trainerRepository, times(1)).findById(1L);
+        verify(trainerRepository, times(1)).delete(trainer);
+
+        InOrder inOrder = inOrder(trainerRepository);
+        inOrder.verify(trainerRepository).findById(1L);
+        inOrder.verify(trainerRepository).delete(trainer);
+    }
+
     private Trainer createTrainer(String loginId, String password, String name) {
         return Trainer.builder()
                 .loginId(loginId)
