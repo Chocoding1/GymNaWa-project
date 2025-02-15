@@ -33,7 +33,7 @@ class GymMembershipRepositoryTest {
         Gym gym = createGym("라온짐", "02-1234-5678", address, "매일", "06:00 ~ 22:00");
         gymRepository.save(gym);
 
-        GymMembership gymMembership = new GymMembership(member, gym, LocalDate.of(2025, 2, 11), LocalDate.of(2025, 3, 11), 400000);
+        GymMembership gymMembership = createGymMembership(member, gym, LocalDate.of(2025, 2, 11), LocalDate.of(2025, 3, 11), 400000, ContractStatus.ACTIVE);
 
 
         //when
@@ -59,8 +59,8 @@ class GymMembershipRepositoryTest {
         Gym gym = createGym("라온짐", "02-1234-5678", address, "매일", "06:00 ~ 22:00");
         gymRepository.save(gym);
 
-        GymMembership gymMembership1 = new GymMembership(member1, gym, LocalDate.of(2025, 2, 11), LocalDate.of(2025, 3, 11), 400000);
-        GymMembership gymMembership2 = new GymMembership(member2, gym, LocalDate.of(2025, 2, 11), LocalDate.of(2025, 5, 11), 400000);
+        GymMembership gymMembership1 = createGymMembership(member1, gym, LocalDate.of(2025, 2, 11), LocalDate.of(2025, 3, 11), 400000, ContractStatus.ACTIVE);
+        GymMembership gymMembership2 = createGymMembership(member2, gym, LocalDate.of(2025, 2, 11), LocalDate.of(2025, 5, 11), 400000, ContractStatus.ACTIVE);
 
         gymMembershipRepository.save(gymMembership1);
         gymMembershipRepository.save(gymMembership2);
@@ -88,8 +88,8 @@ class GymMembershipRepositoryTest {
         Gym gym = createGym("라온짐", "02-1234-5678", address, "매일", "06:00 ~ 22:00");
         gymRepository.save(gym);
 
-        GymMembership gymMembership1 = new GymMembership(member1, gym, LocalDate.of(2025, 2, 11), LocalDate.of(2025, 3, 11), 400000);
-        GymMembership gymMembership2 = new GymMembership(member2, gym, LocalDate.of(2025, 2, 11), LocalDate.of(2025, 5, 11), 400000);
+        GymMembership gymMembership1 = createGymMembership(member1, gym, LocalDate.of(2025, 2, 11), LocalDate.of(2025, 3, 11), 400000, ContractStatus.ACTIVE);
+        GymMembership gymMembership2 = createGymMembership(member2, gym, LocalDate.of(2025, 2, 11), LocalDate.of(2025, 5, 11), 400000, ContractStatus.ACTIVE);
 
         gymMembershipRepository.save(gymMembership1);
         gymMembershipRepository.save(gymMembership2);
@@ -121,6 +121,17 @@ class GymMembershipRepositoryTest {
                 .address(address)
                 .runday(runday)
                 .runtime(runtime)
+                .build();
+    }
+
+    private GymMembership createGymMembership(NorMember norMember, Gym gym, LocalDate startDate, LocalDate endDate, int price, ContractStatus contractStatus) {
+        return GymMembership.builder()
+                .norMember(norMember)
+                .gym(gym)
+                .startDate(startDate)
+                .endDate(endDate)
+                .price(price)
+                .contractStatus(contractStatus)
                 .build();
     }
 }
