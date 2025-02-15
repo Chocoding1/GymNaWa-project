@@ -22,4 +22,8 @@ public interface GymMembershipRepository extends JpaRepository<GymMembership, Lo
      * 회원 별 등록 정보 조회
      */
     List<GymMembership> findByNorMember(NorMember norMember);
+
+    /**
+     * 등록 정보 삭제
+     */
 }
