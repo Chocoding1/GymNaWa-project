@@ -81,4 +81,15 @@ public class TrainerService {
 
         trainer.updateInfo(loginId, password, name, address, gender);
     }
+
+    /**
+     * 트레이너 탈퇴
+     */
+    @Transactional
+    public void deleteOne(Long id) {
+        Trainer trainer = trainerRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
+
+        trainerRepository.delete(trainer);
+    }
 }

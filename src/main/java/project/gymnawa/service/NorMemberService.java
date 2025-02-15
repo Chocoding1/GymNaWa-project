@@ -62,4 +62,15 @@ public class NorMemberService {
         return norMemberRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
     }
+
+    /**
+     * 일반 회원 탈퇴
+     */
+    @Transactional
+    public void deleteOne(Long id) {
+        NorMember norMember = norMemberRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
+
+        norMemberRepository.delete(norMember);
+    }
 }
