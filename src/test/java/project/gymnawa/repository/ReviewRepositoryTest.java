@@ -31,7 +31,7 @@ class ReviewRepositoryTest {
         Trainer trainer = createTrainer("jsj121", "123456", "조성민", "galmeagi2@gmail.com", address, Gender.MALE);
         trainerRepository.save(trainer);
 
-        Review review = new Review("저의 몸 상태에 맞게 운동을 알려주셔서 체형 개선도 되고 너무 좋아요.", norMember, trainer);
+        Review review = createReview("저의 몸 상태에 맞게 운동을 알려주셔서 체형 개선도 되고 너무 좋아요.", norMember, trainer);
 
         //when
         Review savedReview = reviewRepository.save(review);
@@ -39,6 +39,28 @@ class ReviewRepositoryTest {
         //then
         assertThat(savedReview).isEqualTo(review);
         assertThat(savedReview.getId()).isEqualTo(review.getId());
+    }
+
+    @Test
+    @DisplayName("리뷰 단 건 조회 테스트")
+    void findOne() {
+        //given
+        Address address = new Address("12345", "서울", "강서구", "마곡동");
+        NorMember norMember = createNorMember("jsj012100", "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
+        norMemberRepository.save(norMember);
+
+        Trainer trainer = createTrainer("jsj121", "123456", "조성민", "galmeagi2@gmail.com", address, Gender.MALE);
+        trainerRepository.save(trainer);
+
+        Review review = createReview("저의 몸 상태에 맞게 운동을 알려주셔서 체형 개선도 되고 너무 좋아요.", norMember, trainer);
+        reviewRepository.save(review);
+
+        //when
+        Review findReview = reviewRepository.findById(review.getId()).orElse(null);
+
+        //then
+        assertThat(findReview).isEqualTo(review);
+        assertThat(findReview.getNorMember().getName()).isEqualTo("조성진");
     }
 
     @Test
@@ -52,8 +74,8 @@ class ReviewRepositoryTest {
         Trainer trainer = createTrainer("jsj121", "123456", "조성민", "galmeagi2@gmail.com", address, Gender.MALE);
         trainerRepository.save(trainer);
 
-        Review review1 = new Review("저의 몸 상태에 맞게 운동을 알려주셔서 체형 개선도 되고 너무 좋아요.", norMember, trainer);
-        Review review2 = new Review("다양한 지식을 기반으로 하는 PT를 통해 더 탄탄하게 배울 수 있어요.", norMember, trainer);
+        Review review1 = createReview("저의 몸 상태에 맞게 운동을 알려주셔서 체형 개선도 되고 너무 좋아요.", norMember, trainer);
+        Review review2 = createReview("다양한 지식을 기반으로 하는 PT를 통해 더 탄탄하게 배울 수 있어요.", norMember, trainer);
         reviewRepository.save(review1);
         reviewRepository.save(review2);
 
@@ -77,9 +99,9 @@ class ReviewRepositoryTest {
         Trainer trainer = createTrainer("jsj121", "123456", "조성민", "galmeagi2@gmail.com", address, Gender.MALE);
         trainerRepository.save(trainer);
 
-        Review review1 = new Review("저의 몸 상태에 맞게 운동을 알려주셔서 체형 개선도 되고 너무 좋아요.", norMember1, trainer);
-        Review review2 = new Review("다양한 지식을 기반으로 하는 PT를 통해 더 탄탄하게 배울 수 있어요.", norMember1, trainer);
-        Review review3 = new Review("친절해요.", norMember2, trainer);
+        Review review1 = createReview("저의 몸 상태에 맞게 운동을 알려주셔서 체형 개선도 되고 너무 좋아요.", norMember1, trainer);
+        Review review2 = createReview("다양한 지식을 기반으로 하는 PT를 통해 더 탄탄하게 배울 수 있어요.", norMember1, trainer);
+        Review review3 = createReview("친절해요.", norMember2, trainer);
         reviewRepository.save(review1);
         reviewRepository.save(review2);
         reviewRepository.save(review3);
@@ -110,6 +132,14 @@ class ReviewRepositoryTest {
                 .email(email)
                 .address(address)
                 .gender(gender)
+                .build();
+    }
+
+    private Review createReview(String content, NorMember norMember, Trainer trainer) {
+        return Review.builder()
+                .content(content)
+                .norMember(norMember)
+                .trainer(trainer)
                 .build();
     }
 }
