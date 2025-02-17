@@ -2,6 +2,7 @@ package project.gymnawa.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -25,9 +26,15 @@ public class Review extends BaseTime{
     @JoinColumn(name = "TRAINER_ID")
     private Trainer trainer;
 
-    public Review(String content, NorMember norMember, Trainer trainer) {
+    @Builder
+    public Review(Long id, String content, NorMember norMember, Trainer trainer) {
+        this.id = id;
         this.content = content;
         this.norMember = norMember;
         this.trainer = trainer;
+    }
+
+    public void updateContent(String content) {
+        this.content = content;
     }
 }
