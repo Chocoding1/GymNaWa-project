@@ -16,6 +16,10 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
      */
 
     /**
+     * 리뷰 단 건 조회
+     */
+
+    /**
      * 특정 회원이 작성한 리뷰 조회
      */
     List<Review> findByNorMember(NorMember norMember);
