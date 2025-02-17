@@ -33,7 +33,7 @@ class GymTrainerRepositoryTest {
         Gym gym = createGym("라온짐", "02-1234-5678", address, "매일", "06:00 ~ 22:00");
         gymRepository.save(gym);
 
-        GymTrainer gymTrainer = new GymTrainer(trainer, gym, LocalDate.of(2025, 2, 11), LocalDate.of(2026, 2, 11), ContractStatus.ACTIVE);
+        GymTrainer gymTrainer = createGymTrainer(trainer, gym, LocalDate.of(2025, 2, 11), LocalDate.of(2026, 2, 11), ContractStatus.ACTIVE);
 
         //when
         GymTrainer savedGymTrainer = gymTrainerRepository.save(gymTrainer);
@@ -58,8 +58,8 @@ class GymTrainerRepositoryTest {
         gymRepository.save(gym1);
         gymRepository.save(gym2);
 
-        GymTrainer gymTrainer1 = new GymTrainer(trainer, gym1, LocalDate.of(2023, 2, 11), LocalDate.of(2024, 2, 11), ContractStatus.EXPIRED);
-        GymTrainer gymTrainer2 = new GymTrainer(trainer, gym2, LocalDate.of(2025, 2, 11), LocalDate.of(2026, 2, 11), ContractStatus.ACTIVE);
+        GymTrainer gymTrainer1 = createGymTrainer(trainer, gym1, LocalDate.of(2023, 2, 11), LocalDate.of(2024, 2, 11), ContractStatus.EXPIRED);
+        GymTrainer gymTrainer2 = createGymTrainer(trainer, gym2, LocalDate.of(2025, 2, 11), LocalDate.of(2026, 2, 11), ContractStatus.ACTIVE);
 
         gymTrainerRepository.save(gymTrainer1);
         gymTrainerRepository.save(gymTrainer2);
@@ -90,9 +90,9 @@ class GymTrainerRepositoryTest {
         gymRepository.save(gym1);
         gymRepository.save(gym2);
 
-        GymTrainer gymTrainer1 = new GymTrainer(trainer1, gym2, LocalDate.of(2023, 2, 11), LocalDate.of(2024, 2, 11), ContractStatus.EXPIRED);
-        GymTrainer gymTrainer2 = new GymTrainer(trainer2, gym2, LocalDate.of(2025, 2, 11), LocalDate.of(2026, 2, 11), ContractStatus.ACTIVE);
-        GymTrainer gymTrainer3 = new GymTrainer(trainer1, gym2, LocalDate.of(2024, 2, 11), LocalDate.of(2026, 2, 11), ContractStatus.ACTIVE);
+        GymTrainer gymTrainer1 = createGymTrainer(trainer1, gym2, LocalDate.of(2023, 2, 11), LocalDate.of(2024, 2, 11), ContractStatus.EXPIRED);
+        GymTrainer gymTrainer2 = createGymTrainer(trainer2, gym2, LocalDate.of(2025, 2, 11), LocalDate.of(2026, 2, 11), ContractStatus.ACTIVE);
+        GymTrainer gymTrainer3 = createGymTrainer(trainer1, gym2, LocalDate.of(2024, 2, 11), LocalDate.of(2026, 2, 11), ContractStatus.ACTIVE);
 
         gymTrainerRepository.save(gymTrainer1);
         gymTrainerRepository.save(gymTrainer2);
@@ -124,6 +124,16 @@ class GymTrainerRepositoryTest {
                 .address(address)
                 .runday(runday)
                 .runtime(runtime)
+                .build();
+    }
+
+    private GymTrainer createGymTrainer(Trainer trainer, Gym gym, LocalDate hireDate, LocalDate expireDate, ContractStatus contractStatus) {
+        return GymTrainer.builder()
+                .trainer(trainer)
+                .gym(gym)
+                .hireDate(hireDate)
+                .expireDate(expireDate)
+                .contractStatus(contractStatus)
                 .build();
     }
 }
