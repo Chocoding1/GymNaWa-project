@@ -32,7 +32,7 @@ class PtMembershipRepositoryTest {
         NorMember member = createNorMember("jsj012100", "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
         norMemberRepository.save(member);
 
-        PtMembership ptMembership = new PtMembership(member, trainer, 10, 300000);
+        PtMembership ptMembership = createPtMembership(member, trainer, 10, 300000);
 
         //when
         PtMembership savedPtMembership = ptMembershipRepository.save(ptMembership);
@@ -56,8 +56,8 @@ class PtMembershipRepositoryTest {
         NorMember member = createNorMember("jsj012100", "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
         norMemberRepository.save(member);
 
-        PtMembership ptMembership1 = new PtMembership(member, trainer1, 10, 300000);
-        PtMembership ptMembership2 = new PtMembership(member, trainer2, 10, 250000);
+        PtMembership ptMembership1 = createPtMembership(member, trainer1, 10, 300000);
+        PtMembership ptMembership2 = createPtMembership(member, trainer2, 10, 250000);
         ptMembershipRepository.save(ptMembership1);
         ptMembershipRepository.save(ptMembership2);
 
@@ -85,9 +85,9 @@ class PtMembershipRepositoryTest {
         norMemberRepository.save(member1);
         norMemberRepository.save(member2);
 
-        PtMembership ptMembership1 = new PtMembership(member1, trainer1, 10, 300000);
-        PtMembership ptMembership2 = new PtMembership(member1, trainer2, 10, 250000);
-        PtMembership ptMembership3 = new PtMembership(member2, trainer2, 20, 450000);
+        PtMembership ptMembership1 = createPtMembership(member1, trainer1, 10, 300000);
+        PtMembership ptMembership2 = createPtMembership(member1, trainer2, 10, 250000);
+        PtMembership ptMembership3 = createPtMembership(member2, trainer2, 20, 450000);
         ptMembershipRepository.save(ptMembership1);
         ptMembershipRepository.save(ptMembership2);
         ptMembershipRepository.save(ptMembership3);
@@ -119,6 +119,15 @@ class PtMembershipRepositoryTest {
                 .email(email)
                 .address(address)
                 .gender(gender)
+                .build();
+    }
+
+    private PtMembership createPtMembership(NorMember member, Trainer trainer, int initCount, int price) {
+        return PtMembership.builder()
+                .norMember(member)
+                .trainer(trainer)
+                .initCount(initCount)
+                .price(price)
                 .build();
     }
 }

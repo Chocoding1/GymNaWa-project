@@ -2,6 +2,7 @@ package project.gymnawa.domain;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -22,12 +23,18 @@ public class PtMembership extends BaseTime{
     @JoinColumn(name = "TRAINER_ID")
     private Trainer trainer;
 
+    private int initCount;
+    private int usedCount;
     private int remainPtCount;
     private int price;
 
-    public PtMembership(NorMember norMember, Trainer trainer, int remainPtCount, int price) {
+    @Builder
+    public PtMembership(Long id, NorMember norMember, Trainer trainer,int initCount, int usedCount, int remainPtCount, int price) {
+        this.id = id;
         this.norMember = norMember;
         this.trainer = trainer;
+        this.initCount = initCount;
+        this.usedCount = usedCount;
         this.remainPtCount = remainPtCount;
         this.price = price;
     }
