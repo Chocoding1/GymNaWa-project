@@ -61,17 +61,6 @@ public class TrainerService {
     }
 
     /**
-     * 특정 헬스장 소속 트레이너 목록(이 기능을 GymService에 넣어야 할지 고민 중)
-     *  +) GymService에는 Gym 검색 기능이 들어가기 때문에 트레이너 검색은 TrainerService에 들어가는 게 맞다고 판단
-     *  +) GymTrainer 엔티티를 만들었기 때문에 이 기능은 GymTrainerService에서 진행할 예정
-     */
-/*
-    public List<Trainer> findByGym(Gym gym) {
-        return trainerRepository.findByGym(gym);
-    }
-*/
-
-    /**
      * 트레이너 정보 수정
      */
     @Transactional

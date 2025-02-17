@@ -21,6 +21,7 @@ public class GymMembershipService {
     /**
      * 헬스장 등록 회원 저장
      */
+    @Transactional
     public Long save(GymMembership gymMembership) {
         gymMembershipRepository.save(gymMembership);
         return gymMembership.getId();

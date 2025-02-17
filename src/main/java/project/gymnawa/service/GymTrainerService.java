@@ -21,6 +21,7 @@ public class GymTrainerService {
     /**
      * 트레이너 계약 정보 저장
      */
+    @Transactional
     public Long save(GymTrainer gymTrainer) {
         gymTrainerRepository.save(gymTrainer);
         return gymTrainer.getId();
