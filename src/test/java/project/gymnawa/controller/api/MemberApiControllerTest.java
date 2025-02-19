@@ -55,6 +55,23 @@ class MemberApiControllerTest {
     private MockHttpSession session;
 
     @Test
+    @DisplayName("로그인 시 초기 DTO 생성")
+    void createLoginDto() throws Exception {
+        //given
+        String loginId = "";
+        String password = "";
+        //when
+        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.get("/api/member/login"));
+
+        //then
+        resultActions
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.loginId").value(loginId))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.password").value(password));
+
+    }
+
+    @Test
     @DisplayName("로그인 성공")
     void saveSuccess() throws Exception {
         //given
@@ -75,7 +92,7 @@ class MemberApiControllerTest {
                 .password(password)
                 .build();
 
-        session = new MockHttpSession();
+        session = new MockHttpSession(); // 여기서 만든 세션을 전달해야 세션에 저장된 값을 받아올 수 있다.
 
         when(memberService.login(loginId, password)).thenReturn(loginedMember);
 
@@ -83,7 +100,7 @@ class MemberApiControllerTest {
         ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/api/member/login")
                 .content(objectMapper.writeValueAsString(memberLoginDto))
                 .contentType(MediaType.APPLICATION_JSON)
-                .session(session));
+                .session(session)); // 세션 전달
 
         //then
         resultActions
@@ -93,6 +110,7 @@ class MemberApiControllerTest {
 
         verify(memberService, times(1)).login(loginId, password);
 
+        // 저장된 세션 확인
         Member member = (Member) session.getAttribute(SessionConst.LOGIN_MEMBER);
         assertThat(member).isEqualTo(loginedMember);
         assertThat(member.getLoginId()).isEqualTo(loginedMember.getLoginId());

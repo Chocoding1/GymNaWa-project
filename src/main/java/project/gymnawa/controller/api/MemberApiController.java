@@ -8,10 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import project.gymnawa.domain.Member;
 import project.gymnawa.domain.dto.member.MemberLoginDto;
 import project.gymnawa.service.MemberService;
@@ -25,11 +22,25 @@ public class MemberApiController {
 
     private final MemberService memberService;
 
+    @GetMapping("/add/select")
+    public ResponseEntity<String> selectMemberType() {
+        return ResponseEntity.ok().body("/member/memberTypeSelectForm");
+    }
+
+    @GetMapping("/login")
+    public ResponseEntity<MemberLoginDto> loginForm() {
+        MemberLoginDto memberLoginDto = MemberLoginDto.builder()
+                .loginId("")
+                .password("")
+                .build();
+
+        return ResponseEntity.ok().body(memberLoginDto);
+    }
+
     @PostMapping("/login")
     public ResponseEntity<String> login(@Validated @RequestBody MemberLoginDto memberLoginDto,
                                         BindingResult bindingResult,
                                         HttpServletRequest request) {
-
         if (bindingResult.hasErrors()) {
             log.info("errors = " + bindingResult);
             return ResponseEntity.badRequest().body("입력값이 올바르지 않습니다.");
