@@ -4,48 +4,55 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpServletResponse;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.springframework.validation.BindingResult;
 import project.gymnawa.domain.Gender;
 import project.gymnawa.domain.Member;
 import project.gymnawa.domain.dto.member.MemberLoginDto;
 import project.gymnawa.service.MemberService;
+import project.gymnawa.web.SessionConst;
 
 
+
+import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @WebMvcTest(MemberApiController.class)
 @ExtendWith(MockitoExtension.class)
 class MemberApiControllerTest {
 
     @Autowired
-    MockMvc mockMvc;
+    private MockMvc mockMvc;
 
     @Autowired
-    ObjectMapper objectMapper;
+    private ObjectMapper objectMapper;
 
     /**
      * Spring Boot 3.4.0부터 @MockBean은 Deprecated
      * 대신 @MockitoBean으로 대체되었다.
      * https://hdbstn3055.tistory.com/336
+     *
      * @WebMvcTest + @MockitoBean 사용
      */
     @MockitoBean
     private MemberService memberService;
+
+    @MockitoBean
+    private BindingResult bindingResult;
+
+    private MockHttpSession session;
 
     @Test
     @DisplayName("로그인 성공")
@@ -68,7 +75,37 @@ class MemberApiControllerTest {
                 .password(password)
                 .build();
 
+        session = new MockHttpSession();
+
         when(memberService.login(loginId, password)).thenReturn(loginedMember);
+
+        //when
+        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/api/member/login")
+                .content(objectMapper.writeValueAsString(memberLoginDto))
+                .contentType(MediaType.APPLICATION_JSON)
+                .session(session));
+
+        //then
+        resultActions
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().string("login successful"));
+
+        verify(memberService, times(1)).login(loginId, password);
+
+        Member member = (Member) session.getAttribute(SessionConst.LOGIN_MEMBER);
+        assertThat(member).isEqualTo(loginedMember);
+        assertThat(member.getLoginId()).isEqualTo(loginedMember.getLoginId());
+    }
+
+    @Test
+    @DisplayName("로그인 실패 - 잘못된 입력값(@NotBlank 테스트)")
+    void loginFail_WrongInput() throws Exception{
+        //given
+        MemberLoginDto memberLoginDto = MemberLoginDto.builder()
+                .loginId("")
+                .password("")
+                .build();
 
         //when
         ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/api/member/login")
@@ -78,6 +115,51 @@ class MemberApiControllerTest {
         //then
         resultActions
                 .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isOk());
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.content().string("입력값이 올바르지 않습니다."));
+
+        verify(memberService, never()).login(anyString(), anyString());
+    }
+
+    @Test
+    @DisplayName("로그인 실패 - 틀린 아이디 or 비밀번호 입력")
+    void loginFail_EmptyMember() throws Exception{
+        //given
+        MemberLoginDto memberLoginDto = MemberLoginDto.builder()
+                .loginId("wrongId")
+                .password("wrongPw")
+                .build();
+
+        when(memberService.login(anyString(), anyString())).thenReturn(null);
+
+        //when
+        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/api/member/login")
+                .content(objectMapper.writeValueAsString(memberLoginDto))
+                .contentType(MediaType.APPLICATION_JSON));
+
+        //then
+        resultActions
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.content().string("아이디 또는 비밀번호가 맞지 않습니다."));
+
+        verify(memberService, times(1)).login(anyString(), anyString());
+    }
+
+    @Test
+    @DisplayName("로그아웃")
+    void logout() throws Exception {
+        //given
+        session = new MockHttpSession();
+
+        //when
+        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/api/member/logout")
+                .session(session));
+
+        //then
+        resultActions
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().string("logout successful"));
     }
 }
