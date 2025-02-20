@@ -1,6 +1,7 @@
 package project.gymnawa.domain.dto.normember;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -22,7 +23,7 @@ public class MemberSaveDto {
     @NotBlank
     private String email;
 
-    @NotBlank
+    @NotNull
     private Gender gender;
 
     @NotBlank
