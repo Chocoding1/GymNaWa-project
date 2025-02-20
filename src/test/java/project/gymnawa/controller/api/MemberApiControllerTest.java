@@ -16,7 +16,6 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.validation.BindingResult;
 import project.gymnawa.domain.Gender;
 import project.gymnawa.domain.Member;
 import project.gymnawa.domain.dto.member.MemberLoginDto;
@@ -49,9 +48,6 @@ class MemberApiControllerTest {
     @MockitoBean
     private MemberService memberService;
 
-    @MockitoBean
-    private BindingResult bindingResult;
-
     private MockHttpSession session;
 
     @Test
@@ -66,14 +62,14 @@ class MemberApiControllerTest {
         //then
         resultActions
                 .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.loginId").value(loginId))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.password").value(password));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.loginId").value(loginId))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.password").value(password));
 
     }
 
     @Test
     @DisplayName("로그인 성공")
-    void saveSuccess() throws Exception {
+    void loginSuccess() throws Exception {
         //given
         String loginId = "jsj012100";
         String password = "1234";
@@ -106,7 +102,7 @@ class MemberApiControllerTest {
         resultActions
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().string("login successful"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data").value("login successful"));
 
         verify(memberService, times(1)).login(loginId, password);
 
@@ -134,7 +130,7 @@ class MemberApiControllerTest {
         resultActions
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.content().string("입력값이 올바르지 않습니다."));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("입력값이 올바르지 않습니다."));
 
         verify(memberService, never()).login(anyString(), anyString());
     }
@@ -159,7 +155,7 @@ class MemberApiControllerTest {
         resultActions
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.content().string("아이디 또는 비밀번호가 맞지 않습니다."));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("아이디 또는 비밀번호가 맞지 않습니다."));
 
         verify(memberService, times(1)).login(anyString(), anyString());
     }
@@ -178,6 +174,6 @@ class MemberApiControllerTest {
         resultActions
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().string("logout successful"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data").value("logout successful"));
     }
 }
