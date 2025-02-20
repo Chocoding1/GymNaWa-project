@@ -25,7 +25,7 @@ public class NorMember extends Member {
      * 회원 정보 수정
      */
     @Override
-    public void updateInfo(String loginId, String password, String name, Address address, Gender gender) {
-        super.updateInfo(loginId, password, name, address, gender);
+    public void updateInfo(String loginId, String password, String name, Address address) {
+        super.updateInfo(loginId, password, name, address);
     }
 }

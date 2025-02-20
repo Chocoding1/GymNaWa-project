@@ -40,11 +40,10 @@ public class Member extends BaseTime{
         this.gender = gender;
     }
 
-    public void updateInfo(String loginId, String password, String name, Address address, Gender gender) {
+    public void updateInfo(String loginId, String password, String name, Address address) {
         this.loginId = loginId;
         this.password = password;
         this.name = name;
         this.address = address;
-        this.gender = gender;
     }
 }
