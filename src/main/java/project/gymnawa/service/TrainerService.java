@@ -64,11 +64,17 @@ public class TrainerService {
      * 트레이너 정보 수정
      */
     @Transactional
-    public void updateTrainer(Long id, String loginId, String password, String name, Address address, Gender gender) {
+    public void updateTrainer(Long id, String loginId, String password, String name, Address address) {
         Trainer trainer = trainerRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
 
-        trainer.updateInfo(loginId, password, name, address, gender);
+        //중복 아이디 체크
+        Optional<Member> dupliTrainer = memberRepository.findByLoginId(loginId);
+        if (dupliTrainer.isPresent()) {
+            throw new IllegalStateException("이미 존재하는 아이디입니다.");
+        }
+
+        trainer.updateInfo(loginId, password, name, address);
     }
 
     /**

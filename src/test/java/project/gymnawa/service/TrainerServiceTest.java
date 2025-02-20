@@ -172,29 +172,55 @@ class TrainerServiceTest {
         when(trainerRepository.findById(1L)).thenReturn(Optional.of(trainer));
 
         //when
-        trainerService.updateTrainer(1L, "newLoginId", "newPw", "newName", new Address("newZone", "newAddress", "newDetail", "newBuilding"), Gender.FEMALE);
+        trainerService.updateTrainer(1L, "newLoginId", "newPw", "newName", new Address("newZone", "newAddress", "newDetail", "newBuilding"));
 
         //then
         assertThat(trainer.getLoginId()).isEqualTo("newLoginId");
         assertThat(trainer.getPassword()).isEqualTo("newPw");
         assertThat(trainer.getName()).isEqualTo("newName");
         assertThat(trainer.getAddress().getZoneCode()).isEqualTo("newZone");
-        assertThat(trainer.getGender()).isEqualTo(Gender.FEMALE);
 
         verify(trainerRepository, times(1)).findById(1L);
     }
 
     @Test
     @DisplayName("회원 정보 수정 실패 - 존재하지 않는 회원")
-    void updateMemberFail() {
+    void updateTrainerFail_EmptyMember() {
         //given
         when(trainerRepository.findById(1L)).thenReturn(Optional.empty());
 
         //when & then
         assertThrows(NoSuchElementException.class,
-                () -> trainerService.updateTrainer(1L, "newLoginId", "newPw", "newName", new Address("newZone", "newAddress", "newDetail", "newBuilding"), Gender.FEMALE));
+                () -> trainerService.updateTrainer(1L, "newLoginId", "newPw", "newName", new Address("newZone", "newAddress", "newDetail", "newBuilding")));
 
         verify(trainerRepository, times(1)).findById(1L);
+    }
+
+    @Test
+    @DisplayName("회원 정보 수정 실패 - 이미 존재하는 아이디")
+    void updateTrainerFail_DupliLoginId() {
+        //given
+        String dupliLoginId = "loginId";
+
+        Trainer trainer = Trainer.builder()
+                .loginId("oldLoginId")
+                .password("oldPassword")
+                .build();
+
+        Trainer dupliTrainer = Trainer.builder()
+                .loginId(dupliLoginId)
+                .password("1234")
+                .build();
+
+        when(trainerRepository.findById(1L)).thenReturn(Optional.of(trainer));
+        when(memberRepository.findByLoginId(dupliLoginId)).thenReturn(Optional.of(dupliTrainer));
+
+        //when & then
+        assertThrows(IllegalStateException.class,
+                () -> trainerService.updateTrainer(1L, dupliLoginId, "newPw", "newName", new Address("newZone", "newAddress", "newDetail", "newBuilding")));
+
+        verify(trainerRepository, times(1)).findById(1L);
+        verify(memberRepository, times(1)).findByLoginId(dupliLoginId);
     }
 
     @Test

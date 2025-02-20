@@ -48,11 +48,17 @@ public class NorMemberService {
      * 일반 회원 정보 수정
      */
     @Transactional
-    public void updateMember(Long id, String loginId, String password, String name, Address address, Gender gender) {
+    public void updateMember(Long id, String loginId, String password, String name, Address address) {
         NorMember norMember = norMemberRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
 
-        norMember.updateInfo(loginId, password, name, address, gender);
+        //중복 아이디 체크
+        Optional<Member> dupliNorMember = memberRepository.findByLoginId(loginId);
+        if (dupliNorMember.isPresent()) {
+            throw new IllegalStateException("이미 존재하는 아이디입니다.");
+        }
+
+        norMember.updateInfo(loginId, password, name, address);
     }
 
     /**
