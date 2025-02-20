@@ -1,12 +1,18 @@
 package project.gymnawa.controller.api;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+import project.gymnawa.domain.Address;
 import project.gymnawa.domain.Gender;
+import project.gymnawa.domain.NorMember;
+import project.gymnawa.domain.api.ApiResponse;
+import project.gymnawa.domain.dto.normember.MemberEditDto;
 import project.gymnawa.domain.dto.normember.MemberSaveDto;
 import project.gymnawa.service.EmailService;
 import project.gymnawa.service.NorMemberService;
@@ -20,6 +26,9 @@ public class NorMemberApiController {
     private final NorMemberService norMemberService;
     private final EmailService emailService;
 
+    /**
+     * 회원가입
+     */
     @GetMapping("/add")
     public ResponseEntity<MemberSaveDto> addForm() {
         MemberSaveDto memberSaveDto = MemberSaveDto.builder()
@@ -35,5 +44,99 @@ public class NorMemberApiController {
                 .build();
 
         return ResponseEntity.ok().body(memberSaveDto);
+    }
+
+    /**
+     * 회원가입
+     */
+    @PostMapping("/add")
+    public ResponseEntity<ApiResponse<NorMember>> addMember(@Validated @RequestBody MemberSaveDto memberSaveDto,
+                                                            BindingResult bindingResult, HttpServletRequest request) {
+
+        if (bindingResult.hasErrors()) {
+            log.info("errors = " + bindingResult);
+            return ResponseEntity.badRequest().body(ApiResponse.error("입력값이 올바르지 않습니다."));
+        }
+
+        if (!emailService.isEmailVerified(memberSaveDto.getEmail(), request.getParameter("code"))) {
+            log.info("code : " + request.getParameter("code"));
+            bindingResult.rejectValue("email", "verified", "이메일 인증이 필요합니다.");
+            return ResponseEntity.badRequest().body(ApiResponse.error("이메일 인증이 필요합니다."));
+        }
+
+        Address address = Address.builder()
+                .zoneCode(memberSaveDto.getZoneCode())
+                .address(memberSaveDto.getAddress())
+                .detailAddress(memberSaveDto.getDetailAddress())
+                .buildingName(memberSaveDto.getBuildingName())
+                .build();
+
+        NorMember norMember = NorMember.builder()
+                .loginId(memberSaveDto.getLoginId())
+                .password(memberSaveDto.getPassword())
+                .name(memberSaveDto.getName())
+                .email(memberSaveDto.getEmail())
+                .gender(memberSaveDto.getGender())
+                .address(address)
+                .build();
+
+        norMemberService.join(norMember);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(norMember));
+    }
+
+    /**
+     * 마이페이지
+     */
+    @GetMapping("/{id}/mypage")
+    public ResponseEntity<ApiResponse<NorMember>> myPage(@PathVariable Long id) {
+        NorMember norMember = norMemberService.findOne(id);
+        return ResponseEntity.ok().body(ApiResponse.success(norMember));
+    }
+
+    /**
+     * 회원 정보 수정
+     */
+    @GetMapping("{id}/edit")
+    public ResponseEntity<ApiResponse<MemberEditDto>> editForm(@PathVariable Long id) {
+        NorMember norMember = norMemberService.findOne(id);
+        Address address = norMember.getAddress();
+
+        MemberEditDto memberEditDto = MemberEditDto.builder()
+                .loginId(norMember.getLoginId())
+                .password(norMember.getPassword())
+                .name(norMember.getName())
+                .zoneCode(address.getZoneCode())
+                .address(address.getAddress())
+                .detailAddress(address.getDetailAddress())
+                .buildingName(address.getBuildingName())
+                .build();
+
+        return ResponseEntity.ok().body(ApiResponse.success(memberEditDto));
+    }
+
+    /**
+     * 회원 정보 수정
+     */
+    @PostMapping("/{id}/edit")
+    public ResponseEntity<ApiResponse<String>> editMember(@PathVariable Long id,
+                                                          @Validated @RequestBody MemberEditDto memberEditDto,
+                                                          BindingResult bindingResult) {
+
+        if (bindingResult.hasErrors()) {
+            log.info("errors = " + bindingResult);
+            return ResponseEntity.badRequest().body(ApiResponse.error("입력값이 올바르지 않습니다."));
+        }
+
+        Address address = Address.builder()
+                .zoneCode(memberEditDto.getZoneCode())
+                .address(memberEditDto.getAddress())
+                .detailAddress(memberEditDto.getDetailAddress())
+                .buildingName(memberEditDto.getBuildingName())
+                .build();
+
+        norMemberService.updateMember(id, memberEditDto.getLoginId(), memberEditDto.getPassword(), memberEditDto.getName(), address);
+
+        return ResponseEntity.ok().body(ApiResponse.success("edit successful"));
     }
 }
