@@ -3,6 +3,7 @@ package project.gymnawa.domain;
 import jakarta.persistence.Embeddable;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -16,6 +17,7 @@ public class Address {
     private String detailAddress;
     private String buildingName;
 
+    @Builder
     public Address(String zoneCode, String address, String detailAddress, String buildingName) {
         this.zoneCode = zoneCode;
         this.address = address;
