@@ -64,21 +64,7 @@ public class NorMemberApiController {
             return ResponseEntity.badRequest().body(ApiResponse.error("이메일 인증이 필요합니다."));
         }
 
-        Address address = Address.builder()
-                .zoneCode(memberSaveDto.getZoneCode())
-                .address(memberSaveDto.getAddress())
-                .detailAddress(memberSaveDto.getDetailAddress())
-                .buildingName(memberSaveDto.getBuildingName())
-                .build();
-
-        NorMember norMember = NorMember.builder()
-                .loginId(memberSaveDto.getLoginId())
-                .password(memberSaveDto.getPassword())
-                .name(memberSaveDto.getName())
-                .email(memberSaveDto.getEmail())
-                .gender(memberSaveDto.getGender())
-                .address(address)
-                .build();
+        NorMember norMember = createNorMember(memberSaveDto);
 
         norMemberService.join(norMember);
 
@@ -138,5 +124,23 @@ public class NorMemberApiController {
         norMemberService.updateMember(id, memberEditDto.getLoginId(), memberEditDto.getPassword(), memberEditDto.getName(), address);
 
         return ResponseEntity.ok().body(ApiResponse.success("edit successful"));
+    }
+
+    private static NorMember createNorMember(MemberSaveDto memberSaveDto) {
+        Address address = Address.builder()
+                .zoneCode(memberSaveDto.getZoneCode())
+                .address(memberSaveDto.getAddress())
+                .detailAddress(memberSaveDto.getDetailAddress())
+                .buildingName(memberSaveDto.getBuildingName())
+                .build();
+
+        return NorMember.builder()
+                .loginId(memberSaveDto.getLoginId())
+                .password(memberSaveDto.getPassword())
+                .name(memberSaveDto.getName())
+                .email(memberSaveDto.getEmail())
+                .gender(memberSaveDto.getGender())
+                .address(address)
+                .build();
     }
 }
