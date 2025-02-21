@@ -1,6 +1,7 @@
 package project.gymnawa.domain.dto.trainer;
 
 import jakarta.validation.constraints.NotBlank;
+import lombok.Builder;
 import lombok.Data;
 
 @Data
@@ -23,6 +24,7 @@ public class TrainerEditDto {
     private String detailAddress;
     private String buildingName;
 
+    @Builder
     public TrainerEditDto(String loginId, String password, String name, String zoneCode, String address, String detailAddress, String buildingName) {
         this.loginId = loginId;
         this.password = password;
