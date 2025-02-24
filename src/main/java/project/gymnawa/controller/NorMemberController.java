@@ -3,6 +3,7 @@ package project.gymnawa.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -10,10 +11,12 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import project.gymnawa.domain.Address;
 import project.gymnawa.domain.NorMember;
+import project.gymnawa.domain.api.ApiResponse;
 import project.gymnawa.domain.dto.normember.MemberEditDto;
 import project.gymnawa.domain.dto.normember.MemberSaveDto;
 import project.gymnawa.service.EmailService;
 import project.gymnawa.service.NorMemberService;
+import project.gymnawa.web.SessionConst;
 
 @Controller
 @RequiredArgsConstructor
@@ -60,7 +63,13 @@ public class NorMemberController {
      * 마이페이지
      */
     @GetMapping("/{id}/mypage")
-    public String mypage(@PathVariable Long id, Model model) {
+    public String mypage(@PathVariable Long id, Model model,
+                         @SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) NorMember loginedMember) {
+
+        if (!loginedMember.getId().equals(id)) {
+            return "redirect:/";
+        }
+
         NorMember norMember = norMemberService.findOne(id);
 
         model.addAttribute("norMember", norMember);
@@ -72,7 +81,13 @@ public class NorMemberController {
      * 일반회원 정보 수정
      */
     @GetMapping("/{id}/edit")
-    public String editForm(@PathVariable Long id, Model model) {
+    public String editForm(@PathVariable Long id, Model model,
+                           @SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) NorMember loginedMember) {
+
+        if (!loginedMember.getId().equals(id)) {
+            return "redirect:/";
+        }
+
         NorMember norMember = norMemberService.findOne(id);
 
         MemberEditDto memberEditDto = new MemberEditDto(norMember.getLoginId(), norMember.getPassword(), norMember.getName(),
@@ -89,7 +104,12 @@ public class NorMemberController {
      */
     @PostMapping("/{id}/edit")
     public String editMember(@Validated @ModelAttribute MemberEditDto memberEditDto, BindingResult bindingResult,
-                             @PathVariable Long id) {
+                             @PathVariable Long id,
+                             @SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) NorMember loginedMember) {
+
+        if (!loginedMember.getId().equals(id)) {
+            return "redirect:/";
+        }
 
         if (bindingResult.hasErrors()) {
             log.info("errors = " + bindingResult);

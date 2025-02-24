@@ -3,6 +3,7 @@ package project.gymnawa.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -10,10 +11,12 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import project.gymnawa.domain.Address;
 import project.gymnawa.domain.Trainer;
+import project.gymnawa.domain.api.ApiResponse;
 import project.gymnawa.domain.dto.trainer.TrainerEditDto;
 import project.gymnawa.domain.dto.trainer.TrainerSaveDto;
 import project.gymnawa.service.EmailService;
 import project.gymnawa.service.TrainerService;
+import project.gymnawa.web.SessionConst;
 
 @Controller
 @RequestMapping("/member/t")
@@ -60,7 +63,13 @@ public class TrainerController {
      * 마이페이지
      */
     @GetMapping("/{id}/mypage")
-    public String mypage(@PathVariable Long id, Model model) {
+    public String mypage(@PathVariable Long id, Model model,
+                         @SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) Trainer loginedTrainer) {
+
+        if (!loginedTrainer.getId().equals(id)) {
+            return "redirect:/";
+        }
+
         Trainer trainer = trainerService.findOne(id);
 
         model.addAttribute("trainer", trainer);
@@ -72,7 +81,13 @@ public class TrainerController {
      * 트레이너 정보 수정
      */
     @GetMapping("/{id}/edit")
-    public String editForm(@PathVariable Long id, Model model) {
+    public String editForm(@PathVariable Long id, Model model,
+                           @SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) Trainer loginedTrainer) {
+
+        if (!loginedTrainer.getId().equals(id)) {
+            return "redirect:/";
+        }
+
         Trainer trainer = trainerService.findOne(id);
 
         TrainerEditDto trainerEditDto = new TrainerEditDto(trainer.getLoginId(), trainer.getPassword(), trainer.getName(),
@@ -89,7 +104,12 @@ public class TrainerController {
      */
     @PostMapping("/{id}/edit")
     public String editMember(@Validated @ModelAttribute TrainerEditDto trainerEditDto, BindingResult bindingResult,
-                             @PathVariable Long id) {
+                             @PathVariable Long id,
+                             @SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) Trainer loginedTrainer) {
+
+        if (!loginedTrainer.getId().equals(id)) {
+            return "redirect:/";
+        }
 
         if (bindingResult.hasErrors()) {
             log.info("errors = " + bindingResult);

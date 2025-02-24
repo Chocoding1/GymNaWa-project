@@ -10,12 +10,14 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import project.gymnawa.domain.Address;
 import project.gymnawa.domain.Gender;
+import project.gymnawa.domain.NorMember;
 import project.gymnawa.domain.Trainer;
 import project.gymnawa.domain.api.ApiResponse;
 import project.gymnawa.domain.dto.trainer.TrainerEditDto;
 import project.gymnawa.domain.dto.trainer.TrainerSaveDto;
 import project.gymnawa.service.EmailService;
 import project.gymnawa.service.TrainerService;
+import project.gymnawa.web.SessionConst;
 
 @RestController
 @RequiredArgsConstructor
@@ -75,7 +77,13 @@ public class TrainerApiController {
      * 마이페이지
      */
     @GetMapping("/{id}/mypage")
-    public ResponseEntity<ApiResponse<Trainer>> myPage(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<Trainer>> myPage(@PathVariable Long id,
+                                                       @SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) Trainer loginedTrainer) {
+
+        if (!loginedTrainer.getId().equals(id)) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("잘못된 접근입니다."));
+        }
+
         Trainer trainer = trainerService.findOne(id);
         return ResponseEntity.ok().body(ApiResponse.success(trainer));
     }
@@ -84,7 +92,13 @@ public class TrainerApiController {
      * 회원 정보 수정
      */
     @GetMapping("{id}/edit")
-    public ResponseEntity<ApiResponse<TrainerEditDto>> editForm(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<TrainerEditDto>> editForm(@PathVariable Long id,
+                                                                @SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) Trainer loginedTrainer) {
+
+        if (!loginedTrainer.getId().equals(id)) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("잘못된 접근입니다."));
+        }
+
         Trainer trainer = trainerService.findOne(id);
         Address address = trainer.getAddress();
 
@@ -107,7 +121,12 @@ public class TrainerApiController {
     @PostMapping("/{id}/edit")
     public ResponseEntity<ApiResponse<String>> editTrainer(@PathVariable Long id,
                                                           @Validated @RequestBody TrainerEditDto trainerEditDto,
-                                                          BindingResult bindingResult) {
+                                                          BindingResult bindingResult,
+                                                           @SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) Trainer loginedTrainer) {
+
+        if (!loginedTrainer.getId().equals(id)) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("잘못된 접근입니다."));
+        }
 
         if (bindingResult.hasErrors()) {
             log.info("errors = " + bindingResult);
@@ -125,8 +144,6 @@ public class TrainerApiController {
 
         return ResponseEntity.ok().body(ApiResponse.success("edit successful"));
     }
-
-
 
     private static Trainer createTrainer(TrainerSaveDto trainerSaveDto) {
         Address address = Address.builder()

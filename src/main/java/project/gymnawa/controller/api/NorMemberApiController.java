@@ -16,6 +16,7 @@ import project.gymnawa.domain.dto.normember.MemberEditDto;
 import project.gymnawa.domain.dto.normember.MemberSaveDto;
 import project.gymnawa.service.EmailService;
 import project.gymnawa.service.NorMemberService;
+import project.gymnawa.web.SessionConst;
 
 @RestController
 @RequiredArgsConstructor
@@ -75,7 +76,13 @@ public class NorMemberApiController {
      * 마이페이지
      */
     @GetMapping("/{id}/mypage")
-    public ResponseEntity<ApiResponse<NorMember>> myPage(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<NorMember>> myPage(@PathVariable Long id,
+                                                         @SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) NorMember loginedMember) {
+
+        if (!loginedMember.getId().equals(id)) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("잘못된 접근입니다."));
+        }
+
         NorMember norMember = norMemberService.findOne(id);
         return ResponseEntity.ok().body(ApiResponse.success(norMember));
     }
@@ -84,7 +91,13 @@ public class NorMemberApiController {
      * 회원 정보 수정
      */
     @GetMapping("{id}/edit")
-    public ResponseEntity<ApiResponse<MemberEditDto>> editForm(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<MemberEditDto>> editForm(@PathVariable Long id,
+                                                               @SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) NorMember loginedMember) {
+
+        if (!loginedMember.getId().equals(id)) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("잘못된 접근입니다."));
+        }
+
         NorMember norMember = norMemberService.findOne(id);
         Address address = norMember.getAddress();
 
@@ -107,7 +120,12 @@ public class NorMemberApiController {
     @PostMapping("/{id}/edit")
     public ResponseEntity<ApiResponse<String>> editMember(@PathVariable Long id,
                                                           @Validated @RequestBody MemberEditDto memberEditDto,
-                                                          BindingResult bindingResult) {
+                                                          BindingResult bindingResult,
+                                                          @SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) NorMember loginedMember) {
+
+        if (!loginedMember.getId().equals(id)) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("잘못된 접근입니다."));
+        }
 
         if (bindingResult.hasErrors()) {
             log.info("errors = " + bindingResult);
