@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>지도 생성하기</title>
+    <style>
+        /* 상단 영역 스타일 */
+        #header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background-color: #f8f8f8;
+            border-bottom: 1px solid #ddd;
+        }
+        #header h1 {
+            margin: 0;
+            font-size: 20px;
+        }
+        #header .buttons {
+            display: flex;
+            gap: 10px;
+        }
+        #header .buttons button {
+            padding: 5px 10px;
+            font-size: 14px;
+            cursor: pointer;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #ffffff;
+        }
+        #header .buttons button:hover {
+            background-color: #f0f0f0;
+        }
+
+        /* 검색창 스타일 */
+        #searchContainer {
+            position: absolute;
+            top: 60px;
+            left: 10px;
+            z-index: 1000;
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+            display: flex;
+            gap: 5px;
+        }
+        #searchBox {
+            width: 250px;
+            padding: 8px;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        #searchBtn {
+            padding: 8px 12px;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+        }
+        #searchBtn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<div id="header">
+    <h1>주변 헬스장을 탐색해보세요!</h1>
+    <div class="buttons">
+        <button onclick="location.href='#signup'"
+                th:onclick="|location.href='@{/member/add/select}'|">회원가입</button>
+        <button onclick="location.href='#login'"
+                th:onclick="|location.href='@{/member/login}'|">로그인</button>
+    </div>
+</div>
+
+<!-- 검색창 추가 -->
+<div id="searchContainer">
+    <input type="text" id="searchBox" placeholder="주소를 입력하세요">
+    <button id="searchBtn" onclick="searchAddress()">검색</button>
+</div>
+
+<!-- 지도를 표시할 div 입니다 -->
+<div id="map" style="width:100%;height:680px;"></div>
+
+<script type="text/javascript" th:src="'//dapi.kakao.com/v2/maps/sdk.js?appkey=' + ${apiKey} + '&libraries=services'"></script>
+<script>
+    let map;
+    let markers = [];
+
+    // 카카오맵 초기화
+    function initMap(x, y) {
+        const mapContainer = document.getElementById('map'); // 지도 표시할 div
+        const mapOption = {
+            center: new kakao.maps.LatLng(y, x), // 위도(y), 경도(x) -> 지도 중심 좌표 설정
+            level: 3 // 지도 확대 레벨
+        };
+        // 지도를 표시할 div와 지도 옵션으로 지도를 생성합니다
+        map = new kakao.maps.Map(mapContainer, mapOption);
+        searchGyms(x, y);
+    }
+
+    // 현재 위치 가져오기
+    function getCurrentLocation() {
+        if (navigator.geolocation) { // HTML5의 geolocation으로 사용할 수 있는지 확인합니다
+            // GeoLocation을 이용해서 접속 위치를 얻어옵니다
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const x = position.coords.longitude; // 경도
+                    const y = position.coords.latitude; // 위도
+                    initMap(x, y); // 지도 초기화
+                },
+                (error) => {
+                    console.error("위치 정보를 가져올 수 없습니다.", error);
+                    initMap(127.0276, 37.4979); // 기본 좌표 (서울 강남)
+                }
+            );
+        }
+    }
+
+    // 백엔드에 헬스장 정보 요청
+    function searchGyms(x, y) {
+        fetch('/api/gyms?x=${x}&y=${y}')
+            .then(response => response.json())
+            .then(data => {
+                addMarkers(data);
+            })
+            .catch(error => console.error("헬스장 정보를 가져오는 중 오류 발생:", error));
+    }
+
+    // 지도에 마커 표시
+    function addMarkers(gyms) {
+        // 기존 마커 삭제
+        markers.forEach(marker => marker.setMap(null));
+        markers = [];
+
+        gyms.forEach(gym => {
+            const marker = new kakao.maps.Marker({
+                position: new kakao.maps.LatLng(gym.y, gym.x),
+                map: map
+            });
+
+            const infowindow = new kakao.maps.InfoWindow({
+                content: `<div style="padding:5px;">${gym.place_name}</div>`
+            });
+
+            kakao.maps.event.addListener(marker, 'mouseover', function() {
+                infowindow.open(map, marker);
+            });
+
+            kakao.maps.event.addListener(marker, 'mouseout', function() {
+                infowindow.close();
+            });
+
+            markers.push(marker);
+        });
+    }
+
+    // 실행
+    getCurrentLocation();
+</script>
+</body>
+</html>

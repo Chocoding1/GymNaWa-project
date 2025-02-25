@@ -32,6 +32,39 @@
         #header .buttons button:hover {
             background-color: #f0f0f0;
         }
+
+        /* 검색창 스타일 */
+        #searchContainer {
+            position: absolute;
+            top: 60px;
+            left: 10px;
+            z-index: 1000;
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+            display: flex;
+            gap: 5px;
+        }
+        #searchBox {
+            width: 250px;
+            padding: 8px;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        #searchBtn {
+            padding: 8px 12px;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #007BFF;
+            color: white;
+            cursor: pointer;
+        }
+        #searchBtn:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
@@ -44,6 +77,13 @@
                 th:onclick="|location.href='@{/member/login}'|">로그인</button>
     </div>
 </div>
+
+<!-- 검색창 추가 -->
+<div id="searchContainer">
+    <input type="text" id="searchBox" placeholder="주소를 입력하세요">
+    <button id="searchBtn" onclick="searchAddress()">검색</button>
+</div>
+
 <!-- 지도를 표시할 div 입니다 -->
 <div id="map" style="width:100%;height:680px;"></div>
 
@@ -57,6 +97,9 @@
 
     // 지도를 표시할 div와 지도 옵션으로 지도를 생성합니다
     var map = new kakao.maps.Map(mapContainer, mapOption);
+
+    // 주소-좌표 변환 객체를 생성합니다
+    var geocoder = new kakao.maps.services.Geocoder();
 
     // HTML5의 geolocation으로 사용할 수 있는지 확인합니다
     if (navigator.geolocation) {
@@ -107,6 +150,32 @@
         // 지도 중심좌표를 접속위치로 변경합니다
         map.setCenter(locPosition);
     }
+
+    // 주소 검색 후 지도 이동
+    function searchAddress() {
+        var address = document.getElementById("searchBox").value;
+        if (!address) {
+            alert("주소를 입력하세요!");
+            return;
+        }
+
+        geocoder.addressSearch(address, function(result, status) {
+            if (status === kakao.maps.services.Status.OK) {
+                var coords = new kakao.maps.LatLng(result[0].y, result[0].x);
+                map.setCenter(coords);
+                marker.setPosition(coords);
+            } else {
+                alert("주소를 찾을 수 없습니다.");
+            }
+        });
+    }
+
+    // 엔터 키 입력 시 검색 실행
+    document.getElementById("searchBox").addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+            searchAddress();
+        }
+    });
 </script>
 </body>
 </html>
