@@ -18,6 +18,7 @@ public class WebConfig implements WebMvcConfigurer {
                         "/api/", "/api/member/add/select", "/api/member/login", "/api/member/logout",
                         "/api/member/n/add", "/api/member/t/add",
                         "/email/send-code", "/email/verify-code",
+                        "/api/gyms",
                         "/*.ico", "/error");
     }
 }
