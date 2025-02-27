@@ -46,7 +46,7 @@
             display: flex;
             gap: 5px;
         }
-        #searchBox {
+        #searchKeyword {
             width: 250px;
             padding: 8px;
             font-size: 14px;
@@ -80,8 +80,8 @@
 
 <!-- 검색창 추가 -->
 <div id="searchContainer">
-    <input type="text" id="searchBox" placeholder="주소를 입력하세요">
-    <button id="searchBtn" onclick="searchAddress()">검색</button>
+    <input type="text" id="searchKeyword" placeholder="주소를 입력하세요">
+    <button id="searchBtn" onclick="searchGym()">검색</button>
 </div>
 
 <!-- 지도를 표시할 div 입니다 -->
@@ -93,75 +93,94 @@
     let markers = [];
 
     // 카카오맵 초기화
-    function initMap(x, y) {
-        const mapContainer = document.getElementById('map'); // 지도 표시할 div
-        const mapOption = {
-            center: new kakao.maps.LatLng(y, x), // 위도(y), 경도(x) -> 지도 중심 좌표 설정
-            level: 3 // 지도 확대 레벨
-        };
-        // 지도를 표시할 div와 지도 옵션으로 지도를 생성합니다
-        map = new kakao.maps.Map(mapContainer, mapOption);
-        searchGyms(x, y);
-    }
+    function initMap() {
+        navigator.geolocation.getCurrentPosition(
+            position => {
+                let lat = position.coords.latitude;
+                let lng = position.coords.longitude;
 
-    // 현재 위치 가져오기
-    function getCurrentLocation() {
-        if (navigator.geolocation) { // HTML5의 geolocation으로 사용할 수 있는지 확인합니다
-            // GeoLocation을 이용해서 접속 위치를 얻어옵니다
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    const x = position.coords.longitude; // 경도
-                    const y = position.coords.latitude; // 위도
-                    initMap(x, y); // 지도 초기화
-                },
-                (error) => {
-                    console.error("위치 정보를 가져올 수 없습니다.", error);
-                    initMap(127.0276, 37.4979); // 기본 좌표 (서울 강남)
-                }
-            );
-        }
+                let container = document.getElementById('map');
+                let options = { center: new kakao.maps.LatLng(lat, lng), level: 3 };
+                map = new kakao.maps.Map(container, options);
+
+                getGyms(lat, lng);
+            },
+            error => {
+                console.error("위치 정보를 가져올 수 없습니다.", error);
+                initMap(127.0276, 37.4979); // 기본 좌표 (서울 강남)
+            }
+        );
     }
 
     // 백엔드에 헬스장 정보 요청
-    function searchGyms(x, y) {
-        fetch('/api/gyms?x=${x}&y=${y}')
+    function getGyms(lat, lng) {
+        const params = {
+            x: lng,
+            y: lat
+        };
+        const url = new URL('http://localhost:8080/api/gyms');
+        url.search = new URLSearchParams(params).toString()
+        console.log(url)
+        fetch(url)
             .then(response => response.json())
             .then(data => {
-                addMarkers(data);
+                markers.forEach(marker => marker.setMap(null)); // 기존 마커 제거
+                markers = [];
+
+                // 인포윈도우 객체 생성
+                let infowindow = new kakao.maps.InfoWindow({ zIndex: 1 });
+
+                data.data.documents.forEach(gym => {
+                    let markerPosition = new kakao.maps.LatLng(gym.y, gym.x); // 마커 위치
+
+                    // 마커 생성
+                    let marker = new kakao.maps.Marker({
+                        position: markerPosition,
+                        map: map
+                    });
+
+                    // 마커에 마우스를 올리면 인포윈도우 표시
+                    kakao.maps.event.addListener(marker, 'mouseover', function () {
+                        infowindow.setContent(`<div style="padding:5px;font-size:14px;">${gym.place_name}</div>`);
+                        infowindow.open(map, marker);
+                    });
+
+                    // 마커에서 마우스를 떼면 인포윈도우 닫기
+                    kakao.maps.event.addListener(marker, 'mouseout', function () {
+                        infowindow.close();
+                    });
+
+                    markers.push(marker);
+                });
             })
-            .catch(error => console.error("헬스장 정보를 가져오는 중 오류 발생:", error));
+            .catch(error => console.error("API 요청 실패:", error));
     }
 
-    // 지도에 마커 표시
-    function addMarkers(gyms) {
-        // 기존 마커 삭제
-        markers.forEach(marker => marker.setMap(null));
-        markers = [];
+    function searchGym() {
+        let keyword = document.getElementById('searchKeyword').value;
+        let geocoder = new kakao.maps.services.Geocoder();
 
-        gyms.forEach(gym => {
-            const marker = new kakao.maps.Marker({
-                position: new kakao.maps.LatLng(gym.y, gym.x),
-                map: map
-            });
+        geocoder.addressSearch(keyword, function (result, status) {
+            console.log("검색 결과:", result);
 
-            const infowindow = new kakao.maps.InfoWindow({
-                content: `<div style="padding:5px;">${gym.place_name}</div>`
-            });
-
-            kakao.maps.event.addListener(marker, 'mouseover', function() {
-                infowindow.open(map, marker);
-            });
-
-            kakao.maps.event.addListener(marker, 'mouseout', function() {
-                infowindow.close();
-            });
-
-            markers.push(marker);
+            if (status === kakao.maps.services.Status.OK) {
+                let lat = result[0].y;
+                let lng = result[0].x;
+                map.setCenter(new kakao.maps.LatLng(lat, lng));
+                getGyms(lat, lng);
+            }
         });
     }
 
+    document.getElementById("searchKeyword").addEventListener("keydown", function(event) {
+        if (event.key === "Enter") {
+            event.preventDefault(); // 기본 동작 방지 (폼 제출 X)
+            searchGym();
+        }
+    });
+
     // 실행
-    getCurrentLocation();
+    window.onload = initMap;
 </script>
 </body>
 </html>

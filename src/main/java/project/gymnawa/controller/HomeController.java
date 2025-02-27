@@ -23,7 +23,7 @@ public class HomeController {
         model.addAttribute("apiKey", apiKey);
 
         if (loginedMember == null) {
-            return "home";
+            return "kakaoHome";
         }
 
         model.addAttribute("member", loginedMember);
