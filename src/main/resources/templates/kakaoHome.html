@@ -100,28 +100,30 @@
                 let lng = position.coords.longitude;
 
                 let container = document.getElementById('map');
-                let options = { center: new kakao.maps.LatLng(lat, lng), level: 3 };
+                let options = { center: new kakao.maps.LatLng(lat, lng), level: 4 };
                 map = new kakao.maps.Map(container, options);
 
                 getGyms(lat, lng);
-            },
-            error => {
-                console.error("위치 정보를 가져올 수 없습니다.", error);
-                initMap(127.0276, 37.4979); // 기본 좌표 (서울 강남)
             }
         );
     }
 
     // 백엔드에 헬스장 정보 요청
-    function getGyms(lat, lng) {
-        const params = {
-            x: lng,
-            y: lat
-        };
+    function getGyms(lat, lng, keyword = "") {
         const url = new URL('http://localhost:8080/api/gyms');
-        url.search = new URLSearchParams(params).toString()
-        console.log(url)
-        fetch(url)
+        let params = new URLSearchParams(); // URL 파라미터 담는 JavaScript 내장 객체
+
+        // 좌표가 넘어왔으면 파라미터에 좌표 추가
+        if (lat && lng) {
+            params.append("x", lng);
+            params.append("y", lat);
+        } else if (keyword && keyword.trim() !== "") { // 좌표 안 넘어왔으면 키워드 추가
+            params.append("keyword", keyword);
+        }
+
+        url.search = params.toString() // 만든 파라미터로 URL 생성
+
+        fetch(url) // 백엔드로 요청
             .then(response => response.json())
             .then(data => {
                 markers.forEach(marker => marker.setMap(null)); // 기존 마커 제거
@@ -130,14 +132,19 @@
                 // 인포윈도우 객체 생성
                 let infowindow = new kakao.maps.InfoWindow({ zIndex: 1 });
 
+                 // 경계 객체 생성(여러 헬스장을 포함하는 경계)
+                let bounds = new kakao.maps.LatLngBounds();
+
                 data.data.documents.forEach(gym => {
                     let markerPosition = new kakao.maps.LatLng(gym.y, gym.x); // 마커 위치
-
                     // 마커 생성
                     let marker = new kakao.maps.Marker({
                         position: markerPosition,
                         map: map
                     });
+
+                    // 마커 좌표를 경계에 포함
+                    bounds.extend(markerPosition);
 
                     // 마커에 마우스를 올리면 인포윈도우 표시
                     kakao.maps.event.addListener(marker, 'mouseover', function () {
@@ -152,26 +159,36 @@
 
                     markers.push(marker);
                 });
+                map.setBounds(bounds); // 해당 경계로 맵 이동
             })
             .catch(error => console.error("API 요청 실패:", error));
     }
 
     function searchGym() {
-        let keyword = document.getElementById('searchKeyword').value;
+        // 입력값 받아오기
+        let keyword = document.getElementById('searchKeyword').value.trim();
         let geocoder = new kakao.maps.services.Geocoder();
 
-        geocoder.addressSearch(keyword, function (result, status) {
-            console.log("검색 결과:", result);
+        // 입력값 없으면 현위치 주변 헬스장 조회
+        if (keyword === "") {
+            initMap();
+        }
 
+        geocoder.addressSearch(keyword, function (result, status) {
             if (status === kakao.maps.services.Status.OK) {
+                // 좌표 변환 가능하면 좌표 전달해서 좌표 기반 조회
                 let lat = result[0].y;
                 let lng = result[0].x;
-                map.setCenter(new kakao.maps.LatLng(lat, lng));
+<!--                map.setCenter(new kakao.maps.LatLng(lat, lng));-->
                 getGyms(lat, lng);
+            } else {
+                // 좌표 변환 못 하면 키워드 전달해서 키워드 기반 조회
+                getGyms(null, null, keyword);
             }
         });
     }
 
+    // Enter만 눌러도 검색되도록 하는 기능
     document.getElementById("searchKeyword").addEventListener("keydown", function(event) {
         if (event.key === "Enter") {
             event.preventDefault(); // 기본 동작 방지 (폼 제출 X)
