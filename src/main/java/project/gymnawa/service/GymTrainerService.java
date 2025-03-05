@@ -38,7 +38,14 @@ public class GymTrainerService {
      * 헬스장과 계약 상태 별 계약 정보 조회
      * 특정 헬스장에 근무하는 트레이너 조회용 메서드
      */
-    public List<GymTrainer> findByGymAndContractStatus(Gym gym, ContractStatus contractStatus) {
-        return gymTrainerRepository.findByGymAndContractStatus(gym, contractStatus);
+    public List<GymTrainer> findByGymAndContractStatus(String gymId, ContractStatus contractStatus) {
+        return gymTrainerRepository.findByGymIdAndContractStatus(gymId, contractStatus);
+    }
+
+    /**
+     * 특정 헬스장에 특정 트레이너가 계약 상태인지 체크하는 메서드
+     */
+    public List<GymTrainer> findByGymIdAndTrainerAndContractStatus(String gymId, Trainer trainer, ContractStatus contractStatus) {
+        return gymTrainerRepository.findByGymIdAndTrainerAndContractStatus(gymId, trainer, contractStatus);
     }
 }
