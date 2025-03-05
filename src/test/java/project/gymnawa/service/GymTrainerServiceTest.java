@@ -35,7 +35,7 @@ class GymTrainerServiceTest {
         //given
         GymTrainer gymTrainer = GymTrainer.builder()
                 .id(1L)
-                .gym(Gym.builder().build())
+                .gymId("gymId")
                 .trainer(Trainer.builder().build())
                 .contractStatus(ContractStatus.ACTIVE)
                 .build();
@@ -54,9 +54,9 @@ class GymTrainerServiceTest {
     void findByTrainer() {
         //given
         Trainer trainer = createTrainer("jsj012100", "1234", "조성진", "galmeagi2@naver.com");
-        Gym gym = createGym("라온짐");
-        GymTrainer gymTrainer1 = createGymTrainer(trainer, gym, ContractStatus.ACTIVE);
-        GymTrainer gymTrainer2 = createGymTrainer(trainer, gym, ContractStatus.EXPIRED);
+//        Gym gym = createGym("라온짐");
+        GymTrainer gymTrainer1 = createGymTrainer(trainer, "gymId", ContractStatus.ACTIVE);
+        GymTrainer gymTrainer2 = createGymTrainer(trainer, "gymId", ContractStatus.EXPIRED);
 
         List<GymTrainer> gymTrainers = Arrays.asList(gymTrainer1, gymTrainer2);
 
@@ -77,28 +77,47 @@ class GymTrainerServiceTest {
         //given
         Trainer trainer1 = createTrainer("jsj012100", "1234", "조성진", "galmeagi2@naver.com");
         Trainer trainer2 = createTrainer("jsj121", "12345", "조성민", "galmeagi2@naver.com");
-        Gym gym = createGym("라온짐");
+//        Gym gym = createGym("라온짐");
 
-        GymTrainer gymTrainer1 = createGymTrainer(trainer1, gym, ContractStatus.ACTIVE);
-        GymTrainer gymTrainer2 = createGymTrainer(trainer1, gym, ContractStatus.EXPIRED);
-        GymTrainer gymTrainer3 = createGymTrainer(trainer2, gym, ContractStatus.ACTIVE);
+        GymTrainer gymTrainer1 = createGymTrainer(trainer1, "gymId", ContractStatus.ACTIVE);
+        GymTrainer gymTrainer2 = createGymTrainer(trainer1, "gymId", ContractStatus.EXPIRED);
+        GymTrainer gymTrainer3 = createGymTrainer(trainer2, "gymId", ContractStatus.ACTIVE);
 
         List<GymTrainer> gymTrainers = Arrays.asList(gymTrainer1, gymTrainer3);
 
-        when(gymTrainerRepository.findByGymAndContractStatus(gym, ContractStatus.ACTIVE)).thenReturn(gymTrainers);
+        when(gymTrainerRepository.findByGymIdAndContractStatus("gymId", ContractStatus.ACTIVE)).thenReturn(gymTrainers);
 
         //when
-        List<GymTrainer> result = gymTrainerService.findByGymAndContractStatus(gym, ContractStatus.ACTIVE);
+        List<GymTrainer> result = gymTrainerService.findByGymAndContractStatus("gymId", ContractStatus.ACTIVE);
 
         //then
         assertThat(result.size()).isEqualTo(2);
 
-        verify(gymTrainerRepository, times(1)).findByGymAndContractStatus(gym, ContractStatus.ACTIVE);
+        verify(gymTrainerRepository, times(1)).findByGymIdAndContractStatus("gymId", ContractStatus.ACTIVE);
     }
 
-    private static GymTrainer createGymTrainer(Trainer trainer, Gym gym, ContractStatus contractStatus) {
+    @Test
+    @DisplayName("헬스장, 트레이너, 계약 상태 별 계약 정보 조회")
+    void findContractByTrainerAndGymAndContractStatus() {
+        //given
+        Trainer trainer = createTrainer("jsj012100", "1234", "조성진", "galmeagi2@naver.com");
+
+        GymTrainer gymTrainer = createGymTrainer(trainer, "gymId", ContractStatus.ACTIVE);
+
+        List<GymTrainer> gymTrainers = Arrays.asList(gymTrainer);
+
+        when(gymTrainerRepository.findByGymIdAndTrainerAndContractStatus("gymId", trainer, ContractStatus.ACTIVE)).thenReturn(gymTrainers);
+
+        //when
+        List<GymTrainer> result = gymTrainerService.findByGymIdAndTrainerAndContractStatus("gymId", trainer, ContractStatus.ACTIVE);
+
+        //then
+        verify(gymTrainerRepository, times(1)).findByGymIdAndTrainerAndContractStatus("gymId", trainer, ContractStatus.ACTIVE);
+    }
+
+    private static GymTrainer createGymTrainer(Trainer trainer, String gymId, ContractStatus contractStatus) {
         return GymTrainer.builder()
-                .gym(gym)
+                .gymId(gymId)
                 .trainer(trainer)
                 .contractStatus(contractStatus)
                 .build();

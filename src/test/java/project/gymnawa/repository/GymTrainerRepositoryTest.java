@@ -30,10 +30,12 @@ class GymTrainerRepositoryTest {
         Trainer trainer = createTrainer("jsj121", "123456", "조성민", "galmeagi2@gmail.com", address, Gender.MALE);
         trainerRepository.save(trainer);
 
+/*
         Gym gym = createGym("라온짐", "02-1234-5678", address, "매일", "06:00 ~ 22:00");
         gymRepository.save(gym);
+*/
 
-        GymTrainer gymTrainer = createGymTrainer(trainer, gym, LocalDate.of(2025, 2, 11), LocalDate.of(2026, 2, 11), ContractStatus.ACTIVE);
+        GymTrainer gymTrainer = createGymTrainer(trainer, "gymId", LocalDate.of(2025, 2, 11), ContractStatus.ACTIVE);
 
         //when
         GymTrainer savedGymTrainer = gymTrainerRepository.save(gymTrainer);
@@ -52,14 +54,15 @@ class GymTrainerRepositoryTest {
         Trainer trainer = createTrainer("jsj121", "123456", "조성민", "galmeagi2@gmail.com", address, Gender.MALE);
         trainerRepository.save(trainer);
 
+/*
         Gym gym1 = createGym("라온짐", "02-1234-5678", address, "매일", "06:00 ~ 22:00");
         Gym gym2 = createGym("스포애니", "02-5678-1234", address, "매일", "06:00 ~ 22:00");
-
         gymRepository.save(gym1);
         gymRepository.save(gym2);
+*/
 
-        GymTrainer gymTrainer1 = createGymTrainer(trainer, gym1, LocalDate.of(2023, 2, 11), LocalDate.of(2024, 2, 11), ContractStatus.EXPIRED);
-        GymTrainer gymTrainer2 = createGymTrainer(trainer, gym2, LocalDate.of(2025, 2, 11), LocalDate.of(2026, 2, 11), ContractStatus.ACTIVE);
+        GymTrainer gymTrainer1 = createGymTrainer(trainer, "gymId1", LocalDate.of(2023, 2, 11), ContractStatus.EXPIRED);
+        GymTrainer gymTrainer2 = createGymTrainer(trainer, "gymId2", LocalDate.of(2025, 2, 11), ContractStatus.ACTIVE);
 
         gymTrainerRepository.save(gymTrainer1);
         gymTrainerRepository.save(gymTrainer2);
@@ -84,26 +87,52 @@ class GymTrainerRepositoryTest {
         trainerRepository.save(trainer1);
         trainerRepository.save(trainer2);
 
+/*
         Gym gym1 = createGym("라온짐", "02-1234-5678", address, "매일", "06:00 ~ 22:00");
         Gym gym2 = createGym("스포애니", "02-5678-1234", address, "매일", "06:00 ~ 22:00");
-
         gymRepository.save(gym1);
         gymRepository.save(gym2);
+*/
 
-        GymTrainer gymTrainer1 = createGymTrainer(trainer1, gym2, LocalDate.of(2023, 2, 11), LocalDate.of(2024, 2, 11), ContractStatus.EXPIRED);
-        GymTrainer gymTrainer2 = createGymTrainer(trainer2, gym2, LocalDate.of(2025, 2, 11), LocalDate.of(2026, 2, 11), ContractStatus.ACTIVE);
-        GymTrainer gymTrainer3 = createGymTrainer(trainer1, gym2, LocalDate.of(2024, 2, 11), LocalDate.of(2026, 2, 11), ContractStatus.ACTIVE);
+        GymTrainer gymTrainer1 = createGymTrainer(trainer1, "gymId", LocalDate.of(2023, 2, 11), ContractStatus.EXPIRED);
+        GymTrainer gymTrainer2 = createGymTrainer(trainer2, "gymId", LocalDate.of(2025, 2, 11),  ContractStatus.ACTIVE);
+        GymTrainer gymTrainer3 = createGymTrainer(trainer1, "gymId", LocalDate.of(2024, 2, 11), ContractStatus.ACTIVE);
 
         gymTrainerRepository.save(gymTrainer1);
         gymTrainerRepository.save(gymTrainer2);
         gymTrainerRepository.save(gymTrainer3);
 
         //when
-        List<GymTrainer> result = gymTrainerRepository.findByGymAndContractStatus(gym2, ContractStatus.ACTIVE);
+        List<GymTrainer> result = gymTrainerRepository.findByGymIdAndContractStatus("gymId", ContractStatus.ACTIVE);
 
         //then
         assertThat(result.size()).isEqualTo(2);
         assertThat(result).contains(gymTrainer2, gymTrainer3);
+    }
+
+    @Test
+    @DisplayName("트레이너, 헬스장, 계약 상태 별 계약 정보 조회")
+    void findContractByTrainerAndGymAndContractStatus() {
+        //given
+        Address address = new Address("12345", "서울", "강서구", "마곡동");
+
+        Trainer trainer = createTrainer("jsj012100", "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
+
+        trainerRepository.save(trainer);
+
+        GymTrainer gymTrainer1 = createGymTrainer(trainer, "gymId", LocalDate.of(2023, 2, 11), ContractStatus.EXPIRED);
+        GymTrainer gymTrainer2 = createGymTrainer(trainer, "gymId", LocalDate.of(2024, 2, 11), ContractStatus.ACTIVE);
+
+        gymTrainerRepository.save(gymTrainer1);
+        gymTrainerRepository.save(gymTrainer2);
+
+        //when
+        List<GymTrainer> result = gymTrainerRepository.findByGymIdAndTrainerAndContractStatus("gymId", trainer, ContractStatus.ACTIVE);
+
+        //then
+        assertThat(result.size()).isEqualTo(1);
+        assertThat(result).contains(gymTrainer2);
+
     }
 
     private Trainer createTrainer(String loginId, String password, String name, String email, Address address, Gender gender) {
@@ -117,6 +146,7 @@ class GymTrainerRepositoryTest {
                 .build();
     }
 
+/*
     private Gym createGym(String storeName, String storephone, Address address, String runday, String runtime) {
         return Gym.builder()
                 .storeName(storeName)
@@ -126,13 +156,13 @@ class GymTrainerRepositoryTest {
                 .runtime(runtime)
                 .build();
     }
+*/
 
-    private GymTrainer createGymTrainer(Trainer trainer, Gym gym, LocalDate hireDate, LocalDate expireDate, ContractStatus contractStatus) {
+    private GymTrainer createGymTrainer(Trainer trainer, String gymId, LocalDate hireDate, ContractStatus contractStatus) {
         return GymTrainer.builder()
                 .trainer(trainer)
-                .gym(gym)
+                .gymId(gymId)
                 .hireDate(hireDate)
-                .expireDate(expireDate)
                 .contractStatus(contractStatus)
                 .build();
     }
