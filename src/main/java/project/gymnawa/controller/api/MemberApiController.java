@@ -23,11 +23,17 @@ public class MemberApiController {
 
     private final MemberService memberService;
 
+    /**
+     * 회원 타입 선택 
+     */
     @GetMapping("/add/select")
     public ResponseEntity<ApiResponse<String>> selectMemberType() {
         return ResponseEntity.ok().body(ApiResponse.success("/member/memberTypeSelectForm"));
     }
 
+    /**
+     * 로그인
+     */
     @GetMapping("/login")
     public ResponseEntity<ApiResponse<MemberLoginDto>> loginForm() {
         MemberLoginDto memberLoginDto = MemberLoginDto.builder()
@@ -38,6 +44,9 @@ public class MemberApiController {
         return ResponseEntity.ok().body(ApiResponse.success(memberLoginDto));
     }
 
+    /**
+     * 로그인
+     */
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<String>> login(@Validated @RequestBody MemberLoginDto memberLoginDto,
                                         BindingResult bindingResult,
@@ -60,6 +69,9 @@ public class MemberApiController {
         return ResponseEntity.ok().body(ApiResponse.success("login successful"));
     }
 
+    /**
+     * 로그아웃
+     */
     @PostMapping("/logout")
     public ResponseEntity<ApiResponse<String>> logout(HttpServletRequest request) {
         HttpSession session = request.getSession(false);
