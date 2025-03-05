@@ -118,7 +118,7 @@
             params.append("x", lng);
             params.append("y", lat);
         } else if (keyword && keyword.trim() !== "") { // 좌표 안 넘어왔으면 키워드 추가
-            params.append("keyword", keyword + " 헬스장");
+            params.append("keyword", keyword + " 헬스장"); // 특정 장소 검색 시, 뒤에 헬스장 붙여서 헬스장만 검색되도록 설정
         }
 
         url.search = params.toString() // 만든 파라미터로 URL 생성
