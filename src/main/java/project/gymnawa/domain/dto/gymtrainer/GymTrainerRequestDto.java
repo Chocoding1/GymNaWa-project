@@ -1,11 +1,11 @@
-package project.gymnawa.domain.dto;
+package project.gymnawa.domain.dto.gymtrainer;
 
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import project.gymnawa.domain.ContractStatus;
-import project.gymnawa.domain.Trainer;
 
 import java.time.LocalDate;
 
@@ -13,12 +13,12 @@ import java.time.LocalDate;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class GymTrainerDto {
+public class GymTrainerRequestDto {
 
     @NotBlank
     private String gymId;
 
-    @NotBlank
+    @NotNull
     private LocalDate hireDate;
 
     @Enumerated(value = EnumType.STRING)
