@@ -118,7 +118,7 @@
             params.append("x", lng);
             params.append("y", lat);
         } else if (keyword && keyword.trim() !== "") { // 좌표 안 넘어왔으면 키워드 추가
-            params.append("keyword", keyword);
+            params.append("keyword", keyword + " 헬스장");
         }
 
         url.search = params.toString() // 만든 파라미터로 URL 생성
@@ -126,22 +126,30 @@
         fetch(url) // 백엔드로 요청
             .then(response => response.json())
             .then(data => {
+                console.log("API 응답 데이터:", data);
+
                 markers.forEach(marker => marker.setMap(null)); // 기존 마커 제거
                 markers = [];
 
                 // 인포윈도우 객체 생성
                 let infowindow = new kakao.maps.InfoWindow({ zIndex: 1 });
 
-                 // 경계 객체 생성(여러 헬스장을 포함하는 경계)
+                // 경계 객체 생성(여러 헬스장을 포함하는 경계)
                 let bounds = new kakao.maps.LatLngBounds();
 
-                data.data.documents.forEach(gym => {
+                const filteredGyms = data.data.documents.filter(gym =>
+                    gym.category_name.includes("헬스클럽")
+                );
+                console.log("filtering 데이터: ", filteredGyms);
+
+                filteredGyms.forEach(gym => {
                     let markerPosition = new kakao.maps.LatLng(gym.y, gym.x); // 마커 위치
                     // 마커 생성
                     let marker = new kakao.maps.Marker({
                         position: markerPosition,
                         map: map
                     });
+                    console.log("마커 생성 성공");
 
                     // 마커 좌표를 경계에 포함
                     bounds.extend(markerPosition);
@@ -160,6 +168,7 @@
                     markers.push(marker);
                 });
                 map.setBounds(bounds); // 해당 경계로 맵 이동
+                console.log("맵 이동 성공");
             })
             .catch(error => console.error("API 요청 실패:", error));
     }

@@ -64,7 +64,7 @@ public class KakaoService {
         // URI 생성
         log.info("keyword : " + keyword);
         URI uri = createUri(keyword, null, null);
-        log.info("[findGymByAddress] URI : " + uri);
+        log.info("[findGymByKeyword URI : " + uri);
 
         // 요청 객체 생성
         HttpEntity<Object> entity = setHttpEntity();
@@ -92,7 +92,6 @@ public class KakaoService {
             uriBuilder.queryParam("radius", radius);
             uriBuilder.queryParam("sort", "distance");
         }
-
 
         return uriBuilder.build().encode(StandardCharsets.UTF_8).toUri();
     }
