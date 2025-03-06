@@ -24,7 +24,7 @@ public class GymTrainerResponseDto {
     private String gymId;
 
     @NotNull
-    private Trainer trainer;
+    private Long trainerId;
 
     @NotNull
     private LocalDate hireDate;
