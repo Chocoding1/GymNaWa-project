@@ -79,6 +79,7 @@ public class NorMemberApiController {
     public ResponseEntity<ApiResponse<NorMember>> myPage(@PathVariable Long id,
                                                          @SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) NorMember loginedMember) {
 
+        // url 조작으로 다른 사용자 마이페이지 접속 방지
         if (!loginedMember.getId().equals(id)) {
             return ResponseEntity.badRequest().body(ApiResponse.error("잘못된 접근입니다."));
         }
