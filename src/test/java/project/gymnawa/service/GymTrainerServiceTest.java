@@ -8,6 +8,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import project.gymnawa.domain.ContractStatus;
 import project.gymnawa.domain.Gym;
 import project.gymnawa.domain.GymTrainer;
@@ -16,6 +18,7 @@ import project.gymnawa.repository.GymTrainerRepository;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -23,6 +26,7 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class GymTrainerServiceTest {
 
+    private static final Logger log = LoggerFactory.getLogger(GymTrainerServiceTest.class);
     @InjectMocks
     GymTrainerService gymTrainerService;
 
@@ -113,6 +117,27 @@ class GymTrainerServiceTest {
 
         //then
         verify(gymTrainerRepository, times(1)).findByGymIdAndTrainerAndContractStatus("gymId", trainer, ContractStatus.ACTIVE);
+    }
+
+    @Test
+    @DisplayName("계약 만료 처리")
+    void contractExpire() {
+        //given
+        Trainer trainer = createTrainer("jsj012100", "1234", "조성진", "galmeagi2@naver.com");
+
+        Long gymTrainerId = 1L;
+        GymTrainer gymTrainer = createGymTrainer(trainer, "gymId", ContractStatus.ACTIVE);
+
+        when(gymTrainerRepository.findById(anyLong())).thenReturn(Optional.of(gymTrainer));
+
+        //when
+        gymTrainerService.expireContract(gymTrainerId);
+
+        //then
+        verify(gymTrainerRepository, times(1)).findById(anyLong());
+
+        assertThat(gymTrainer.getContractStatus()).isEqualTo(ContractStatus.EXPIRED);
+        assertThat(gymTrainer.getExpireDate()).isNotNull();
     }
 
     private static GymTrainer createGymTrainer(Trainer trainer, String gymId, ContractStatus contractStatus) {
