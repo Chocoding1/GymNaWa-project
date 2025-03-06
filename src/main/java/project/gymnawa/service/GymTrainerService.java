@@ -9,7 +9,9 @@ import project.gymnawa.domain.GymTrainer;
 import project.gymnawa.domain.Trainer;
 import project.gymnawa.repository.GymTrainerRepository;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 @Transactional(readOnly = true)
@@ -43,9 +45,20 @@ public class GymTrainerService {
     }
 
     /**
-     * 특정 헬스장에 특정 트레이너가 계약 상태인지 체크하는 메서드
+     * 특정 헬스장에 특정 트레이너가 계약 상태인지 조회
      */
     public List<GymTrainer> findByGymIdAndTrainerAndContractStatus(String gymId, Trainer trainer, ContractStatus contractStatus) {
         return gymTrainerRepository.findByGymIdAndTrainerAndContractStatus(gymId, trainer, contractStatus);
+    }
+
+    /**
+     * 계약 만료
+     */
+    @Transactional
+    public void expireContract(Long gymTrainerId) {
+        GymTrainer gymTrainer = gymTrainerRepository.findById(gymTrainerId)
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 계약입니다."));
+
+        gymTrainer.expireContract(LocalDate.now());
     }
 }

@@ -16,6 +16,8 @@ import project.gymnawa.domain.dto.gymtrainer.GymTrainerResponseDto;
 import project.gymnawa.service.GymTrainerService;
 import project.gymnawa.web.SessionConst;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @Slf4j
@@ -24,10 +26,15 @@ public class GymTrainerApiController {
 
     private final GymTrainerService gymTrainerService;
 
+    /**
+     * 계약 정보 등록 (헬스장에 트레이너 등록)
+     */
     @PostMapping("/gymtrainer/add")
     public ResponseEntity<ApiResponse<GymTrainerResponseDto>> addGymTrainer(@Validated @RequestBody GymTrainerRequestDto gymTrainerRequestDto,
-                                                                           BindingResult bindingResult,
-                                                                           @SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) Trainer loginedTrainer) {
+                                                                            BindingResult bindingResult,
+                                                                            // @SessionAttribute : 세션에 해당 키를 자기는 쌍이 없을 때, required가 true이면 오류 발생, false이면 null 반환
+                                                                            @SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) Trainer loginedTrainer) {
+
         if (bindingResult.hasErrors()) {
             log.info("errors = " + bindingResult);
             return ResponseEntity.badRequest().body(ApiResponse.error("입력값이 올바르지 않습니다."));
@@ -40,11 +47,31 @@ public class GymTrainerApiController {
 
         GymTrainer gymTrainer = createGymTrainer(gymTrainerRequestDto, loginedTrainer);
 
-        Long savedId = gymTrainerService.save(gymTrainer);
+        gymTrainerService.save(gymTrainer);
 
-        GymTrainerResponseDto gymTrainerResponseDto = createGymTrainerResponseDto(savedId, gymTrainer);
+        log.info("Trainer : " + gymTrainer.getTrainer());
+        GymTrainerResponseDto gymTrainerResponseDto = createGymTrainerResponseDto(gymTrainer);
+        log.info("Trainer : " + gymTrainer.getTrainer());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(gymTrainerResponseDto));
+    }
+
+    /**
+     * 계약 정보 만료 (트레이너 계약 만료)
+     */
+    @PostMapping("/gymtrainer/expire")
+    public ResponseEntity<ApiResponse<GymTrainerResponseDto>> expireGymTrainer(@SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) Trainer loginedTrainer,
+                                                                               @RequestParam("gymId") String gymId) {
+        List<GymTrainer> gymTrainers = gymTrainerService.findByGymIdAndTrainerAndContractStatus(gymId, loginedTrainer, ContractStatus.ACTIVE);
+        log.info("gymTrainers.size : " + gymTrainers.size());
+
+        gymTrainerService.expireContract(gymTrainers.get(0).getId());
+
+        log.info("Trainer : " + gymTrainers.get(0).getTrainer());
+        GymTrainerResponseDto gymTrainerResponseDto = createGymTrainerResponseDto(gymTrainers.get(0));
+        log.info("Trainer : " + gymTrainers.get(0).getTrainer());
+
+        return ResponseEntity.ok().body(ApiResponse.success(gymTrainerResponseDto));
     }
 
     private static GymTrainer createGymTrainer(GymTrainerRequestDto gymTrainerRequestDto, Trainer trainer) {
@@ -56,10 +83,10 @@ public class GymTrainerApiController {
                 .build();
     }
 
-    private GymTrainerResponseDto createGymTrainerResponseDto(Long savedId, GymTrainer gymTrainer) {
+    private GymTrainerResponseDto createGymTrainerResponseDto(GymTrainer gymTrainer) {
         return GymTrainerResponseDto.builder()
-                .id(savedId)
-                .trainer(gymTrainer.getTrainer())
+                .id(gymTrainer.getId())
+                .trainerId(gymTrainer.getTrainer().getId())
                 .gymId(gymTrainer.getGymId())
                 .hireDate(gymTrainer.getHireDate())
                 .contractStatus(gymTrainer.getContractStatus())
