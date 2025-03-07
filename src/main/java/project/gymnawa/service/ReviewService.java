@@ -16,7 +16,7 @@ import java.util.NoSuchElementException;
 @RequiredArgsConstructor
 public class ReviewService {
 
-    private ReviewRepository reviewRepository;
+    private final ReviewRepository reviewRepository;
 
     /**
      * 리뷰 저장
@@ -25,6 +25,14 @@ public class ReviewService {
     public Long save(Review review) {
         reviewRepository.save(review);
         return review.getId();
+    }
+
+    /**
+     * 리뷰 단 건 조회
+     */
+    public Review findById(Long id) {
+        return reviewRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 리뷰입니다."));
     }
 
     /**
