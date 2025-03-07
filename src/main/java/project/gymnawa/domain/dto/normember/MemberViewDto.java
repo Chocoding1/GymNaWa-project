@@ -7,7 +7,6 @@ import project.gymnawa.domain.Gender;
 
 @Data
 @Builder
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class MemberViewDto {
 

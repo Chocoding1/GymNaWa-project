@@ -12,7 +12,6 @@ import project.gymnawa.domain.Trainer;
 import java.time.LocalDate;
 
 @Data
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
 public class GymTrainerResponseDto {

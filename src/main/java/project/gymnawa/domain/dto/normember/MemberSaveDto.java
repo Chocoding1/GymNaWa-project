@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import project.gymnawa.domain.Gender;
 
 @Data
-@NoArgsConstructor
 public class MemberSaveDto {
 
     @NotBlank

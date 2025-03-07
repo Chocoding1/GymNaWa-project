@@ -10,7 +10,6 @@ import project.gymnawa.domain.ContractStatus;
 import java.time.LocalDate;
 
 @Data
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
 public class GymTrainerRequestDto {
