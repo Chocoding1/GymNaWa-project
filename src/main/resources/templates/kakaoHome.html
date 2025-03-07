@@ -71,10 +71,31 @@
 <div id="header">
     <h1>주변 헬스장을 탐색해보세요!</h1>
     <div class="buttons">
-        <button onclick="location.href='#signup'"
-                th:onclick="|location.href='@{/member/add/select}'|">회원가입</button>
-        <button onclick="location.href='#login'"
-                th:onclick="|location.href='@{/member/login}'|">로그인</button>
+        <!-- 로그인 상태인 경우: 회원 정보 표시 -->
+        <span th:if="${member != null}">
+            <span class="welcome-message" th:text="|환영합니다. ${member.name}님!|">로그인 사용자 이름</span>
+            <span th:switch="${isTrainer}">
+                <button th:case="true"
+                        th:onclick="|location.href='@{|/member/t/${member.id}/mypage|}'|">
+                    마이페이지
+                </button>
+                <button th:case="false"
+                        th:onclick="|location.href='@{|/member/n/${member.id}/mypage|}'|">
+                    마이페이지
+                </button>
+            </span>
+            <form th:action="@{/member/logout}" method="post" style="display: inline;">
+                <button type="submit">로그아웃</button>
+            </form>
+        </span>
+
+        <!-- 로그인 상태가 아닌 경우: 로그인 & 회원가입 버튼 표시 -->
+        <span th:if="${member == null}">
+            <button onclick="location.href='#signup'"
+                    th:onclick="|location.href='@{/member/add/select}'|">회원가입</button>
+            <button onclick="location.href='#login'"
+                    th:onclick="|location.href='@{/member/login}'|">로그인</button>
+        </span>
     </div>
 </div>
 

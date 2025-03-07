@@ -1,5 +1,6 @@
 package project.gymnawa.controller;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -10,6 +11,7 @@ import project.gymnawa.domain.NorMember;
 import project.gymnawa.web.SessionConst;
 
 @Controller
+@Slf4j
 public class HomeController {
 
     @Value("${api.key}")
@@ -22,17 +24,21 @@ public class HomeController {
 
         model.addAttribute("apiKey", apiKey);
 
-        if (loginedMember == null) {
-            return "kakaoHome";
-        }
+//        if (loginedMember == null) {
+//            return "kakaoHome";
+//        }
 
         model.addAttribute("member", loginedMember);
 
         if (loginedMember instanceof NorMember) {
-            return "/normember/loginHome";
+            model.addAttribute("isTrainer", false);
         } else {
-            return "/trainer/loginHome";
+            model.addAttribute("isTrainer", true);
         }
+
+        return "kakaoHome";
+
+
 
     }
 }
