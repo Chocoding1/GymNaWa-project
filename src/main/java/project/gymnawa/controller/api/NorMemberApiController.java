@@ -14,6 +14,7 @@ import project.gymnawa.domain.NorMember;
 import project.gymnawa.domain.api.ApiResponse;
 import project.gymnawa.domain.dto.normember.MemberEditDto;
 import project.gymnawa.domain.dto.normember.MemberSaveDto;
+import project.gymnawa.domain.dto.normember.MemberViewDto;
 import project.gymnawa.service.EmailService;
 import project.gymnawa.service.NorMemberService;
 import project.gymnawa.web.SessionConst;
@@ -51,7 +52,7 @@ public class NorMemberApiController {
      * 회원가입
      */
     @PostMapping("/add")
-    public ResponseEntity<ApiResponse<NorMember>> addMember(@Validated @RequestBody MemberSaveDto memberSaveDto,
+    public ResponseEntity<ApiResponse<Long>> addMember(@Validated @RequestBody MemberSaveDto memberSaveDto,
                                                             BindingResult bindingResult, HttpServletRequest request) {
 
         if (bindingResult.hasErrors()) {
@@ -67,16 +68,16 @@ public class NorMemberApiController {
 
         NorMember norMember = createNorMember(memberSaveDto);
 
-        norMemberService.join(norMember);
+        Long joinId = norMemberService.join(norMember);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(norMember));
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(joinId));
     }
 
     /**
      * 마이페이지
      */
     @GetMapping("/{id}/mypage")
-    public ResponseEntity<ApiResponse<NorMember>> myPage(@PathVariable Long id,
+    public ResponseEntity<ApiResponse<MemberViewDto>> myPage(@PathVariable Long id,
                                                          @SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) NorMember loginedMember) {
 
         // url 조작으로 다른 사용자 마이페이지 접속 방지
@@ -84,8 +85,9 @@ public class NorMemberApiController {
             return ResponseEntity.badRequest().body(ApiResponse.error("잘못된 접근입니다."));
         }
 
-        NorMember norMember = norMemberService.findOne(id);
-        return ResponseEntity.ok().body(ApiResponse.success(norMember));
+        MemberViewDto memberViewDto = createMemberViewDto(loginedMember);
+
+        return ResponseEntity.ok().body(ApiResponse.success(memberViewDto));
     }
 
     /**
@@ -99,18 +101,7 @@ public class NorMemberApiController {
             return ResponseEntity.badRequest().body(ApiResponse.error("잘못된 접근입니다."));
         }
 
-        NorMember norMember = norMemberService.findOne(id);
-        Address address = norMember.getAddress();
-
-        MemberEditDto memberEditDto = MemberEditDto.builder()
-                .loginId(norMember.getLoginId())
-                .password(norMember.getPassword())
-                .name(norMember.getName())
-                .zoneCode(address.getZoneCode())
-                .address(address.getAddress())
-                .detailAddress(address.getDetailAddress())
-                .buildingName(address.getBuildingName())
-                .build();
+        MemberEditDto memberEditDto = createMemberEditDto(loginedMember);
 
         return ResponseEntity.ok().body(ApiResponse.success(memberEditDto));
     }
@@ -160,6 +151,32 @@ public class NorMemberApiController {
                 .email(memberSaveDto.getEmail())
                 .gender(memberSaveDto.getGender())
                 .address(address)
+                .build();
+    }
+
+    private MemberViewDto createMemberViewDto(NorMember loginedMember) {
+        return MemberViewDto.builder()
+                .loginId(loginedMember.getLoginId())
+                .password(loginedMember.getPassword())
+                .name(loginedMember.getName())
+                .email(loginedMember.getEmail())
+                .gender(loginedMember.getGender().getExp())
+                .zoneCode(loginedMember.getAddress().getZoneCode())
+                .address(loginedMember.getAddress().getAddress())
+                .detailAddress(loginedMember.getAddress().getDetailAddress())
+                .buildingName(loginedMember.getAddress().getBuildingName())
+                .build();
+    }
+
+    private MemberEditDto createMemberEditDto(NorMember loginedMember) {
+        return MemberEditDto.builder()
+                .loginId(loginedMember.getLoginId())
+                .password(loginedMember.getPassword())
+                .name(loginedMember.getName())
+                .zoneCode(loginedMember.getAddress().getZoneCode())
+                .address(loginedMember.getAddress().getAddress())
+                .detailAddress(loginedMember.getAddress().getDetailAddress())
+                .buildingName(loginedMember.getAddress().getBuildingName())
                 .build();
     }
 }

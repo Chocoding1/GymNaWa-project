@@ -21,7 +21,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@RequestMapping("/api")
+@RequestMapping("/api/gymtrainer")
 public class GymTrainerApiController {
 
     private final GymTrainerService gymTrainerService;
@@ -29,7 +29,7 @@ public class GymTrainerApiController {
     /**
      * 계약 정보 등록 (헬스장에 트레이너 등록)
      */
-    @PostMapping("/gymtrainer/add")
+    @PostMapping("/add")
     public ResponseEntity<ApiResponse<GymTrainerResponseDto>> addGymTrainer(@Validated @RequestBody GymTrainerRequestDto gymTrainerRequestDto,
                                                                             BindingResult bindingResult,
                                                                             // @SessionAttribute : 세션에 해당 키를 자기는 쌍이 없을 때, required가 true이면 오류 발생, false이면 null 반환
@@ -59,7 +59,7 @@ public class GymTrainerApiController {
     /**
      * 계약 정보 만료 (트레이너 계약 만료)
      */
-    @PostMapping("/gymtrainer/expire")
+    @PostMapping("/expire")
     public ResponseEntity<ApiResponse<GymTrainerResponseDto>> expireGymTrainer(@SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) Trainer loginedTrainer,
                                                                                @RequestParam("gymId") String gymId) {
         List<GymTrainer> gymTrainers = gymTrainerService.findByGymIdAndTrainerAndContractStatus(gymId, loginedTrainer, ContractStatus.ACTIVE);

@@ -10,11 +10,11 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import project.gymnawa.domain.Address;
 import project.gymnawa.domain.Gender;
-import project.gymnawa.domain.NorMember;
 import project.gymnawa.domain.Trainer;
 import project.gymnawa.domain.api.ApiResponse;
 import project.gymnawa.domain.dto.trainer.TrainerEditDto;
 import project.gymnawa.domain.dto.trainer.TrainerSaveDto;
+import project.gymnawa.domain.dto.trainer.TrainerViewDto;
 import project.gymnawa.service.EmailService;
 import project.gymnawa.service.TrainerService;
 import project.gymnawa.web.SessionConst;
@@ -52,7 +52,7 @@ public class TrainerApiController {
      * 회원가입
      */
     @PostMapping("/add")
-    public ResponseEntity<ApiResponse<Trainer>> addTrainer(@Validated @RequestBody TrainerSaveDto trainerSaveDto,
+    public ResponseEntity<ApiResponse<Long>> addTrainer(@Validated @RequestBody TrainerSaveDto trainerSaveDto,
                                                           BindingResult bindingResult, HttpServletRequest request) {
 
         if (bindingResult.hasErrors()) {
@@ -68,24 +68,25 @@ public class TrainerApiController {
 
         Trainer trainer = createTrainer(trainerSaveDto);
 
-        trainerService.join(trainer);
+        Long joinId = trainerService.join(trainer);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(trainer));
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(joinId));
     }
 
     /**
      * 마이페이지
      */
     @GetMapping("/{id}/mypage")
-    public ResponseEntity<ApiResponse<Trainer>> myPage(@PathVariable Long id,
+    public ResponseEntity<ApiResponse<TrainerViewDto>> myPage(@PathVariable Long id,
                                                        @SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) Trainer loginedTrainer) {
 
         if (!loginedTrainer.getId().equals(id)) {
             return ResponseEntity.badRequest().body(ApiResponse.error("잘못된 접근입니다."));
         }
 
-        Trainer trainer = trainerService.findOne(id);
-        return ResponseEntity.ok().body(ApiResponse.success(trainer));
+        TrainerViewDto trainerViewDto = createTrainerViewDto(loginedTrainer);
+
+        return ResponseEntity.ok().body(ApiResponse.success(trainerViewDto));
     }
 
     /**
@@ -99,18 +100,7 @@ public class TrainerApiController {
             return ResponseEntity.badRequest().body(ApiResponse.error("잘못된 접근입니다."));
         }
 
-        Trainer trainer = trainerService.findOne(id);
-        Address address = trainer.getAddress();
-
-        TrainerEditDto trainerEditDto = TrainerEditDto.builder()
-                .loginId(trainer.getLoginId())
-                .password(trainer.getPassword())
-                .name(trainer.getName())
-                .zoneCode(address.getZoneCode())
-                .address(address.getAddress())
-                .detailAddress(address.getDetailAddress())
-                .buildingName(address.getBuildingName())
-                .build();
+        TrainerEditDto trainerEditDto = createTrainerEditDto(loginedTrainer);
 
         return ResponseEntity.ok().body(ApiResponse.success(trainerEditDto));
     }
@@ -160,6 +150,32 @@ public class TrainerApiController {
                 .email(trainerSaveDto.getEmail())
                 .gender(trainerSaveDto.getGender())
                 .address(address)
+                .build();
+    }
+
+    private TrainerViewDto createTrainerViewDto(Trainer loginedTrainer) {
+        return TrainerViewDto.builder()
+                .loginId(loginedTrainer.getLoginId())
+                .password(loginedTrainer.getPassword())
+                .name(loginedTrainer.getName())
+                .email(loginedTrainer.getEmail())
+                .gender(loginedTrainer.getGender().getExp())
+                .zoneCode(loginedTrainer.getAddress().getZoneCode())
+                .address(loginedTrainer.getAddress().getAddress())
+                .detailAddress(loginedTrainer.getAddress().getDetailAddress())
+                .buildingName(loginedTrainer.getAddress().getBuildingName())
+                .build();
+    }
+
+    private TrainerEditDto createTrainerEditDto(Trainer loginedTrainer) {
+        return TrainerEditDto.builder()
+                .loginId(loginedTrainer.getLoginId())
+                .password(loginedTrainer.getPassword())
+                .name(loginedTrainer.getName())
+                .zoneCode(loginedTrainer.getAddress().getZoneCode())
+                .address(loginedTrainer.getAddress().getAddress())
+                .detailAddress(loginedTrainer.getAddress().getDetailAddress())
+                .buildingName(loginedTrainer.getAddress().getBuildingName())
                 .build();
     }
 }

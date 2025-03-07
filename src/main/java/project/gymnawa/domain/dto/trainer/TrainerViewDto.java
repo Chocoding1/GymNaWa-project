@@ -1,15 +1,13 @@
-package project.gymnawa.domain.dto.normember;
+package project.gymnawa.domain.dto.trainer;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
-import project.gymnawa.domain.Address;
-import project.gymnawa.domain.Gender;
 
 @Data
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class MemberViewDto {
+public class TrainerViewDto {
 
     @NotBlank
     private String loginId;
