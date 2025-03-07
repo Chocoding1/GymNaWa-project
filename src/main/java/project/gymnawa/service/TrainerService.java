@@ -43,7 +43,7 @@ public class TrainerService {
      */
     public Trainer findOne(Long id) {
         return trainerRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 트레이너입니다."));
     }
 
     /**
@@ -66,7 +66,7 @@ public class TrainerService {
     @Transactional
     public void updateTrainer(Long id, String loginId, String password, String name, Address address) {
         Trainer trainer = trainerRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 트레이너입니다."));
 
         //중복 아이디 체크
         Optional<Member> dupliTrainer = memberRepository.findByLoginId(loginId);
@@ -83,7 +83,7 @@ public class TrainerService {
     @Transactional
     public void deleteOne(Long id) {
         Trainer trainer = trainerRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 트레이너입니다."));
 
         trainerRepository.delete(trainer);
     }
