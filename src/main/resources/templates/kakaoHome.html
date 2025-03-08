@@ -65,6 +65,46 @@
         #searchBtn:hover {
             background-color: #0056b3;
         }
+
+        /* 오버레이 스타일 */
+        #map .overlay {
+        position: relative;
+        width: 250px;
+        border-radius: 8px;
+        background-color: #fff !important;    /* 불투명한 흰색 배경 */
+        border: 1px solid #ddd !important;    /* 얇은 테두리 추가 */
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3) !important; /* 부드러운 그림자 */
+        overflow: hidden;
+        z-index: 1000;                       /* 맵 위로 나오게 */
+        }
+        #map .overlay .info {
+            padding: 10px;
+        }
+        #map .overlay .title {
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: flex;
+            justify-content: space-between;
+            color: #333 !important;               /* 글자색 어둡게 */
+        }
+        #map .overlay .close {
+            cursor: pointer;
+            color: #ff4d4f !important;            /* 닫기 버튼 빨간색으로 */
+        }
+        #map .overlay .close:hover {
+            color: #d9363e !important;            /* 닫기 버튼 호버 시 진하게 */
+        }
+        #map .overlay .desc {
+            font-size: 14px;
+            color: #555 !important;               /* 설명 글자 어둡게 */
+        }
+        #map .overlay .link {
+            color: #007BFF !important;            /* 링크 파란색으로 */
+            text-decoration: none !important;
+        }
+        #map .overlay .link:hover {
+            text-decoration: underline !important; /* 링크 호버 시 밑줄 */
+        }
     </style>
 </head>
 <body>
@@ -112,6 +152,7 @@
 <script>
     let map;
     let markers = [];
+    let overlays = [];
 
     // 카카오맵 초기화
     function initMap() {
@@ -121,7 +162,7 @@
                 let lng = position.coords.longitude;
 
                 let container = document.getElementById('map');
-                let options = { center: new kakao.maps.LatLng(lat, lng), level: 4 };
+                let options = { center: new kakao.maps.LatLng(lat, lng), level: 3 };
                 map = new kakao.maps.Map(container, options);
 
                 getGyms(lat, lng);
@@ -150,7 +191,9 @@
                 console.log("API 응답 데이터:", data);
 
                 markers.forEach(marker => marker.setMap(null)); // 기존 마커 제거
+                overlays.forEach(overlay => overlay.setMap(null)); // 기존 오버레이 제거
                 markers = [];
+                overlays = [];
 
                 // 인포윈도우 객체 생성
                 let infowindow = new kakao.maps.InfoWindow({ zIndex: 1 });
@@ -168,12 +211,48 @@
                     // 마커 생성
                     let marker = new kakao.maps.Marker({
                         position: markerPosition,
-                        map: map
+                        map: map,
+                        clickable: true
                     });
                     console.log("마커 생성 성공");
 
                     // 마커 좌표를 경계에 포함
                     bounds.extend(markerPosition);
+
+                    // 커스텀 오버레이 컨텐츠 생성
+                    let overlayContent = `
+                        <div class="overlay">
+                            <div class="info">
+                                <div class="title">
+                                    ${gym.place_name}
+                                    <div class="close" onclick="closeOverlay()" title="닫기">X</div>
+                                </div>
+                                <div class="body">
+                                    <div class="desc">
+                                        <div>
+                                            <a href="${gym.place_url}" target="_blank" class="link">홈페이지 방문</a>
+                                        </div>
+                                        <div>
+                                            <a href="/trainers/${gym.id}" class="link">트레이너 목록</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>`;
+
+                    // 커스텀 오버레이 생성
+                    let customOverlay = new kakao.maps.CustomOverlay({
+                        content: overlayContent,
+                        position: markerPosition,
+                        map: null // 처음엔 숨겨둠
+                    });
+
+                    // 마커 클릭 이벤트
+                    kakao.maps.event.addListener(marker, 'click', function () {
+                        // 기존 오버레이 닫기
+                        overlays.forEach(overlay => overlay.setMap(null));
+                        customOverlay.setMap(map);
+                    });
 
                     // 마커에 마우스를 올리면 인포윈도우 표시
                     kakao.maps.event.addListener(marker, 'mouseover', function () {
@@ -187,11 +266,17 @@
                     });
 
                     markers.push(marker);
+                    overlays.push(customOverlay);
                 });
                 map.setBounds(bounds); // 해당 경계로 맵 이동
                 console.log("맵 이동 성공");
             })
             .catch(error => console.error("API 요청 실패:", error));
+    }
+
+    // 커스텀 오버레이 닫기
+    function closeOverlay() {
+        overlays.forEach(overlay => overlay.setMap(null));
     }
 
     function searchGym() {
