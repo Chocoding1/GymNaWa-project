@@ -13,6 +13,7 @@ import project.gymnawa.domain.Trainer;
 import project.gymnawa.domain.api.ApiResponse;
 import project.gymnawa.domain.dto.gymtrainer.GymTrainerRequestDto;
 import project.gymnawa.domain.dto.gymtrainer.GymTrainerResponseDto;
+import project.gymnawa.domain.dto.gymtrainer.GymTrainerViewDto;
 import project.gymnawa.service.GymTrainerService;
 import project.gymnawa.web.SessionConst;
 
@@ -72,6 +73,25 @@ public class GymTrainerApiController {
         log.info("Trainer : " + gymTrainers.get(0).getTrainer());
 
         return ResponseEntity.ok().body(ApiResponse.success(gymTrainerResponseDto));
+    }
+
+    /**
+     * 헬스장 별 소속 트레이너 조회
+     */
+    @GetMapping("/{gymId}/trainers")
+    public ResponseEntity<ApiResponse<List<GymTrainerViewDto>>> trainersByGym(@PathVariable String gymId) {
+        List<GymTrainer> trainers = gymTrainerService.findByGymAndContractStatus(gymId, ContractStatus.ACTIVE);
+
+        List<GymTrainerViewDto> trainerViewDtos = trainers.stream()
+                .map(gt ->
+                        GymTrainerViewDto.builder()
+                                .id(gt.getTrainer().getId())
+                                .name(gt.getTrainer().getName())
+                                .gender(gt.getTrainer().getGender().getExp())
+                                .build())
+                .toList();
+
+        return ResponseEntity.ok().body(ApiResponse.success(trainerViewDtos));
     }
 
     private static GymTrainer createGymTrainer(GymTrainerRequestDto gymTrainerRequestDto, Trainer trainer) {
