@@ -1,6 +1,7 @@
 package project.gymnawa.domain.dto.normember;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import project.gymnawa.domain.Address;
 import project.gymnawa.domain.Gender;
@@ -10,6 +11,8 @@ import project.gymnawa.domain.Gender;
 @AllArgsConstructor
 public class MemberViewDto {
 
+    @NotNull
+    private Long id;
     @NotBlank
     private String loginId;
     @NotBlank
@@ -20,12 +23,6 @@ public class MemberViewDto {
     private String email;
     @NotBlank
     private String gender;
-    @NotBlank
-    private String zoneCode;
-    @NotBlank
-    private String address;
-    @NotBlank
-    private String detailAddress;
-    @NotBlank
-    private String buildingName;
+    @NotNull
+    private Address address;
 }
