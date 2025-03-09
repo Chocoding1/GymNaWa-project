@@ -22,6 +22,10 @@
         .menu-item.text-danger {
             color: #dc3545;
         }
+        .section-divider {
+            border-top: 2px solid #ddd;
+            margin: 30px 0;
+        }
     </style>
 </head>
 <body>
@@ -46,7 +50,7 @@
         <!-- Content -->
         <div class="col-md-9">
             <!-- Profile Section -->
-            <div id="profile" th:object="${norMember}">
+            <div id="profile" th:object="${memberViewDto}">
                 <h3 class="mb-3">프로필</h3>
                 <div class="mb-2"><strong>이름:</strong> <span th:text="*{name}">name</span></div>
                 <div class="mb-2"><strong>성별:</strong> <span th:text="*{gender}">gender</span></div>
@@ -55,6 +59,7 @@
                 <div class="mb-2"><strong>비밀번호:</strong> <span th:text="*{password}">password</span></div>
                 <div class="mb-2">
                     <h4>주소</h4>
+                    <div><strong>우편번호:</strong> <span th:text="*{address.zoneCode}">address</span></div>
                     <div><strong>주소:</strong> <span th:text="*{address.address}">address</span></div>
                     <div><strong>건물명:</strong> <span th:text="*{address.buildingName}">buildingName</span></div>
                     <div><strong>상세주소:</strong> <span th:text="*{address.detailAddress}">detailAddress</span></div>
@@ -62,12 +67,34 @@
                 <a th:href="@{|/member/n/*{id}/edit|}" class="btn btn-primary">정보 수정</a>
             </div>
 
+            <hr class="section-divider"> <!-- 구분선 -->
+
+            <!-- 진행중인 PT Section -->
+            <div id="ongoing-pt" class="mt-5">
+                <h3 class="mb-3">진행중인 PT</h3>
+<!--
+                <ul class="list-group">
+                    <li class="list-group-item" th:each="trainer : ${norMember.trainers}">
+                        <strong>트레이너 이름:</strong> <span th:text="${trainer.name}">트레이너 이름</span> |
+                        <strong>성별:</strong> <span th:text="${trainer.gender}">성별</span> |
+                        <strong>소속 헬스장:</strong> <span th:text="${trainer.gymName}">헬스장 이름</span>
+                    </li>
+                </ul>
+                <p th:if="${#lists.isEmpty(norMember.trainers)}">진행중인 PT가 없습니다.</p>
+-->
+            </div>
+
+            <hr class="section-divider"> <!-- 구분선 -->
+
             <!-- Reviews Section -->
             <div id="reviews" class="mt-5">
                 <h3 class="mb-3">작성한 리뷰</h3>
+<!--
                 <ul class="list-group">
-                    <!-- <li class="list-group-item" th:each="review : ${normalMember.reviews}" th:text="${review}">리뷰 내용</li> -->
+                    <li class="list-group-item" th:each="review : ${norMember.reviews}" th:text="${review}">리뷰 내용</li>
                 </ul>
+                <p th:if="${#lists.isEmpty(norMember.reviews)}">작성한 리뷰가 없습니다.</p>
+-->
             </div>
         </div>
     </div>

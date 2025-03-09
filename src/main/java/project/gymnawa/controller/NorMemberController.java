@@ -75,7 +75,7 @@ public class NorMemberController {
 
         MemberViewDto memberViewDto = createMemberViewDto(norMember);
 
-        model.addAttribute("norMember", memberViewDto);
+        model.addAttribute("memberViewDto", memberViewDto);
 
         return "/normember/myPage";
     }
@@ -144,15 +144,13 @@ public class NorMemberController {
 
     private MemberViewDto createMemberViewDto(NorMember norMember) {
         return MemberViewDto.builder()
+                .id(norMember.getId())
                 .name(norMember.getName())
                 .gender(norMember.getGender().getExp())
                 .loginId(norMember.getLoginId())
                 .password(norMember.getPassword())
                 .email(norMember.getEmail())
-                .zoneCode(norMember.getAddress().getZoneCode())
-                .address(norMember.getAddress().getAddress())
-                .buildingName(norMember.getAddress().getBuildingName())
-                .detailAddress(norMember.getAddress().getDetailAddress())
+                .address(norMember.getAddress())
                 .build();
 
     }

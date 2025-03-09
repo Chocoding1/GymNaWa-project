@@ -161,10 +161,7 @@ public class NorMemberApiController {
                 .name(loginedMember.getName())
                 .email(loginedMember.getEmail())
                 .gender(loginedMember.getGender().getExp())
-                .zoneCode(loginedMember.getAddress().getZoneCode())
-                .address(loginedMember.getAddress().getAddress())
-                .detailAddress(loginedMember.getAddress().getDetailAddress())
-                .buildingName(loginedMember.getAddress().getBuildingName())
+                .address(loginedMember.getAddress())
                 .build();
     }
 
