@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>트레이너 목록</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+<h2>헬스장 트레이너 목록</h2>
+<ul>
+    <li><strong th:text="${gymName}"></strong></li>
+</ul>
+<hr>
+<h3>트레이너 정보</h3>
+<ul>
+    <li th:each="trainer : ${trainers}">
+        <strong th:text="${trainer.name}"></strong> (<span th:text="${trainer.gender}"></span>)
+    </li>
+</ul>
+<a href="javascript:window.close();" class="button">창 닫기</a>
+</body>
+</html>
