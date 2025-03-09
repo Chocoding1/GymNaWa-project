@@ -14,6 +14,7 @@ import project.gymnawa.domain.NorMember;
 import project.gymnawa.domain.api.ApiResponse;
 import project.gymnawa.domain.dto.normember.MemberEditDto;
 import project.gymnawa.domain.dto.normember.MemberSaveDto;
+import project.gymnawa.domain.dto.normember.MemberViewDto;
 import project.gymnawa.service.EmailService;
 import project.gymnawa.service.NorMemberService;
 import project.gymnawa.web.SessionConst;
@@ -72,7 +73,9 @@ public class NorMemberController {
 
         NorMember norMember = norMemberService.findOne(id);
 
-        model.addAttribute("norMember", norMember);
+        MemberViewDto memberViewDto = createMemberViewDto(norMember);
+
+        model.addAttribute("norMember", memberViewDto);
 
         return "/normember/myPage";
     }
@@ -90,9 +93,7 @@ public class NorMemberController {
 
         NorMember norMember = norMemberService.findOne(id);
 
-        MemberEditDto memberEditDto = new MemberEditDto(norMember.getLoginId(), norMember.getPassword(), norMember.getName(),
-                norMember.getAddress().getZoneCode(), norMember.getAddress().getAddress(), norMember.getAddress().getDetailAddress(),
-                norMember.getAddress().getBuildingName());
+        MemberEditDto memberEditDto = createMemberEditDto(norMember);
 
         model.addAttribute("memberEditDto", memberEditDto);
 
@@ -138,6 +139,33 @@ public class NorMemberController {
                 .email(memberSaveDto.getEmail())
                 .gender(memberSaveDto.getGender())
                 .address(address)
+                .build();
+    }
+
+    private MemberViewDto createMemberViewDto(NorMember norMember) {
+        return MemberViewDto.builder()
+                .name(norMember.getName())
+                .gender(norMember.getGender().getExp())
+                .loginId(norMember.getLoginId())
+                .password(norMember.getPassword())
+                .email(norMember.getEmail())
+                .zoneCode(norMember.getAddress().getZoneCode())
+                .address(norMember.getAddress().getAddress())
+                .buildingName(norMember.getAddress().getBuildingName())
+                .detailAddress(norMember.getAddress().getDetailAddress())
+                .build();
+
+    }
+
+    private MemberEditDto createMemberEditDto(NorMember norMember) {
+        return MemberEditDto.builder()
+                .loginId(norMember.getLoginId())
+                .password(norMember.getPassword())
+                .name(norMember.getName())
+                .zoneCode(norMember.getAddress().getZoneCode())
+                .address(norMember.getAddress().getAddress())
+                .buildingName(norMember.getAddress().getBuildingName())
+                .detailAddress(norMember.getAddress().getDetailAddress())
                 .build();
     }
 }
