@@ -75,9 +75,13 @@
 <!--
                 <ul class="list-group">
                     <li class="list-group-item" th:each="trainer : ${norMember.trainers}">
-                        <strong>트레이너 이름:</strong> <span th:text="${trainer.name}">트레이너 이름</span> |
-                        <strong>성별:</strong> <span th:text="${trainer.gender}">성별</span> |
-                        <strong>소속 헬스장:</strong> <span th:text="${trainer.gymName}">헬스장 이름</span>
+                        <div>
+                            <strong>트레이너 이름:</strong> <span th:text="${trainer.name}">트레이너 이름</span> |
+                            <strong>성별:</strong> <span th:text="${trainer.gender}">성별</span> |
+                            <strong>소속 헬스장:</strong> <span th:text="${trainer.gymName}">헬스장 이름</span>
+                        </div>
+                        &lt;!&ndash; 리뷰 작성 버튼 &ndash;&gt;
+                        <a th:href="@{|/reviews/write/${trainer.id}|}" class="btn btn-outline-primary btn-sm">리뷰 작성</a>
                     </li>
                 </ul>
                 <p th:if="${#lists.isEmpty(norMember.trainers)}">진행중인 PT가 없습니다.</p>
