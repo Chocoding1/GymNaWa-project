@@ -14,6 +14,7 @@ import project.gymnawa.domain.Trainer;
 import project.gymnawa.domain.api.ApiResponse;
 import project.gymnawa.domain.dto.trainer.TrainerEditDto;
 import project.gymnawa.domain.dto.trainer.TrainerSaveDto;
+import project.gymnawa.domain.dto.trainer.TrainerViewDto;
 import project.gymnawa.service.EmailService;
 import project.gymnawa.service.TrainerService;
 import project.gymnawa.web.SessionConst;
@@ -70,9 +71,9 @@ public class TrainerController {
             return "redirect:/";
         }
 
-        Trainer trainer = trainerService.findOne(id);
+        TrainerViewDto trainerViewDto = createTrainerViewDto(loginedTrainer);
 
-        model.addAttribute("trainer", trainer);
+        model.addAttribute("trainerViewDto", trainerViewDto);
 
         return "/trainer/myPage";
     }
@@ -138,6 +139,18 @@ public class TrainerController {
                 .email(trainerSaveDto.getEmail())
                 .gender(trainerSaveDto.getGender())
                 .address(address)
+                .build();
+    }
+
+    private TrainerViewDto createTrainerViewDto(Trainer loginedTrainer) {
+        return TrainerViewDto.builder()
+                .id(loginedTrainer.getId())
+                .loginId(loginedTrainer.getLoginId())
+                .password(loginedTrainer.getPassword())
+                .name(loginedTrainer.getName())
+                .email(loginedTrainer.getEmail())
+                .gender(loginedTrainer.getGender().getExp())
+                .address(loginedTrainer.getAddress())
                 .build();
     }
 }
