@@ -12,6 +12,8 @@ import java.time.LocalDateTime;
 @Builder
 public class ReviewViewDto {
 
+    private Long id;
+
     private String memberName;
 
     private String trainerName;
