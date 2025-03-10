@@ -46,13 +46,11 @@ public class GymTrainerApiController {
             return ResponseEntity.badRequest().body(ApiResponse.error("이미 계약되어 있습니다."));
         }
 
-        GymTrainer gymTrainer = createGymTrainer(gymTrainerRequestDto, loginedTrainer);
+        GymTrainer gymTrainer = createGymTrainer(gymTrainerRequestDto, loginedTrainer); // 원본 트레이너 객체로 gymtrainer 객체 생성
 
         gymTrainerService.save(gymTrainer);
 
-        log.info("Trainer : " + gymTrainer.getTrainer());
         GymTrainerResponseDto gymTrainerResponseDto = createGymTrainerResponseDto(gymTrainer);
-        log.info("Trainer : " + gymTrainer.getTrainer());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(gymTrainerResponseDto));
     }
@@ -64,13 +62,11 @@ public class GymTrainerApiController {
     public ResponseEntity<ApiResponse<GymTrainerResponseDto>> expireGymTrainer(@SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) Trainer loginedTrainer,
                                                                                @RequestParam("gymId") String gymId) {
         List<GymTrainer> gymTrainers = gymTrainerService.findByGymIdAndTrainerAndContractStatus(gymId, loginedTrainer, ContractStatus.ACTIVE);
-        log.info("gymTrainers.size : " + gymTrainers.size());
+        // gymtrainer 안에 들어있는 trainer 객체는 프록시
 
         gymTrainerService.expireContract(gymTrainers.get(0).getId());
 
-        log.info("Trainer : " + gymTrainers.get(0).getTrainer());
         GymTrainerResponseDto gymTrainerResponseDto = createGymTrainerResponseDto(gymTrainers.get(0));
-        log.info("Trainer : " + gymTrainers.get(0).getTrainer());
 
         return ResponseEntity.ok().body(ApiResponse.success(gymTrainerResponseDto));
     }
