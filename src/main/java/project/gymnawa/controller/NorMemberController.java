@@ -68,7 +68,7 @@ public class NorMemberController {
                          @SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) NorMember loginedMember) {
 
         if (!loginedMember.getId().equals(id)) {
-            return "redirect:/";
+            return "redirect:/member/n/" + loginedMember.getId() + "/mypage";
         }
 
         NorMember norMember = norMemberService.findOne(id);
@@ -88,7 +88,7 @@ public class NorMemberController {
                            @SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) NorMember loginedMember) {
 
         if (!loginedMember.getId().equals(id)) {
-            return "redirect:/";
+            return "redirect:/member/n/" + loginedMember.getId() + "/edit";
         }
 
         NorMember norMember = norMemberService.findOne(id);

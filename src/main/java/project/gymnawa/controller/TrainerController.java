@@ -68,7 +68,7 @@ public class TrainerController {
                          @SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) Trainer loginedTrainer) {
 
         if (!loginedTrainer.getId().equals(id)) {
-            return "redirect:/";
+            return "redirect:/member/t/" + loginedTrainer.getId() + "/mypage";
         }
 
         TrainerViewDto trainerViewDto = createTrainerViewDto(loginedTrainer);
@@ -86,7 +86,7 @@ public class TrainerController {
                            @SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) Trainer loginedTrainer) {
 
         if (!loginedTrainer.getId().equals(id)) {
-            return "redirect:/";
+            return "redirect:/member/t/" + loginedTrainer.getId() + "/edit";
         }
 
         Trainer trainer = trainerService.findOne(id);
