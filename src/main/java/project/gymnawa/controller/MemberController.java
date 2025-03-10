@@ -8,7 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import project.gymnawa.domain.Member;
+import project.gymnawa.domain.entity.Member;
 import project.gymnawa.domain.dto.member.MemberLoginDto;
 import project.gymnawa.web.SessionConst;
 import project.gymnawa.service.MemberService;

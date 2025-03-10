@@ -1,6 +1,5 @@
 package project.gymnawa.service;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -8,9 +7,9 @@ import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import project.gymnawa.domain.NorMember;
-import project.gymnawa.domain.Review;
-import project.gymnawa.domain.Trainer;
+import project.gymnawa.domain.entity.NorMember;
+import project.gymnawa.domain.entity.Review;
+import project.gymnawa.domain.entity.Trainer;
 import project.gymnawa.repository.ReviewRepository;
 
 import java.util.Arrays;

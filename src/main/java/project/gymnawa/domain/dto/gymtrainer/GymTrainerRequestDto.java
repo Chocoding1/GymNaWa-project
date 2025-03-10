@@ -5,7 +5,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import project.gymnawa.domain.ContractStatus;
+import project.gymnawa.domain.etcfield.ContractStatus;
 
 import java.time.LocalDate;
 

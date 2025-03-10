@@ -4,8 +4,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import project.gymnawa.domain.Address;
-import project.gymnawa.domain.Gym;
+import project.gymnawa.domain.etcfield.Address;
+import project.gymnawa.domain.entity.Gym;
 
 import java.util.List;
 

@@ -8,7 +8,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -16,8 +15,8 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import project.gymnawa.domain.Gender;
-import project.gymnawa.domain.Member;
+import project.gymnawa.domain.etcfield.Gender;
+import project.gymnawa.domain.entity.Member;
 import project.gymnawa.domain.dto.member.MemberLoginDto;
 import project.gymnawa.service.MemberService;
 import project.gymnawa.web.SessionConst;
@@ -25,7 +24,6 @@ import project.gymnawa.web.SessionConst;
 
 
 import static org.assertj.core.api.Assertions.*;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @WebMvcTest(MemberApiController.class)

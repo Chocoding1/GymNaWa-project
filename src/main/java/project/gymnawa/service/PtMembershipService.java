@@ -3,9 +3,9 @@ package project.gymnawa.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import project.gymnawa.domain.NorMember;
-import project.gymnawa.domain.PtMembership;
-import project.gymnawa.domain.Trainer;
+import project.gymnawa.domain.entity.NorMember;
+import project.gymnawa.domain.entity.PtMembership;
+import project.gymnawa.domain.entity.Trainer;
 import project.gymnawa.repository.PtMembershipRepository;
 
 import java.util.List;

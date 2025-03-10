@@ -1,15 +1,16 @@
-package project.gymnawa.domain;
+package project.gymnawa.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import project.gymnawa.domain.etcfield.BaseTime;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class PtMembership extends BaseTime{
+public class PtMembership extends BaseTime {
 
     @Id
     @GeneratedValue

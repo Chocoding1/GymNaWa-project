@@ -3,7 +3,7 @@ package project.gymnawa.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import project.gymnawa.domain.Gym;
+import project.gymnawa.domain.entity.Gym;
 import project.gymnawa.repository.GymRepository;
 
 import java.util.List;

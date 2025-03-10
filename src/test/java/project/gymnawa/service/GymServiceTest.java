@@ -6,7 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import project.gymnawa.domain.Gym;
+import project.gymnawa.domain.entity.Gym;
 import project.gymnawa.repository.GymRepository;
 
 import java.util.Arrays;

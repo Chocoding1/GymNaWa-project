@@ -6,9 +6,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import project.gymnawa.domain.NorMember;
-import project.gymnawa.domain.PtMembership;
-import project.gymnawa.domain.Trainer;
+import project.gymnawa.domain.entity.NorMember;
+import project.gymnawa.domain.entity.PtMembership;
+import project.gymnawa.domain.entity.Trainer;
 import project.gymnawa.repository.PtMembershipRepository;
 
 import java.util.Arrays;

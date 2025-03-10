@@ -1,11 +1,13 @@
-package project.gymnawa.domain;
+package project.gymnawa.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import project.gymnawa.domain.etcfield.Address;
+import project.gymnawa.domain.etcfield.BaseTime;
+import project.gymnawa.domain.etcfield.Gender;
 
 @Entity
 @DiscriminatorColumn
@@ -13,7 +15,7 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Member extends BaseTime{
+public class Member extends BaseTime {
 
     @Id
     @GeneratedValue

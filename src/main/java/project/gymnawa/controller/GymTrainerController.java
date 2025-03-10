@@ -5,12 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import project.gymnawa.domain.ContractStatus;
-import project.gymnawa.domain.GymTrainer;
-import project.gymnawa.domain.Trainer;
+import project.gymnawa.domain.etcfield.ContractStatus;
+import project.gymnawa.domain.entity.GymTrainer;
 import project.gymnawa.domain.dto.gymtrainer.GymTrainerViewDto;
 import project.gymnawa.service.GymTrainerService;
-import project.gymnawa.web.SessionConst;
 
 import java.util.List;
 

@@ -1,10 +1,7 @@
 package project.gymnawa.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
-import project.gymnawa.domain.Gym;
-import project.gymnawa.domain.Trainer;
+import project.gymnawa.domain.entity.Trainer;
 
 import java.util.List;
 

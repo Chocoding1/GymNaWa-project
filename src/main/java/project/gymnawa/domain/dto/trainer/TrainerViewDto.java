@@ -3,7 +3,7 @@ package project.gymnawa.domain.dto.trainer;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import project.gymnawa.domain.Address;
+import project.gymnawa.domain.etcfield.Address;
 
 @Data
 @Builder

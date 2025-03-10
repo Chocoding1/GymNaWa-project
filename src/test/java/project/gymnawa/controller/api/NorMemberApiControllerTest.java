@@ -15,16 +15,15 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import project.gymnawa.domain.Address;
-import project.gymnawa.domain.Gender;
-import project.gymnawa.domain.NorMember;
+import project.gymnawa.domain.etcfield.Address;
+import project.gymnawa.domain.etcfield.Gender;
+import project.gymnawa.domain.entity.NorMember;
 import project.gymnawa.domain.dto.normember.MemberEditDto;
 import project.gymnawa.domain.dto.normember.MemberSaveDto;
 import project.gymnawa.service.EmailService;
 import project.gymnawa.service.NorMemberService;
 import project.gymnawa.web.SessionConst;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @WebMvcTest(NorMemberApiController.class)

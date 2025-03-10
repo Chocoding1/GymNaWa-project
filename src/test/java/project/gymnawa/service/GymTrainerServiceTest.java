@@ -1,19 +1,17 @@
 package project.gymnawa.service;
 
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import project.gymnawa.domain.ContractStatus;
-import project.gymnawa.domain.Gym;
-import project.gymnawa.domain.GymTrainer;
-import project.gymnawa.domain.Trainer;
+import project.gymnawa.domain.etcfield.ContractStatus;
+import project.gymnawa.domain.entity.Gym;
+import project.gymnawa.domain.entity.GymTrainer;
+import project.gymnawa.domain.entity.Trainer;
 import project.gymnawa.repository.GymTrainerRepository;
 
 import java.util.Arrays;

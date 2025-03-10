@@ -3,7 +3,9 @@ package project.gymnawa.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import project.gymnawa.domain.*;
+import project.gymnawa.domain.entity.Member;
+import project.gymnawa.domain.entity.Trainer;
+import project.gymnawa.domain.etcfield.Address;
 import project.gymnawa.repository.MemberRepository;
 import project.gymnawa.repository.TrainerRepository;
 

@@ -6,9 +6,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import project.gymnawa.domain.Address;
-import project.gymnawa.domain.Gender;
-import project.gymnawa.domain.Member;
+import project.gymnawa.domain.etcfield.Address;
+import project.gymnawa.domain.etcfield.Gender;
+import project.gymnawa.domain.entity.Member;
 import project.gymnawa.repository.MemberRepository;
 
 import java.util.*;

@@ -3,10 +3,9 @@ package project.gymnawa.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import project.gymnawa.domain.ContractStatus;
-import project.gymnawa.domain.Gym;
-import project.gymnawa.domain.GymTrainer;
-import project.gymnawa.domain.Trainer;
+import project.gymnawa.domain.etcfield.ContractStatus;
+import project.gymnawa.domain.entity.GymTrainer;
+import project.gymnawa.domain.entity.Trainer;
 import project.gymnawa.repository.GymTrainerRepository;
 
 import java.time.LocalDate;

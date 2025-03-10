@@ -1,7 +1,7 @@
 package project.gymnawa.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import project.gymnawa.domain.NorMember;
+import project.gymnawa.domain.entity.NorMember;
 
 
 public interface NorMemberRepository extends JpaRepository<NorMember, Long> {

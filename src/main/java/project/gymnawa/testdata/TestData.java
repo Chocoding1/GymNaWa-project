@@ -3,7 +3,12 @@ package project.gymnawa.testdata;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import project.gymnawa.domain.*;
+import project.gymnawa.domain.entity.NorMember;
+import project.gymnawa.domain.entity.PtMembership;
+import project.gymnawa.domain.entity.Review;
+import project.gymnawa.domain.entity.Trainer;
+import project.gymnawa.domain.etcfield.Address;
+import project.gymnawa.domain.etcfield.Gender;
 import project.gymnawa.service.*;
 
 @Component

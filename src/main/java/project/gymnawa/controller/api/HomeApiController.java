@@ -6,8 +6,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.SessionAttribute;
-import project.gymnawa.domain.Member;
-import project.gymnawa.domain.NorMember;
+import project.gymnawa.domain.entity.Member;
+import project.gymnawa.domain.entity.NorMember;
 import project.gymnawa.domain.api.ApiResponse;
 import project.gymnawa.web.SessionConst;
 

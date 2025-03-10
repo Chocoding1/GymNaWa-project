@@ -4,8 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
-import project.gymnawa.domain.Gender;
+import project.gymnawa.domain.etcfield.Gender;
 
 @Data
 public class TrainerSaveDto {

@@ -1,4 +1,4 @@
-package project.gymnawa.domain;
+package project.gymnawa.domain.etcfield;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

@@ -1,7 +1,6 @@
-package project.gymnawa.domain;
+package project.gymnawa.domain.etcfield;
 
 import jakarta.persistence.Embeddable;
-import jakarta.validation.constraints.NotBlank;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;

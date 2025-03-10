@@ -6,8 +6,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.SessionAttribute;
-import project.gymnawa.domain.Member;
-import project.gymnawa.domain.NorMember;
+import project.gymnawa.domain.entity.Member;
+import project.gymnawa.domain.entity.NorMember;
 import project.gymnawa.web.SessionConst;
 
 @Controller
@@ -23,11 +23,6 @@ public class HomeController {
             Model model) {
 
         model.addAttribute("apiKey", apiKey);
-
-//        if (loginedMember == null) {
-//            return "kakaoHome";
-//        }
-
         model.addAttribute("member", loginedMember);
 
         if (loginedMember instanceof NorMember) {

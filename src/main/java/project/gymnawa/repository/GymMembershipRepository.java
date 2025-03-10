@@ -1,9 +1,9 @@
 package project.gymnawa.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import project.gymnawa.domain.Gym;
-import project.gymnawa.domain.GymMembership;
-import project.gymnawa.domain.NorMember;
+import project.gymnawa.domain.entity.Gym;
+import project.gymnawa.domain.entity.GymMembership;
+import project.gymnawa.domain.entity.NorMember;
 
 import java.util.List;
 
