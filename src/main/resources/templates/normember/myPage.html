@@ -5,6 +5,17 @@
     <title>마이페이지</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
+        body {
+            background-color: #f8f9fa;
+        }
+        .sidebar {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            height: 100%;
+            width: 180px;
+        }
         .menu {
             list-style: none;
             padding: 0;
@@ -18,6 +29,11 @@
             margin-bottom: 5px;
             border-radius: 5px;
             text-align: center;
+            background-color: #f1f1f1;
+            width: 100%;
+        }
+        .menu-item:hover {
+            background-color: #e2e6ea;
         }
         .menu-item.text-danger {
             color: #dc3545;
@@ -26,25 +42,41 @@
             border-top: 2px solid #ddd;
             margin: 30px 0;
         }
+        .logout-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
     </style>
 </head>
 <body>
+
+<!-- 로그아웃 버튼 -->
+<div class="logout-button">
+    <form th:action="@{/member/logout}" method="post" style="margin: 0;">
+        <button type="submit" class="btn btn-danger">로그아웃</button>
+    </form>
+</div>
+
 <div class="container mt-5">
     <div class="row">
         <!-- Sidebar -->
         <nav class="col-md-3">
-            <ul class="menu">
-                <li>
-                    <form th:action="@{/member/logout}" method="post" style="margin: 0;">
-                        <button type="submit" class="menu-item text-danger">로그아웃</button>
-                    </form>
-                </li>
-                <li>
-                    <form th:action="@{/member/delete-account}" method="post" style="margin: 0;">
-                        <button type="submit" class="menu-item text-danger">회원 탈퇴</button>
-                    </form>
-                </li>
-            </ul>
+            <div class="sidebar">
+                <ul class="menu">
+                    <li>
+                        <a th:href="@{/member/ongoing-pt}" class="menu-item">진행 중인 PT</a>
+                    </li>
+                    <li>
+                        <a th:href="@{/member/reviews}" class="menu-item">내가 쓴 리뷰</a>
+                    </li>
+                    <li>
+                        <form th:action="@{/member/delete-account}" method="post" style="margin: 0;">
+                            <button type="submit" class="menu-item text-danger">회원 탈퇴</button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
         </nav>
 
         <!-- Content -->
@@ -65,40 +97,6 @@
                     <div><strong>상세주소:</strong> <span th:text="*{address.detailAddress}">detailAddress</span></div>
                 </div>
                 <a th:href="@{|/member/n/*{id}/edit|}" class="btn btn-primary">정보 수정</a>
-            </div>
-
-            <hr class="section-divider"> <!-- 구분선 -->
-
-            <!-- 진행중인 PT Section -->
-            <div id="ongoing-pt" class="mt-5">
-                <h3 class="mb-3">진행중인 PT</h3>
-<!--
-                <ul class="list-group">
-                    <li class="list-group-item" th:each="trainer : ${norMember.trainers}">
-                        <div>
-                            <strong>트레이너 이름:</strong> <span th:text="${trainer.name}">트레이너 이름</span> |
-                            <strong>성별:</strong> <span th:text="${trainer.gender}">성별</span> |
-                            <strong>소속 헬스장:</strong> <span th:text="${trainer.gymName}">헬스장 이름</span>
-                        </div>
-                        &lt;!&ndash; 리뷰 작성 버튼 &ndash;&gt;
-                        <a th:href="@{|/reviews/write/${trainer.id}|}" class="btn btn-outline-primary btn-sm">리뷰 작성</a>
-                    </li>
-                </ul>
-                <p th:if="${#lists.isEmpty(norMember.trainers)}">진행중인 PT가 없습니다.</p>
--->
-            </div>
-
-            <hr class="section-divider"> <!-- 구분선 -->
-
-            <!-- Reviews Section -->
-            <div id="reviews" class="mt-5">
-                <h3 class="mb-3">작성한 리뷰</h3>
-<!--
-                <ul class="list-group">
-                    <li class="list-group-item" th:each="review : ${norMember.reviews}" th:text="${review}">리뷰 내용</li>
-                </ul>
-                <p th:if="${#lists.isEmpty(norMember.reviews)}">작성한 리뷰가 없습니다.</p>
--->
             </div>
         </div>
     </div>
