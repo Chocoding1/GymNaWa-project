@@ -26,5 +26,6 @@ public interface NorMemberRepository extends JpaRepository<NorMember, Long> {
      * 마이페이지
      * 일반 회원 + 작성한 리뷰 + PT 받는 트레이너
      * NorMember + Review + PtMembership
+     * 일단 보류
      */
 }
