@@ -1,13 +1,17 @@
 package project.gymnawa.domain.dto.trainer;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import project.gymnawa.domain.Address;
 
 @Data
 @Builder
 @AllArgsConstructor
 public class TrainerViewDto {
 
+    @NotNull
+    private Long id;
     @NotBlank
     private String loginId;
     @NotBlank
@@ -19,11 +23,5 @@ public class TrainerViewDto {
     @NotBlank
     private String gender;
     @NotBlank
-    private String zoneCode;
-    @NotBlank
-    private String address;
-    @NotBlank
-    private String detailAddress;
-    @NotBlank
-    private String buildingName;
+    private Address address;
 }

@@ -160,10 +160,7 @@ public class TrainerApiController {
                 .name(loginedTrainer.getName())
                 .email(loginedTrainer.getEmail())
                 .gender(loginedTrainer.getGender().getExp())
-                .zoneCode(loginedTrainer.getAddress().getZoneCode())
-                .address(loginedTrainer.getAddress().getAddress())
-                .detailAddress(loginedTrainer.getAddress().getDetailAddress())
-                .buildingName(loginedTrainer.getAddress().getBuildingName())
+                .address(loginedTrainer.getAddress())
                 .build();
     }
 
