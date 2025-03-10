@@ -74,7 +74,6 @@ public class NorMemberController {
         NorMember norMember = norMemberService.findOne(id);
 
         MemberViewDto memberViewDto = createMemberViewDto(norMember);
-
         model.addAttribute("memberViewDto", memberViewDto);
 
         return "/normember/myPage";
