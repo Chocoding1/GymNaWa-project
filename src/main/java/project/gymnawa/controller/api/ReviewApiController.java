@@ -18,6 +18,8 @@ import project.gymnawa.service.ReviewService;
 import project.gymnawa.service.TrainerService;
 import project.gymnawa.web.SessionConst;
 
+import java.util.List;
+
 @RestController
 @Slf4j
 @RequestMapping("/api/review")
@@ -86,6 +88,20 @@ public class ReviewApiController {
         reviewService.deleteReview(id);
 
         return ResponseEntity.ok().body(ApiResponse.success("delete successful"));
+    }
+
+    /**
+     * 내가 쓴 리뷰 조회
+     */
+    @GetMapping("/list")
+    public ResponseEntity<ApiResponse<List<ReviewViewDto>>> findReviewsByMember(@SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) NorMember loginedMember) {
+        log.info(loginedMember.getClass().getName());
+        List<ReviewViewDto> reviewViewDtos = reviewService.findByMember(loginedMember).stream()
+                .map(r -> new ReviewViewDto(r.getNorMember().getName(), r.getTrainer().getName(),
+                        r.getContent(), r.getCreatedDateTime(), r.getModifiedDateTime()))
+                .toList();
+
+        return ResponseEntity.ok().body(ApiResponse.success(reviewViewDtos));
     }
 
     private ReviewViewDto createReviewViewDto(Review review) {
