@@ -93,11 +93,10 @@ public class ReviewApiController {
     /**
      * 내가 쓴 리뷰 조회
      */
-    @GetMapping("/list")
+    @GetMapping("/n/list")
     public ResponseEntity<ApiResponse<List<ReviewViewDto>>> findReviewsByMember(@SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) NorMember loginedMember) {
-        log.info(loginedMember.getClass().getName());
         List<ReviewViewDto> reviewViewDtos = reviewService.findByMember(loginedMember).stream()
-                .map(r -> new ReviewViewDto(r.getNorMember().getName(), r.getTrainer().getName(),
+                .map(r -> new ReviewViewDto(r.getId(), loginedMember.getName(), r.getTrainer().getName(),
                         r.getContent(), r.getCreatedDateTime(), r.getModifiedDateTime()))
                 .toList();
 
