@@ -22,6 +22,15 @@
         .menu-item.text-danger {
             color: #dc3545;
         }
+        .section-divider {
+            border-top: 2px solid #ddd;
+            margin: 30px 0;
+        }
+        .gym-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
     </style>
 </head>
 <body>
@@ -63,12 +72,40 @@
                 <a th:href="@{|/member/t/*{id}/edit|}" class="btn btn-primary">정보 수정</a>
             </div>
 
-            <!-- Reviews Section -->
-            <div id="reviews" class="mt-5">
-                <h3 class="mb-3">작성된 리뷰</h3>
+            <hr class="section-divider"> <!-- 구분선 -->
+
+            <!-- 내가 소속된 헬스장 Section -->
+            <div id="gyms" class="mt-5">
+                <div class="gym-header">
+                    <h3 class="mb-3">내가 소속된 헬스장</h3>
+                    <a href="/gymtrainer/register" class="btn btn-success">소속 헬스장 등록</a>
+                </div>
+<!--
                 <ul class="list-group">
-                    <!-- <li class="list-group-item" th:each="review : ${normalMember.reviews}" th:text="${review}">리뷰 내용</li> -->
+                    <li class="list-group-item" th:each="gym : ${trainerViewDto.gyms}">
+                        <strong>헬스장 이름:</strong> <span th:text="${gym.name}">헬스장 이름</span> |
+                        <strong>주소:</strong> <span th:text="${gym.address}">주소</span>
+                    </li>
                 </ul>
+                <p th:if="${#lists.isEmpty(trainerViewDto.gyms)}">소속된 헬스장이 없습니다.</p>
+-->
+            </div>
+
+            <hr class="section-divider"> <!-- 구분선 -->
+
+            <!-- 나에게 달린 리뷰 Section -->
+            <div id="reviews" class="mt-5">
+                <h3 class="mb-3">나에게 달린 리뷰</h3>
+<!--
+                <ul class="list-group">
+                    <li class="list-group-item" th:each="review : ${trainerViewDto.reviews}">
+                        <strong>작성자:</strong> <span th:text="${review.author}">작성자</span> |
+                        <strong>내용:</strong> <span th:text="${review.content}">내용</span> |
+                        <strong>평점:</strong> <span th:text="${review.rating}">평점</span>
+                    </li>
+                </ul>
+                <p th:if="${#lists.isEmpty(trainerViewDto.reviews)}">아직 받은 리뷰가 없습니다.</p>
+-->
             </div>
         </div>
     </div>
