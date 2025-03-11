@@ -33,7 +33,7 @@ public class ReviewApiController {
      * 리뷰 추가
      */
     @PostMapping("/add")
-    public ResponseEntity<ApiResponse<Long>> reviewForm(@Validated @RequestBody ReviewSaveDto reviewSaveDto,
+    public ResponseEntity<ApiResponse<Long>> addReview(@Validated @RequestBody ReviewSaveDto reviewSaveDto,
                                                         BindingResult bindingResult,
                                                         @SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) NorMember loginedNorMember,
                                                         @RequestParam("trainerId") Long trainerId) {
