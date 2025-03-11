@@ -36,7 +36,7 @@ public class TestData {
         Review review2 = createReview("친절하게 잘 가르져주세요ㅎㅎ", normalMember, trainer);
         reviewService.save(review2);
 
-        PtMembership ptMembership = createPtMembership(normalMember, trainer, 10, 3, 7, 490000);
+        PtMembership ptMembership = createPtMembership(normalMember, trainer, 10, 7, 490000);
         ptMembershipService.save(ptMembership);
 
 
@@ -72,12 +72,11 @@ public class TestData {
                 .build();
     }
 
-    private PtMembership createPtMembership(NorMember normalMember, Trainer trainer, int initCnt, int usedCnt, int remainCnt, int price) {
+    private PtMembership createPtMembership(NorMember normalMember, Trainer trainer, int initCnt, int remainCnt, int price) {
         return PtMembership.builder()
                 .norMember(normalMember)
                 .trainer(trainer)
                 .initCount(initCnt)
-                .usedCount(usedCnt)
                 .remainPtCount(remainCnt)
                 .price(price)
                 .build();
