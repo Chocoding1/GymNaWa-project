@@ -59,9 +59,7 @@
 
             <!-- 수정, 삭제 버튼 -->
             <div class="review-footer">
-                <form th:action="@{|/review/${review.id}/edit|}" method="post" style="display: inline;">
-                    <button type="submit" class="btn btn-sm btn-primary">수정</button>
-                </form>
+                <a th:href="@{|/review/${review.id}/edit|}" class="btn btn-sm btn-primary">수정</a>
                 <form th:action="@{|/review/${review.id}/delete|}" method="post" style="display: inline;">
                     <button type="submit" class="btn btn-sm btn-danger">삭제</button>
                 </form>
