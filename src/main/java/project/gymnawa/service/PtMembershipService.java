@@ -39,4 +39,12 @@ public class PtMembershipService {
     public List<PtMembership> findByTrainer(Trainer trainer) {
         return ptMembershipRepository.findByTrainer(trainer);
     }
+
+    /**
+     * 회원, 트레이너별 PT 등록 정보 조히
+     */
+    public List<PtMembership> findByNorMemberAndTrainer(NorMember norMember, Trainer trainer) {
+        return ptMembershipRepository.findByNorMemberAndTrainer(norMember, trainer);
+    }
+
 }

@@ -22,4 +22,9 @@ public interface PtMembershipRepository extends JpaRepository<PtMembership, Long
      * 트레이너 별 PT 등록 정보 조회
      */
     List<PtMembership> findByTrainer(Trainer trainer);
+
+    /**
+     * 회원, 트레이너 별 PT 등록 정보 조회
+     */
+    List<PtMembership> findByNorMemberAndTrainer(NorMember norMember, Trainer trainer);
 }
