@@ -10,6 +10,39 @@
             border-color: #dc3545;
             color: #dc3545;
         }
+
+        /* 구글 로그인 버튼 CSS */
+        .google-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 240px;
+        height: 50px;
+        background-color: white;
+        border: 1px solid #dadce0;
+        border-radius: 5px;
+        font-size: 16px;
+        font-weight: 500;
+        color: #5f6368;
+        text-decoration: none;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: background-color 0.3s, box-shadow 0.3s;
+    }
+
+    .google-btn:hover {
+        background-color: #f8f9fa;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+    }
+
+    .google-btn:active {
+        background-color: #f1f3f4;
+    }
+
+    .google-logo {
+        width: 20px;
+        height: 20px;
+        margin-right: 10px;
+    }
     </style>
 </head>
 <body>
@@ -50,6 +83,10 @@
                             <button type="submit" class="btn btn-primary">로그인</button>
                         </div>
                     </form>
+                    <a href="/oauth2/authorization/google" class="google-btn">
+                        <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google Logo" class="google-logo">
+                        <span>Sign in with Google</span>
+                    </a>
                 </div>
                 <div class="card-footer text-center">
                     <small>계정이 없으신가요? <a href="#signup"
