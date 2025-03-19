@@ -35,7 +35,7 @@ public class MemberController {
      * 로그인 성공하면 홈화면으로 redirect
      * 로그인 실패하면 로그인 화면으로 이동
      */
-    @PostMapping("/login")
+//    @PostMapping("/login")
     public String loginMember(@Validated MemberLoginDto memberLoginDto, BindingResult bindingResult,
                               HttpServletRequest request, @RequestParam(defaultValue = "/") String redirectURL) {
 
