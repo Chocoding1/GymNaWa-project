@@ -32,8 +32,5 @@ public class HomeController {
         }
 
         return "kakaoHome";
-
-
-
     }
 }
