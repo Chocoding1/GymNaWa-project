@@ -3,6 +3,7 @@ package project.gymnawa.testdata;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
+import project.gymnawa.domain.dto.normember.MemberSaveDto;
 import project.gymnawa.domain.entity.NorMember;
 import project.gymnawa.domain.entity.PtMembership;
 import project.gymnawa.domain.entity.Review;
@@ -24,30 +25,32 @@ public class TestData {
     public void testDataInit() {
         Address address = new Address("07809", "서울 강서구 마곡중앙1로 71", "1307동 803호", "마곡 13단지 힐스테이트 마스터");
 
-        NorMember normalMember = createNorMember("1234", "조성진", "whtjdwls@naver.com", address, Gender.MALE);
-        norMemberService.join(normalMember);
+        MemberSaveDto memberSaveDto = createMemberSaveDto("1234", "조성진", "whtjdwls@naver.com", "07809", "서울 강서구 마곡중앙1로 71", "1307동 803호", "마곡 13단지 힐스테이트 마스터", Gender.MALE);
+        Long joinId = norMemberService.join(memberSaveDto);
+        NorMember joinedMember = norMemberService.findOne(joinId);
 
         Trainer trainer = createTrainer("123456", "조성모", "whtjdah@gmail.com", address, Gender.FEMALE);
         trainerService.join(trainer);
 
-        Review review1 = createReview("운동 잘 가르치십니다:)", normalMember, trainer);
+        Review review1 = createReview("운동 잘 가르치십니다:)", joinedMember, trainer);
         reviewService.save(review1);
 
-        Review review2 = createReview("친절하게 잘 가르져주세요ㅎㅎ", normalMember, trainer);
+        Review review2 = createReview("친절하게 잘 가르져주세요ㅎㅎ", joinedMember, trainer);
         reviewService.save(review2);
 
-        PtMembership ptMembership = createPtMembership(normalMember, trainer, 10, 7, 490000);
+        PtMembership ptMembership = createPtMembership(joinedMember, trainer, 10, 7, 490000);
         ptMembershipService.save(ptMembership);
-
-
     }
 
-    private NorMember createNorMember(String password, String name, String email, Address address, Gender gender) {
-        return NorMember.builder()
+    private MemberSaveDto createMemberSaveDto(String password, String name, String email, String zoneCode, String address, String detailAddress, String buildingName, Gender gender) {
+        return MemberSaveDto.builder()
                 .password(password)
                 .name(name)
                 .email(email)
+                .zoneCode(zoneCode)
                 .address(address)
+                .detailAddress(detailAddress)
+                .buildingName(buildingName)
                 .gender(gender)
                 .build();
     }
