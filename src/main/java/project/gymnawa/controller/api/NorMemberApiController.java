@@ -65,9 +65,7 @@ public class NorMemberApiController {
             return ResponseEntity.badRequest().body(ApiResponse.error("이메일 인증이 필요합니다."));
         }
 
-        NorMember norMember = createNorMember(memberSaveDto);
-
-        Long joinId = norMemberService.join(norMember);
+        Long joinId = norMemberService.join(memberSaveDto);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(joinId));
     }
