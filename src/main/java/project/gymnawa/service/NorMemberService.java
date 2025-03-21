@@ -46,8 +46,7 @@ public class NorMemberService {
      * 중복 아이디 검증 함수
      */
     private void validateDuplicateMember(MemberSaveDto memberSaveDto) {
-        Optional<Member> result = memberRepository.findByEmail(memberSaveDto.getEmail());
-        if (result.isPresent()) {
+        if (memberRepository.existsByEmail(memberSaveDto.getEmail())) {
             throw new IllegalStateException("이미 존재하는 이메일입니다.");
         }
     }

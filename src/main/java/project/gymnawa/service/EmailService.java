@@ -39,8 +39,7 @@ public class EmailService {
     }
 
     private void validateDuplicateEmail(String email) {
-        Optional<Member> result = memberRepository.findByEmail(email);
-        if (result.isPresent()) {
+        if (memberRepository.existsByEmail(email)) {
             throw new IllegalStateException("해당 이메일로 가입한 이력이 있습니다.");
         }
     }
