@@ -1,8 +1,10 @@
 package project.gymnawa.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import project.gymnawa.domain.dto.normember.MemberSaveDto;
 import project.gymnawa.domain.etcfield.Address;
 import project.gymnawa.domain.entity.Member;
 import project.gymnawa.domain.entity.NorMember;
@@ -22,22 +24,29 @@ public class NorMemberService {
     // service 계층에서 다른 repository를 의존해도 상관 없다고는 한다. service가 다른 service를 의존해도 된다.
     // Facade Pattern이라는 것도 있지만, 지금은 규모가 작은 프로젝트이기 때문에 굳이 사용하지 않겠다.
 
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
+
     /**
      * 회원가입 함수
      */
     @Transactional
-    public Long join(NorMember norMember) {
+    public Long join(MemberSaveDto memberSaveDto) {
         // 중복 회원 검증 필요
-        validateDuplicateMember(norMember);
-        norMemberRepository.save(norMember);
-        return norMember.getId();
+        validateDuplicateMember(memberSaveDto);
+
+        // 비밀번호 암호화
+        memberSaveDto.setPassword(bCryptPasswordEncoder.encode(memberSaveDto.getPassword()));
+
+        NorMember joinedMember = norMemberRepository.save(memberSaveDto.toEntity());
+
+        return joinedMember.getId();
     }
 
     /**
      * 중복 아이디 검증 함수
      */
-    private void validateDuplicateMember(NorMember norMember) {
-        Optional<Member> result = memberRepository.findByEmail(norMember.getEmail());
+    private void validateDuplicateMember(MemberSaveDto memberSaveDto) {
+        Optional<Member> result = memberRepository.findByEmail(memberSaveDto.getEmail());
         if (result.isPresent()) {
             throw new IllegalStateException("이미 존재하는 이메일입니다.");
         }
