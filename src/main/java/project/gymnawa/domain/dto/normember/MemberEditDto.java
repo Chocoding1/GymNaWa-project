@@ -8,9 +8,6 @@ import lombok.Data;
 public class MemberEditDto {
 
     @NotBlank
-    private String loginId;
-
-    @NotBlank
     private String password;
 
     @NotBlank
@@ -25,8 +22,7 @@ public class MemberEditDto {
     private String buildingName;
 
     @Builder
-    public MemberEditDto(String loginId, String password, String name, String zoneCode, String address, String detailAddress, String buildingName) {
-        this.loginId = loginId;
+    public MemberEditDto(String password, String name, String zoneCode, String address, String detailAddress, String buildingName) {
         this.password = password;
         this.name = name;
         this.zoneCode = zoneCode;

@@ -55,7 +55,7 @@ class GymTrainerServiceTest {
     @DisplayName("트레이너별 계약 정보 조회")
     void findByTrainer() {
         //given
-        Trainer trainer = createTrainer("jsj012100", "1234", "조성진", "galmeagi2@naver.com");
+        Trainer trainer = createTrainer("1234", "조성진", "galmeagi2@naver.com");
 //        Gym gym = createGym("라온짐");
         GymTrainer gymTrainer1 = createGymTrainer(trainer, "gymId", ContractStatus.ACTIVE);
         GymTrainer gymTrainer2 = createGymTrainer(trainer, "gymId", ContractStatus.EXPIRED);
@@ -77,8 +77,8 @@ class GymTrainerServiceTest {
     @DisplayName("헬스장과 계약 상태 별 계약 정보 조회")
     void findByGymAndContractStatus() {
         //given
-        Trainer trainer1 = createTrainer("jsj012100", "1234", "조성진", "galmeagi2@naver.com");
-        Trainer trainer2 = createTrainer("jsj121", "12345", "조성민", "galmeagi2@naver.com");
+        Trainer trainer1 = createTrainer("1234", "조성진", "galmeagi2@naver.com");
+        Trainer trainer2 = createTrainer("12345", "조성민", "galmeagi2@naver.com");
 //        Gym gym = createGym("라온짐");
 
         GymTrainer gymTrainer1 = createGymTrainer(trainer1, "gymId", ContractStatus.ACTIVE);
@@ -102,7 +102,7 @@ class GymTrainerServiceTest {
     @DisplayName("헬스장, 트레이너, 계약 상태 별 계약 정보 조회")
     void findContractByTrainerAndGymAndContractStatus() {
         //given
-        Trainer trainer = createTrainer("jsj012100", "1234", "조성진", "galmeagi2@naver.com");
+        Trainer trainer = createTrainer("1234", "조성진", "galmeagi2@naver.com");
 
         GymTrainer gymTrainer = createGymTrainer(trainer, "gymId", ContractStatus.ACTIVE);
 
@@ -121,7 +121,7 @@ class GymTrainerServiceTest {
     @DisplayName("계약 만료 처리")
     void contractExpire() {
         //given
-        Trainer trainer = createTrainer("jsj012100", "1234", "조성진", "galmeagi2@naver.com");
+        Trainer trainer = createTrainer("1234", "조성진", "galmeagi2@naver.com");
 
         Long gymTrainerId = 1L;
         GymTrainer gymTrainer = createGymTrainer(trainer, "gymId", ContractStatus.ACTIVE);
@@ -152,9 +152,8 @@ class GymTrainerServiceTest {
                 .build();
     }
 
-    private Trainer createTrainer(String loginId, String password, String name, String email) {
+    private Trainer createTrainer(String password, String name, String email) {
         return Trainer.builder()
-                .loginId(loginId)
                 .password(password)
                 .name(name)
                 .email(email)

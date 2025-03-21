@@ -8,6 +8,7 @@ import lombok.experimental.SuperBuilder;
 import project.gymnawa.domain.etcfield.Address;
 import project.gymnawa.domain.etcfield.BaseTime;
 import project.gymnawa.domain.etcfield.Gender;
+import project.gymnawa.domain.etcfield.MemberRole;
 
 @Entity
 @DiscriminatorColumn
@@ -21,10 +22,9 @@ public class Member extends BaseTime {
     @GeneratedValue
     private Long id;
 
-    private String loginId;
+    private String email;
     private String password;
     private String name;
-    private String email;
 
     @Enumerated(value = EnumType.STRING)
     private Gender gender;
@@ -32,9 +32,11 @@ public class Member extends BaseTime {
     @Embedded
     private Address address;
 
-    public Member(Long id, String loginId, String password, String name, String email, Address address, Gender gender) {
+    @Enumerated(EnumType.STRING)
+    private MemberRole role;
+
+    public Member(Long id, String password, String name, String email, Address address, Gender gender) {
         this.id = id;
-        this.loginId = loginId;
         this.password = password;
         this.name = name;
         this.email = email;
@@ -42,8 +44,7 @@ public class Member extends BaseTime {
         this.gender = gender;
     }
 
-    public void updateInfo(String loginId, String password, String name, Address address) {
-        this.loginId = loginId;
+    public void updateInfo(String password, String name, Address address) {
         this.password = password;
         this.name = name;
         this.address = address;

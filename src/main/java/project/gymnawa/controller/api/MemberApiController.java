@@ -36,7 +36,7 @@ public class MemberApiController {
     @GetMapping("/login")
     public ResponseEntity<ApiResponse<MemberLoginDto>> loginForm() {
         MemberLoginDto memberLoginDto = MemberLoginDto.builder()
-                .loginId("")
+                .email("")
                 .password("")
                 .build();
 
@@ -55,7 +55,7 @@ public class MemberApiController {
             return ResponseEntity.badRequest().body(ApiResponse.error("입력값이 올바르지 않습니다."));
         }
 
-        Member loginedMember = memberService.login(memberLoginDto.getLoginId(), memberLoginDto.getPassword());
+        Member loginedMember = memberService.login(memberLoginDto.getEmail(), memberLoginDto.getPassword());
 
         if (loginedMember == null) {
             bindingResult.reject("loginFail", "아이디 또는 비밀번호가 맞지 않습니다.");

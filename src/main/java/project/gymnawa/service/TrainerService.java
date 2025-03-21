@@ -33,10 +33,13 @@ public class TrainerService {
         return trainer.getId();
     }
 
+    /**
+     * 이메일 중복 체크
+     */
     private void validateDuplicateTrainer(Trainer trainer) {
-        Optional<Member> result = memberRepository.findByLoginId(trainer.getLoginId());
+        Optional<Member> result = memberRepository.findByEmail(trainer.getEmail());
         if (result.isPresent()) {
-            throw new IllegalStateException("이미 존재하는 아이디입니다.");
+            throw new IllegalStateException("이미 존재하는 이메일입니다.");
         }
     }
 
@@ -66,17 +69,11 @@ public class TrainerService {
      * 트레이너 정보 수정
      */
     @Transactional
-    public void updateTrainer(Long id, String loginId, String password, String name, Address address) {
+    public void updateTrainer(Long id, String password, String name, Address address) {
         Trainer trainer = trainerRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 트레이너입니다."));
 
-        //중복 아이디 체크
-        Optional<Member> dupliTrainer = memberRepository.findByLoginId(loginId);
-        if (dupliTrainer.isPresent()) {
-            throw new IllegalStateException("이미 존재하는 아이디입니다.");
-        }
-
-        trainer.updateInfo(loginId, password, name, address);
+        trainer.updateInfo(password, name, address);
     }
 
     /**

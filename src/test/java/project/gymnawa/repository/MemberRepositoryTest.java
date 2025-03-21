@@ -29,7 +29,7 @@ class MemberRepositoryTest {
     void save() {
         //given
         Address address = new Address("12345", "서울", "강서구", "마곡동");
-        Member member = createMember("jsj012100", "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
+        Member member = createMember("1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
 
         memberRepository.save(member);
 
@@ -46,8 +46,8 @@ class MemberRepositoryTest {
     void findAll() {
         //given
         Address address = new Address("12345", "서울", "강서구", "마곡동");
-        Member member1 = createMember("jsj012100", "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
-        Member member2 = createMember("jsj121", "123456", "조성민", "galmeagi2@gmail.com", address, Gender.MALE);
+        Member member1 = createMember("1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
+        Member member2 = createMember("123456", "조성민", "galmeagi2@gmail.com", address, Gender.MALE);
 
         memberRepository.save(member1);
         memberRepository.save(member2);
@@ -59,32 +59,14 @@ class MemberRepositoryTest {
         assertThat(result.size()).isEqualTo(2);
     }
 
-    @Test
-    @DisplayName("로그인 아이디로 회원 조회 테스트")
-    void findByLoginId() {
-        //given
-        Address address = new Address("12345", "서울", "강서구", "마곡동");
-        Member member1 = createMember("jsj012100", "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
-        Member member2 = createMember("jsj121", "123456", "조성민", "galmeagi2@gmail.com", address, Gender.MALE);
-
-        memberRepository.save(member1);
-        memberRepository.save(member2);
-
-        //when
-        Member findMember = memberRepository.findByLoginId("jsj012100").orElse(null);
-
-        //then
-        assertThat(findMember).isEqualTo(member1);
-        assertThat(findMember.getName()).isEqualTo("조성진");
-    }
 
     @Test
     @DisplayName("이메일로 회원 조회 테스트")
     void findByEmail() {
         //given
         Address address = new Address("12345", "서울", "강서구", "마곡동");
-        Member member1 = createMember("jsj012100", "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
-        Member member2 = createMember("jsj121", "123456", "조성민", "galmeagi2@gmail.com", address, Gender.MALE);
+        Member member1 = createMember("1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
+        Member member2 = createMember("123456", "조성민", "galmeagi2@gmail.com", address, Gender.MALE);
 
         memberRepository.save(member1);
         memberRepository.save(member2);
@@ -94,12 +76,11 @@ class MemberRepositoryTest {
 
         //then
         assertThat(findMember).isEqualTo(member2);
-        assertThat(findMember.getLoginId()).isEqualTo("jsj121");
+        assertThat(findMember.getEmail()).isEqualTo("galmeagi2@gmail.com");
     }
 
-    private Member createMember(String loginId, String password, String name, String email, Address address, Gender gender) {
+    private Member createMember(String password, String name, String email, Address address, Gender gender) {
         return Member.builder()
-                .loginId(loginId)
                 .password(password)
                 .name(name)
                 .email(email)

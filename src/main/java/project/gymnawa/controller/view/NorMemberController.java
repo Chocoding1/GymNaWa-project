@@ -116,7 +116,7 @@ public class NorMemberController {
         Address address = new Address(memberEditDto.getZoneCode(), memberEditDto.getAddress(), memberEditDto.getDetailAddress(), memberEditDto.getBuildingName());
 
         //로그인 아이디 중복 체크 필요
-        norMemberService.updateMember(id, memberEditDto.getLoginId(), memberEditDto.getPassword(), memberEditDto.getName(), address);
+        norMemberService.updateMember(id, memberEditDto.getPassword(), memberEditDto.getName(), address);
 
         return "redirect:/member/n/{id}/mypage";
     }
@@ -130,7 +130,6 @@ public class NorMemberController {
                 .build();
 
         return NorMember.builder()
-                .loginId(memberSaveDto.getLoginId())
                 .password(memberSaveDto.getPassword())
                 .name(memberSaveDto.getName())
                 .email(memberSaveDto.getEmail())
@@ -144,7 +143,6 @@ public class NorMemberController {
                 .id(norMember.getId())
                 .name(norMember.getName())
                 .gender(norMember.getGender().getExp())
-                .loginId(norMember.getLoginId())
                 .password(norMember.getPassword())
                 .email(norMember.getEmail())
                 .address(norMember.getAddress())
@@ -154,7 +152,6 @@ public class NorMemberController {
 
     private MemberEditDto createMemberEditDto(NorMember norMember) {
         return MemberEditDto.builder()
-                .loginId(norMember.getLoginId())
                 .password(norMember.getPassword())
                 .name(norMember.getName())
                 .zoneCode(norMember.getAddress().getZoneCode())

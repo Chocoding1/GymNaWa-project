@@ -19,10 +19,10 @@ public class MemberService {
     /**
      * 로그인
      * 로그인 아이디로 회원을 찾아서 그 회원의 비밀번호와 입력받은 비밀번호가 같은지 확인
-     * 애초에 초그인 아이디가 존재하지 않을 경우, 즉 findByLoginId의 리턴값이 null일 경우도 예외처리 해줘야 됨 -> 스트림 사용하여 해결
+     * 애초에 초그인 아이디가 존재하지 않을 경우, 즉 findByEmail의 리턴값이 null일 경우도 예외처리 해줘야 됨 -> 스트림 사용하여 해결
      */
-    public Member login(String loginId, String password) {
-        return memberRepository.findByLoginId(loginId)
+    public Member login(String email, String password) {
+        return memberRepository.findByEmail(email)
                 .filter(m -> m.getPassword().equals(password))
                 .orElse(null);
     }
@@ -40,14 +40,6 @@ public class MemberService {
      */
     public List<Member> findMembers() {
         return memberRepository.findAll();
-    }
-
-    /**
-     * 로그인 아이디로 회원 조회
-     */
-    public Member findByLoginId(String loginId) {
-        return memberRepository.findByLoginId(loginId)
-                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
     }
 
     /**

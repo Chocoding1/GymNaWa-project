@@ -51,9 +51,9 @@ class PtMembershipServiceTest {
     @DisplayName("회원 별 PT 등록 정보 저장")
     void findByMember() {
         //given
-        NorMember norMember = createNorMember("jsj012100", "1234", "조성진");
-        Trainer trainer1 = createTrainer("jsj121", "1234556", "조성모");
-        Trainer trainer2 = createTrainer("jsj", "1556", "조성민");
+        NorMember norMember = createNorMember("galmeagi2@naver.com", "1234", "조성진");
+        Trainer trainer1 = createTrainer("galmeagi2@naver.com", "1234556", "조성모");
+        Trainer trainer2 = createTrainer("galmeagi2@naver.com", "1556", "조성민");
         PtMembership ptMembership1 = createPtMembership(norMember, trainer1, 10, 300000);
         PtMembership ptMembership2 = createPtMembership(norMember, trainer2, 10, 300000);
 
@@ -74,9 +74,9 @@ class PtMembershipServiceTest {
     @DisplayName("트레이너 별 PT 등록 정보 저장")
     void findByTrainer() {
         //given
-        NorMember norMember1 = createNorMember("jsj012100", "1234", "조성진");
-        NorMember norMember2 = createNorMember("jsj121", "1234556", "조성모");
-        Trainer trainer = createTrainer("jsj", "1556", "조성민");
+        NorMember norMember1 = createNorMember("galmeagi2@naver.com", "1234", "조성진");
+        NorMember norMember2 = createNorMember("galmeagi2@naver.com", "1234556", "조성모");
+        Trainer trainer = createTrainer("galmeagi2@naver.com", "1556", "조성민");
         PtMembership ptMembership1 = createPtMembership(norMember1, trainer, 10, 300000);
         PtMembership ptMembership2 = createPtMembership(norMember2, trainer, 10, 300000);
 
@@ -93,17 +93,17 @@ class PtMembershipServiceTest {
         verify(ptMembershipRepository, times(1)).findByTrainer(trainer);
     }
 
-    private NorMember createNorMember(String loginId, String password, String name) {
+    private NorMember createNorMember(String email, String password, String name) {
         return NorMember.builder()
-                .loginId(loginId)
+                .email(email)
                 .password(password)
                 .name(name)
                 .build();
     }
 
-    private Trainer createTrainer(String loginId, String password, String name) {
+    private Trainer createTrainer(String email, String password, String name) {
         return Trainer.builder()
-                .loginId(loginId)
+                .email(email)
                 .password(password)
                 .name(name)
                 .build();

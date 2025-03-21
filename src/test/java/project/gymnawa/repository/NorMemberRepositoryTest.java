@@ -23,7 +23,7 @@ class NorMemberRepositoryTest {
     void save() {
         //given
         Address address = new Address("12345", "서울", "강서구", "마곡동");
-        NorMember member = createNorMember("jsj012100", "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
+        NorMember member = createNorMember("1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
 
         //when
         NorMember savedMember = norMemberRepository.save(member);
@@ -38,7 +38,7 @@ class NorMemberRepositoryTest {
     void findById() {
         //given
         Address address = new Address("12345", "서울", "강서구", "마곡동");
-        NorMember member = createNorMember("jsj012100", "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
+        NorMember member = createNorMember("1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
 
         norMemberRepository.save(member);
 
@@ -55,8 +55,8 @@ class NorMemberRepositoryTest {
     void findAll() {
         //given
         Address address = new Address("12345", "서울", "강서구", "마곡동");
-        NorMember member1 = createNorMember("jsj012100", "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
-        NorMember member2 = createNorMember("jsj121", "123456", "조성민", "galmeagi2@gmail.com", address, Gender.MALE);
+        NorMember member1 = createNorMember("1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
+        NorMember member2 = createNorMember("123456", "조성민", "galmeagi2@gmail.com", address, Gender.MALE);
 
         norMemberRepository.save(member1);
         norMemberRepository.save(member2);
@@ -74,8 +74,8 @@ class NorMemberRepositoryTest {
     void delete() {
         //given
         Address address = new Address("12345", "서울", "강서구", "마곡동");
-        NorMember member1 = createNorMember("jsj012100", "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
-        NorMember member2 = createNorMember("jsj121", "123456", "조성민", "galmeagi2@gmail.com", address, Gender.MALE);
+        NorMember member1 = createNorMember("1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
+        NorMember member2 = createNorMember("123456", "조성민", "galmeagi2@gmail.com", address, Gender.MALE);
 
         norMemberRepository.save(member1);
         norMemberRepository.save(member2);
@@ -87,12 +87,10 @@ class NorMemberRepositoryTest {
         //then
         assertThat(result.size()).isEqualTo(1);
         assertThat(result).contains(member2);
-        assertThat(result.get(0).getLoginId()).isEqualTo("jsj121");
     }
 
-    private NorMember createNorMember(String loginId, String password, String name, String email, Address address, Gender gender) {
+    private NorMember createNorMember(String password, String name, String email, Address address, Gender gender) {
         return NorMember.builder()
-                .loginId(loginId)
                 .password(password)
                 .name(name)
                 .email(email)

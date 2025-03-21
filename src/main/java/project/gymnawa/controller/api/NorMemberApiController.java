@@ -34,7 +34,6 @@ public class NorMemberApiController {
     @GetMapping("/add")
     public ResponseEntity<MemberSaveDto> addForm() {
         MemberSaveDto memberSaveDto = MemberSaveDto.builder()
-                .loginId("")
                 .password("")
                 .name("")
                 .email("")
@@ -131,7 +130,7 @@ public class NorMemberApiController {
                 .buildingName(memberEditDto.getBuildingName())
                 .build();
 
-        norMemberService.updateMember(id, memberEditDto.getLoginId(), memberEditDto.getPassword(), memberEditDto.getName(), address);
+        norMemberService.updateMember(id, memberEditDto.getPassword(), memberEditDto.getName(), address);
 
         return ResponseEntity.ok().body(ApiResponse.success("edit successful"));
     }
@@ -145,7 +144,6 @@ public class NorMemberApiController {
                 .build();
 
         return NorMember.builder()
-                .loginId(memberSaveDto.getLoginId())
                 .password(memberSaveDto.getPassword())
                 .name(memberSaveDto.getName())
                 .email(memberSaveDto.getEmail())
@@ -156,7 +154,6 @@ public class NorMemberApiController {
 
     private MemberViewDto createMemberViewDto(NorMember loginedMember) {
         return MemberViewDto.builder()
-                .loginId(loginedMember.getLoginId())
                 .password(loginedMember.getPassword())
                 .name(loginedMember.getName())
                 .email(loginedMember.getEmail())
@@ -167,7 +164,6 @@ public class NorMemberApiController {
 
     private MemberEditDto createMemberEditDto(NorMember loginedMember) {
         return MemberEditDto.builder()
-                .loginId(loginedMember.getLoginId())
                 .password(loginedMember.getPassword())
                 .name(loginedMember.getName())
                 .zoneCode(loginedMember.getAddress().getZoneCode())

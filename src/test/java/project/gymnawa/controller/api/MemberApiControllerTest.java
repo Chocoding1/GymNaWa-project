@@ -52,7 +52,7 @@ class MemberApiControllerTest {
     @DisplayName("로그인 시 초기 DTO 생성")
     void createLoginDto() throws Exception {
         //given
-        String loginId = "";
+        String email = "";
         String password = "";
         //when
         ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.get("/api/member/login"));
@@ -60,7 +60,7 @@ class MemberApiControllerTest {
         //then
         resultActions
                 .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.loginId").value(loginId))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.email").value(email))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.password").value(password));
 
     }
@@ -69,26 +69,24 @@ class MemberApiControllerTest {
     @DisplayName("로그인 성공")
     void loginSuccess() throws Exception {
         //given
-        String loginId = "jsj012100";
+        String email = "galmeagi2@naver.com";
         String password = "1234";
 
         Member loginedMember = Member.builder()
                 .id(1L)
-                .loginId(loginId)
                 .password(password)
                 .name("조성진")
-                .email("galmeagi2@naver.com")
+                .email(email)
                 .gender(Gender.MALE)
                 .build();
 
         MemberLoginDto memberLoginDto = MemberLoginDto.builder()
-                .loginId(loginId)
                 .password(password)
                 .build();
 
         session = new MockHttpSession(); // 여기서 만든 세션을 전달해야 세션에 저장된 값을 받아올 수 있다.
 
-        when(memberService.login(loginId, password)).thenReturn(loginedMember);
+        when(memberService.login(email, password)).thenReturn(loginedMember);
 
         //when
         ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/api/member/login")
@@ -102,12 +100,12 @@ class MemberApiControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data").value("login successful"));
 
-        verify(memberService, times(1)).login(loginId, password);
+        verify(memberService, times(1)).login(email, password);
 
         // 저장된 세션 확인
         Member member = (Member) session.getAttribute(SessionConst.LOGIN_MEMBER);
         assertThat(member).isEqualTo(loginedMember);
-        assertThat(member.getLoginId()).isEqualTo(loginedMember.getLoginId());
+        assertThat(member.getEmail()).isEqualTo(loginedMember.getEmail());
     }
 
     @Test
@@ -115,7 +113,7 @@ class MemberApiControllerTest {
     void loginFail_WrongInput() throws Exception{
         //given
         MemberLoginDto memberLoginDto = MemberLoginDto.builder()
-                .loginId("")
+                .email("")
                 .password("")
                 .build();
 
@@ -134,11 +132,11 @@ class MemberApiControllerTest {
     }
 
     @Test
-    @DisplayName("로그인 실패 - 틀린 아이디 or 비밀번호 입력")
+    @DisplayName("로그인 실패 - 틀린 이메일 or 비밀번호 입력")
     void loginFail_EmptyMember() throws Exception{
         //given
         MemberLoginDto memberLoginDto = MemberLoginDto.builder()
-                .loginId("wrongId")
+                .email("wrongEmail")
                 .password("wrongPw")
                 .build();
 
@@ -153,7 +151,7 @@ class MemberApiControllerTest {
         resultActions
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("아이디 또는 비밀번호가 맞지 않습니다."));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("이메일 또는 비밀번호가 맞지 않습니다."));
 
         verify(memberService, times(1)).login(anyString(), anyString());
     }

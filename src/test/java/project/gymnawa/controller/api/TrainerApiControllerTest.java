@@ -50,7 +50,7 @@ class TrainerApiControllerTest {
     @DisplayName("회원가입 시 초기 DTO 생성")
     void createAddDto() throws Exception {
         //given
-        String loginId = "";
+        String email = "";
         String password = "";
         Gender gender = Gender.MALE;
 
@@ -60,7 +60,7 @@ class TrainerApiControllerTest {
         //then
         resultActions
                 .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.loginId").value(loginId))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.email").value(email))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.password").value(password));
     }
 
@@ -69,7 +69,7 @@ class TrainerApiControllerTest {
     void addSuccess() throws Exception {
         //given
         Long id = 1L;
-        TrainerSaveDto trainerSaveDto = createTrainerSaveDto("loginId", "password",
+        TrainerSaveDto trainerSaveDto = createTrainerSaveDto("password",
                 "name", "email", Gender.MALE, "zoneCode", "address", "detailAddress", "buildingName");
 
         when(emailService.isEmailVerified(anyString(), anyString())).thenReturn(true);
@@ -86,7 +86,7 @@ class TrainerApiControllerTest {
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isCreated())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("요청 성공"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.loginId").value("loginId"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.email").value("email"));
 
         verify(emailService, times(1)).isEmailVerified(anyString(), anyString());
         verify(trainerService, times(1)).join(any(Trainer.class));
@@ -96,7 +96,7 @@ class TrainerApiControllerTest {
     @DisplayName("회원가입 실패 - 잘못된 입력값")
     void addFail_WrongInput() throws Exception {
         //given
-        TrainerSaveDto trainerSaveDto = createTrainerSaveDto("", "", "", "", Gender.MALE, "", "", "", "");
+        TrainerSaveDto trainerSaveDto = createTrainerSaveDto("", "", "", Gender.MALE, "", "", "", "");
 
         //when
         ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/api/member/t/add")
@@ -114,7 +114,7 @@ class TrainerApiControllerTest {
     @DisplayName("회원가입 실패 - 이메일 인증 실패")
     void addFail_EmailNotVerified() throws Exception {
         //given
-        TrainerSaveDto trainerSaveDto = createTrainerSaveDto("loginId", "password",
+        TrainerSaveDto trainerSaveDto = createTrainerSaveDto("password",
                 "name", "email", Gender.MALE, "zoneCode", "address", "detailAddress", "buildingName");
 
         when(emailService.isEmailVerified(anyString(), anyString())).thenReturn(false);
@@ -138,7 +138,7 @@ class TrainerApiControllerTest {
     @DisplayName("마이페이지")
     void mypage() throws Exception {
         //given
-        Trainer trainer = createTrainer("loginId", "password", "name", "email", Gender.MALE, Address.builder().build());
+        Trainer trainer = createTrainer("password", "name", "email", Gender.MALE, Address.builder().build());
 
         when(trainerService.findOne(1L)).thenReturn(trainer);
 
@@ -154,7 +154,7 @@ class TrainerApiControllerTest {
         resultActions
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.loginId").value("loginId"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.email").value("email"));
 
         verify(trainerService, times(1)).findOne(1L);
     }
@@ -163,7 +163,7 @@ class TrainerApiControllerTest {
     @DisplayName("회원 정보 수정 시 초기 DTO 생성")
     void createEditDto() throws Exception {
         //given
-        Trainer trainer = createTrainer("loginId", "password", "name", "email", Gender.MALE, Address.builder().build());
+        Trainer trainer = createTrainer("password", "name", "email", Gender.MALE, Address.builder().build());
 
         when(trainerService.findOne(1L)).thenReturn(trainer);
 
@@ -179,7 +179,7 @@ class TrainerApiControllerTest {
         resultActions
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.loginId").value(trainer.getLoginId()));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.email").value(trainer.getEmail()));
 
         verify(trainerService, times(1)).findOne(1L);
     }
@@ -188,9 +188,9 @@ class TrainerApiControllerTest {
     @DisplayName("회원 정보 수정 성공")
     void editSuccess() throws Exception {
         //given
-        Trainer trainer = createTrainer("oldLoginId", "oldPassword", "oldName", "email", Gender.MALE, Address.builder().build());
+        Trainer trainer = createTrainer("oldPassword", "oldName", "email", Gender.MALE, Address.builder().build());
 
-        TrainerEditDto trainerEditDto = createTrainerEditDto("oldLoginId", "oldPassword", "oldName", "zoneCode", "address", "detailAddress", "buildingName");
+        TrainerEditDto trainerEditDto = createTrainerEditDto("oldPassword", "oldName", "zoneCode", "address", "detailAddress", "buildingName");
 
         Address address = Address.builder()
                 .zoneCode("zoneCode")
@@ -215,16 +215,16 @@ class TrainerApiControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data").value("edit successful"));
 
-        verify(trainerService, times(1)).updateTrainer(eq(1L), eq(trainerEditDto.getLoginId()), eq(trainerEditDto.getPassword()), eq(trainerEditDto.getName()), any(Address.class));
+        verify(trainerService, times(1)).updateTrainer(eq(1L), eq(trainerEditDto.getPassword()), eq(trainerEditDto.getName()), any(Address.class));
     }
 
     @Test
     @DisplayName("회원 정보 수정 실패 - 잘못된 입력값")
     void editFail_WrongInput() throws Exception {
         //given
-        Trainer trainer = createTrainer("oldLoginId", "oldPassword", "oldName", "email", Gender.MALE, Address.builder().build());
+        Trainer trainer = createTrainer("oldPassword", "oldName", "email", Gender.MALE, Address.builder().build());
 
-        TrainerEditDto trainerEditDto = createTrainerEditDto("", "", "newName", "zoneCode", "address", "detailAddress", "buildingName");
+        TrainerEditDto trainerEditDto = createTrainerEditDto("", "newName", "zoneCode", "address", "detailAddress", "buildingName");
 
         // 인터셉터 통과를 위한 세션 설정
         session = new MockHttpSession();
@@ -242,14 +242,13 @@ class TrainerApiControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("입력값이 올바르지 않습니다."));
 
-        verify(trainerService, never()).updateTrainer(eq(1L), eq(trainerEditDto.getLoginId()), eq(trainerEditDto.getPassword()), eq(trainerEditDto.getName()), any(Address.class));
+        verify(trainerService, never()).updateTrainer(eq(1L), eq(trainerEditDto.getPassword()), eq(trainerEditDto.getName()), any(Address.class));
     }
 
-    private TrainerSaveDto createTrainerSaveDto(String loginId, String password, String name,
+    private TrainerSaveDto createTrainerSaveDto(String password, String name,
                                                        String email, Gender gender, String zoneCode, String address,
                                                        String detailAddress, String buildingName) {
         return TrainerSaveDto.builder()
-                .loginId(loginId)
                 .password(password)
                 .name(name)
                 .email(email)
@@ -261,10 +260,9 @@ class TrainerApiControllerTest {
                 .build();
     }
 
-    private Trainer createTrainer(String loginId, String password, String name,
+    private Trainer createTrainer(String password, String name,
                                          String email, Gender gender, Address address) {
         return Trainer.builder()
-                .loginId(loginId)
                 .password(password)
                 .name(name)
                 .email(email)
@@ -273,10 +271,9 @@ class TrainerApiControllerTest {
                 .build();
     }
 
-    private TrainerEditDto createTrainerEditDto(String loginId, String password, String name, String zoneCode,
+    private TrainerEditDto createTrainerEditDto(String password, String name, String zoneCode,
                                                 String address, String detailAddress, String buildingName) {
         return TrainerEditDto.builder()
-                .loginId(loginId)
                 .password(password)
                 .name(name)
                 .zoneCode(zoneCode)

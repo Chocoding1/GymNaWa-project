@@ -29,10 +29,10 @@ class ReviewRepositoryTest {
     void save() {
         //given
         Address address = new Address("12345", "서울", "강서구", "마곡동");
-        NorMember norMember = createNorMember("jsj012100", "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
+        NorMember norMember = createNorMember("1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
         norMemberRepository.save(norMember);
 
-        Trainer trainer = createTrainer("jsj121", "123456", "조성민", "galmeagi2@gmail.com", address, Gender.MALE);
+        Trainer trainer = createTrainer("123456", "조성민", "galmeagi2@gmail.com", address, Gender.MALE);
         trainerRepository.save(trainer);
 
         Review review = createReview("저의 몸 상태에 맞게 운동을 알려주셔서 체형 개선도 되고 너무 좋아요.", norMember, trainer);
@@ -50,10 +50,10 @@ class ReviewRepositoryTest {
     void findOne() {
         //given
         Address address = new Address("12345", "서울", "강서구", "마곡동");
-        NorMember norMember = createNorMember("jsj012100", "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
+        NorMember norMember = createNorMember("1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
         norMemberRepository.save(norMember);
 
-        Trainer trainer = createTrainer("jsj121", "123456", "조성민", "galmeagi2@gmail.com", address, Gender.MALE);
+        Trainer trainer = createTrainer("123456", "조성민", "galmeagi2@gmail.com", address, Gender.MALE);
         trainerRepository.save(trainer);
 
         Review review = createReview("저의 몸 상태에 맞게 운동을 알려주셔서 체형 개선도 되고 너무 좋아요.", norMember, trainer);
@@ -72,10 +72,10 @@ class ReviewRepositoryTest {
     void findByMember() {
         //given
         Address address = new Address("12345", "서울", "강서구", "마곡동");
-        NorMember norMember = createNorMember("jsj012100", "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
+        NorMember norMember = createNorMember("1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
         norMemberRepository.save(norMember);
 
-        Trainer trainer = createTrainer("jsj121", "123456", "조성민", "galmeagi2@gmail.com", address, Gender.MALE);
+        Trainer trainer = createTrainer("123456", "조성민", "galmeagi2@gmail.com", address, Gender.MALE);
         trainerRepository.save(trainer);
 
         Review review1 = createReview("저의 몸 상태에 맞게 운동을 알려주셔서 체형 개선도 되고 너무 좋아요.", norMember, trainer);
@@ -95,12 +95,12 @@ class ReviewRepositoryTest {
     void findByTrainer() {
         //given
         Address address = new Address("12345", "서울", "강서구", "마곡동");
-        NorMember norMember1 = createNorMember("jsj012100", "1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
-        NorMember norMember2 = createNorMember("jsj121", "123456", "조성민", "galmeagi2@gmail.com", address, Gender.MALE);
+        NorMember norMember1 = createNorMember("1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
+        NorMember norMember2 = createNorMember("123456", "조성민", "galmeagi2@gmail.com", address, Gender.MALE);
         norMemberRepository.save(norMember1);
         norMemberRepository.save(norMember2);
 
-        Trainer trainer = createTrainer("jsj121", "123456", "조성민", "galmeagi2@gmail.com", address, Gender.MALE);
+        Trainer trainer = createTrainer("123456", "조성민", "galmeagi2@gmail.com", address, Gender.MALE);
         trainerRepository.save(trainer);
 
         Review review1 = createReview("저의 몸 상태에 맞게 운동을 알려주셔서 체형 개선도 되고 너무 좋아요.", norMember1, trainer);
@@ -117,9 +117,8 @@ class ReviewRepositoryTest {
         assertThat(result.size()).isEqualTo(3);
     }
 
-    private NorMember createNorMember(String loginId, String password, String name, String email, Address address, Gender gender) {
+    private NorMember createNorMember(String password, String name, String email, Address address, Gender gender) {
         return NorMember.builder()
-                .loginId(loginId)
                 .password(password)
                 .name(name)
                 .email(email)
@@ -128,9 +127,8 @@ class ReviewRepositoryTest {
                 .build();
     }
 
-    private Trainer createTrainer(String loginId, String password, String name, String email, Address address, Gender gender) {
+    private Trainer createTrainer(String password, String name, String email, Address address, Gender gender) {
         return Trainer.builder()
-                .loginId(loginId)
                 .password(password)
                 .name(name)
                 .email(email)

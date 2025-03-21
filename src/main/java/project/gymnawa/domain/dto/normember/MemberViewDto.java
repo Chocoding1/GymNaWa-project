@@ -13,8 +13,6 @@ public class MemberViewDto {
     @NotNull
     private Long id;
     @NotBlank
-    private String loginId;
-    @NotBlank
     private String password;
     @NotBlank
     private String name;

@@ -38,37 +38,36 @@ class TrainerServiceTest {
     @DisplayName("회원가입 성공")
     void joinSuccess() {
         //given
-        Trainer trainer = createTrainer("jsj012100", "1234", "조성진");
+        Trainer trainer = createTrainer("galmeagi2@naver.com", "1234", "조성진");
 
         when(trainerRepository.save(trainer)).thenReturn(trainer);
-        when(memberRepository.findByLoginId("jsj012100")).thenReturn(Optional.empty());
+        when(memberRepository.findByEmail("galmeagi2@naver.com")).thenReturn(Optional.empty());
 
         //when
         Long joinId = trainerService.join(trainer);
 
         //then
         assertThat(joinId).isEqualTo(trainer.getId());
-        verify(memberRepository, times(1)).findByLoginId("jsj012100");
         verify(trainerRepository, times(1)).save(trainer);
 
         InOrder inOrder = inOrder(memberRepository, trainerRepository);
-        inOrder.verify(memberRepository).findByLoginId("jsj012100");
+        inOrder.verify(memberRepository).findByEmail("galmeagi2@naver.com");
         inOrder.verify(trainerRepository).save(trainer);
     }
 
     @Test
-    @DisplayName("회원가입 실패 - 중복 아이디는 입력 불가")
+    @DisplayName("회원가입 실패 - 중복 이메일은 입력 불가")
     void joinFail() {
         //given
-        Trainer trainer = createTrainer("jsj012100", "aadfad", "조성진");
-        Trainer dupliTrainer = createTrainer("jsj012100", "aadfad", "조성진");
+        Trainer trainer = createTrainer("galmeagi2@naver.com", "aadfad", "조성진");
+        Trainer dupliTrainer = createTrainer("galmeagi2@naver.com", "aadfad", "조성진");
 
-        when(memberRepository.findByLoginId("jsj012100")).thenReturn(Optional.of(trainer));
+        when(memberRepository.findByEmail("galmeagi2@naver.com")).thenReturn(Optional.of(trainer));
 
         //when & then
         assertThrows(IllegalStateException.class,
                 () -> trainerService.join(dupliTrainer));
-        verify(memberRepository, times(1)).findByLoginId("jsj012100");
+        verify(memberRepository, times(1)).findByEmail("galmeagi2@naver.com");
     }
 
     @Test
@@ -77,7 +76,6 @@ class TrainerServiceTest {
         //given
         Trainer trainer = Trainer.builder()
                 .id(1L)
-                .loginId("jsj012100")
                 .password("1234")
                 .name("조성진")
                 .email("galmeagi2@naver.com")
@@ -112,9 +110,9 @@ class TrainerServiceTest {
     @DisplayName("트레이너 이름으로 조회")
     void findByName() {
         //given
-        Trainer trainer1 = createTrainer("jsj012100", "aadfad", "조성진");
-        Trainer trainer2 = createTrainer("jsj0121", "aadfad", "조성진");
-        Trainer trainer3 = createTrainer("jsj121", "aadfad", "조성진");
+        Trainer trainer1 = createTrainer("galmeagi2@naver.com", "aadfad", "조성진");
+        Trainer trainer2 = createTrainer("galmeagi2@naver.com", "aadfad", "조성진");
+        Trainer trainer3 = createTrainer("galmeagi2@naver.com", "aadfad", "조성진");
 
         List<Trainer> trainers = Arrays.asList(trainer1, trainer2, trainer3);
 
@@ -134,9 +132,9 @@ class TrainerServiceTest {
     @DisplayName("트레이너 목록")
     void findTrainers() {
         //given
-        Trainer trainer1 = createTrainer("jsj012100", "aadfad", "조성진");
-        Trainer trainer2 = createTrainer("jsj0121", "aadfad", "조성진");
-        Trainer trainer3 = createTrainer("jsj121", "aadfad", "조성진");
+        Trainer trainer1 = createTrainer("galmeagi2@naver.com", "aadfad", "조성진");
+        Trainer trainer2 = createTrainer("galmeagi2@naver.com", "aadfad", "조성진");
+        Trainer trainer3 = createTrainer("galmeagi2@naver.com", "aadfad", "조성진");
 
         List<Trainer> trainers = Arrays.asList(trainer1, trainer2, trainer3);
 
@@ -158,7 +156,6 @@ class TrainerServiceTest {
         //given
         Trainer trainer = Trainer.builder()
                 .id(1L)
-                .loginId("oldLoginId")
                 .password("oldPw")
                 .name("oldName")
                 .email("oldMail")
@@ -169,10 +166,9 @@ class TrainerServiceTest {
         when(trainerRepository.findById(1L)).thenReturn(Optional.of(trainer));
 
         //when
-        trainerService.updateTrainer(1L, "newLoginId", "newPw", "newName", new Address("newZone", "newAddress", "newDetail", "newBuilding"));
+        trainerService.updateTrainer(1L, "newPw", "newName", new Address("newZone", "newAddress", "newDetail", "newBuilding"));
 
         //then
-        assertThat(trainer.getLoginId()).isEqualTo("newLoginId");
         assertThat(trainer.getPassword()).isEqualTo("newPw");
         assertThat(trainer.getName()).isEqualTo("newName");
         assertThat(trainer.getAddress().getZoneCode()).isEqualTo("newZone");
@@ -188,36 +184,9 @@ class TrainerServiceTest {
 
         //when & then
         assertThrows(NoSuchElementException.class,
-                () -> trainerService.updateTrainer(1L, "newLoginId", "newPw", "newName", new Address("newZone", "newAddress", "newDetail", "newBuilding")));
+                () -> trainerService.updateTrainer(1L, "newPw", "newName", new Address("newZone", "newAddress", "newDetail", "newBuilding")));
 
         verify(trainerRepository, times(1)).findById(1L);
-    }
-
-    @Test
-    @DisplayName("회원 정보 수정 실패 - 이미 존재하는 아이디")
-    void updateTrainerFail_DupliLoginId() {
-        //given
-        String dupliLoginId = "loginId";
-
-        Trainer trainer = Trainer.builder()
-                .loginId("oldLoginId")
-                .password("oldPassword")
-                .build();
-
-        Trainer dupliTrainer = Trainer.builder()
-                .loginId(dupliLoginId)
-                .password("1234")
-                .build();
-
-        when(trainerRepository.findById(1L)).thenReturn(Optional.of(trainer));
-        when(memberRepository.findByLoginId(dupliLoginId)).thenReturn(Optional.of(dupliTrainer));
-
-        //when & then
-        assertThrows(IllegalStateException.class,
-                () -> trainerService.updateTrainer(1L, dupliLoginId, "newPw", "newName", new Address("newZone", "newAddress", "newDetail", "newBuilding")));
-
-        verify(trainerRepository, times(1)).findById(1L);
-        verify(memberRepository, times(1)).findByLoginId(dupliLoginId);
     }
 
     @Test
@@ -226,7 +195,6 @@ class TrainerServiceTest {
         //given
         Trainer trainer = Trainer.builder()
                 .id(1L)
-                .loginId("jsj012100")
                 .password("1234")
                 .email("galmeagi2@naver.com")
                 .build();
@@ -244,9 +212,9 @@ class TrainerServiceTest {
         inOrder.verify(trainerRepository).delete(trainer);
     }
 
-    private Trainer createTrainer(String loginId, String password, String name) {
+    private Trainer createTrainer(String email, String password, String name) {
         return Trainer.builder()
-                .loginId(loginId)
+                .email(email)
                 .password(password)
                 .name(name)
                 .build();

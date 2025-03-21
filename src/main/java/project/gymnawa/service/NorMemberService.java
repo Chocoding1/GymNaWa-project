@@ -37,9 +37,9 @@ public class NorMemberService {
      * 중복 아이디 검증 함수
      */
     private void validateDuplicateMember(NorMember norMember) {
-        Optional<Member> result = memberRepository.findByLoginId(norMember.getLoginId());
+        Optional<Member> result = memberRepository.findByEmail(norMember.getEmail());
         if (result.isPresent()) {
-            throw new IllegalStateException("이미 존재하는 아이디입니다.");
+            throw new IllegalStateException("이미 존재하는 이메일입니다.");
         }
     }
 
@@ -47,17 +47,11 @@ public class NorMemberService {
      * 일반 회원 정보 수정
      */
     @Transactional
-    public void updateMember(Long id, String loginId, String password, String name, Address address) {
+    public void updateMember(Long id, String password, String name, Address address) {
         NorMember norMember = norMemberRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
 
-        //중복 아이디 체크
-        Optional<Member> dupliNorMember = memberRepository.findByLoginId(loginId);
-        if (dupliNorMember.isPresent()) {
-            throw new IllegalStateException("이미 존재하는 아이디입니다.");
-        }
-
-        norMember.updateInfo(loginId, password, name, address);
+        norMember.updateInfo(password, name, address);
     }
 
     /**

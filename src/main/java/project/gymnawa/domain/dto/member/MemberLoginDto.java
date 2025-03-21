@@ -11,7 +11,7 @@ import lombok.Data;
 public class MemberLoginDto {
 
     @NotBlank
-    private String loginId;
+    private String email;
     @NotBlank
     private String password;
 }

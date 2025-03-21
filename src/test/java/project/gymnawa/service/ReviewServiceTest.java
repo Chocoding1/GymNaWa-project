@@ -34,8 +34,8 @@ class ReviewServiceTest {
     @DisplayName("리뷰 저장")
     void save() {
         //given
-        NorMember norMember = createNorMember("jsj012100", "1234", "조성진");
-        Trainer trainer = createTrainer("jsj121", "123456", "조성민");
+        NorMember norMember = createNorMember("galmeagi2@naver.com", "1234", "조성진");
+        Trainer trainer = createTrainer("galmeagi2@naver.com", "123456", "조성민");
         Review review = createReview("content", norMember, trainer);
 
         //when
@@ -49,9 +49,9 @@ class ReviewServiceTest {
     @DisplayName("회원 별 리뷰 조회")
     void findByMember() {
         //given
-        NorMember norMember = createNorMember("jsj012100", "1234", "조성진");
-        Trainer trainer1 = createTrainer("jsj121", "123456", "조성민");
-        Trainer trainer2 = createTrainer("jsj", "456", "조성모");
+        NorMember norMember = createNorMember("galmeagi2@naver.com", "1234", "조성진");
+        Trainer trainer1 = createTrainer("galmeagi2@naver.com", "123456", "조성민");
+        Trainer trainer2 = createTrainer("galmeagi2@naver.com", "456", "조성모");
         Review review1 = createReview("content1", norMember, trainer1);
         Review review2 = createReview("content2", norMember, trainer2);
 
@@ -72,9 +72,9 @@ class ReviewServiceTest {
     @DisplayName("트레이너 별 리뷰 조회")
     void findByTrainer() {
         //given
-        NorMember norMember1 = createNorMember("jsj012100", "1234", "조성진");
-        NorMember norMember2 = createNorMember("jsj121", "123456", "조성민");
-        Trainer trainer = createTrainer("jsj", "456", "조성모");
+        NorMember norMember1 = createNorMember("galmeagi2@naver.com", "1234", "조성진");
+        NorMember norMember2 = createNorMember("galmeagi2@naver.com", "123456", "조성민");
+        Trainer trainer = createTrainer("galmeagi2@naver.com", "456", "조성모");
         Review review1 = createReview("content1", norMember1, trainer);
         Review review2 = createReview("content2", norMember2, trainer);
 
@@ -95,8 +95,8 @@ class ReviewServiceTest {
     @DisplayName("리뷰 수정 성공")
     void updateReviewSuccess() {
         //given
-        NorMember norMember = createNorMember("jsj012100", "1234", "조성진");
-        Trainer trainer = createTrainer("jsj121", "123456", "조성민");
+        NorMember norMember = createNorMember("galmeagi2@naver.com", "1234", "조성진");
+        Trainer trainer = createTrainer("galmeagi2@naver.com", "123456", "조성민");
         Review review = Review.builder()
                 .id(1L)
                 .content("oldContent")
@@ -134,8 +134,8 @@ class ReviewServiceTest {
     @DisplayName("리뷰 삭제 성공")
     void ReviewDeleteSuccess() {
         //given
-        NorMember norMember = createNorMember("jsj012100", "1234", "조성진");
-        Trainer trainer = createTrainer("jsj121", "123456", "조성민");
+        NorMember norMember = createNorMember("galmeagi2@naver.com", "1234", "조성진");
+        Trainer trainer = createTrainer("galmeagi2@naver.com", "123456", "조성민");
         Review review = Review.builder()
                 .id(1L)
                 .content("oldContent")
@@ -174,17 +174,17 @@ class ReviewServiceTest {
         inOrder.verify(reviewRepository).findById(1L);
     }
 
-    private NorMember createNorMember(String loginId, String password, String name) {
+    private NorMember createNorMember(String email, String password, String name) {
         return NorMember.builder()
-                .loginId(loginId)
+                .email(email)
                 .password(password)
                 .name(name)
                 .build();
     }
 
-    private Trainer createTrainer(String loginId, String password, String name) {
+    private Trainer createTrainer(String email, String password, String name) {
         return Trainer.builder()
-                .loginId(loginId)
+                .email(email)
                 .password(password)
                 .name(name)
                 .build();

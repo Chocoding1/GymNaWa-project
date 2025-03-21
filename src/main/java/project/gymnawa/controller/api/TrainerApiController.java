@@ -34,7 +34,6 @@ public class TrainerApiController {
     @GetMapping("/add")
     public ResponseEntity<TrainerSaveDto> addForm() {
         TrainerSaveDto trainerSaveDto = TrainerSaveDto.builder()
-                .loginId("")
                 .password("")
                 .name("")
                 .email("")
@@ -130,7 +129,7 @@ public class TrainerApiController {
                 .buildingName(trainerEditDto.getBuildingName())
                 .build();
 
-        trainerService.updateTrainer(id, trainerEditDto.getLoginId(), trainerEditDto.getPassword(), trainerEditDto.getName(), address);
+        trainerService.updateTrainer(id, trainerEditDto.getPassword(), trainerEditDto.getName(), address);
 
         return ResponseEntity.ok().body(ApiResponse.success("edit successful"));
     }
@@ -144,7 +143,6 @@ public class TrainerApiController {
                 .build();
 
         return Trainer.builder()
-                .loginId(trainerSaveDto.getLoginId())
                 .password(trainerSaveDto.getPassword())
                 .name(trainerSaveDto.getName())
                 .email(trainerSaveDto.getEmail())
@@ -155,7 +153,6 @@ public class TrainerApiController {
 
     private TrainerViewDto createTrainerViewDto(Trainer loginedTrainer) {
         return TrainerViewDto.builder()
-                .loginId(loginedTrainer.getLoginId())
                 .password(loginedTrainer.getPassword())
                 .name(loginedTrainer.getName())
                 .email(loginedTrainer.getEmail())
@@ -166,7 +163,6 @@ public class TrainerApiController {
 
     private TrainerEditDto createTrainerEditDto(Trainer loginedTrainer) {
         return TrainerEditDto.builder()
-                .loginId(loginedTrainer.getLoginId())
                 .password(loginedTrainer.getPassword())
                 .name(loginedTrainer.getName())
                 .zoneCode(loginedTrainer.getAddress().getZoneCode())

@@ -48,7 +48,7 @@ class NorMemberApiControllerTest {
     @DisplayName("회원가입 시 초기 DTO 생성")
     void createAddDto() throws Exception {
         //given
-        String loginId = "";
+        String email = "";
         String password = "";
         Gender gender = Gender.MALE;
 
@@ -58,7 +58,7 @@ class NorMemberApiControllerTest {
         //then
         resultActions
                 .andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.loginId").value(loginId))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.email").value(email))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.password").value(password));
     }
 
@@ -67,7 +67,7 @@ class NorMemberApiControllerTest {
     void addSuccess() throws Exception {
         //given
         Long id = 1L;
-        MemberSaveDto memberSaveDto = createMemberSaveDto("loginId", "password",
+        MemberSaveDto memberSaveDto = createMemberSaveDto("password",
                 "name", "email", Gender.MALE, "zoneCode", "address", "detailAddress", "buildingName");
 
         when(emailService.isEmailVerified(anyString(), anyString())).thenReturn(true);
@@ -84,7 +84,7 @@ class NorMemberApiControllerTest {
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isCreated())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("요청 성공"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.loginId").value("loginId"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.email").value("email"));
 
         verify(emailService, times(1)).isEmailVerified(anyString(), anyString());
         verify(norMemberService, times(1)).join(any(NorMember.class));
@@ -94,7 +94,7 @@ class NorMemberApiControllerTest {
     @DisplayName("회원가입 실패 - 잘못된 입력값")
     void addFail_WrongInput() throws Exception {
         //given
-        MemberSaveDto memberSaveDto = createMemberSaveDto("", "", "", "", Gender.MALE, "", "", "", "");
+        MemberSaveDto memberSaveDto = createMemberSaveDto("", "", "", Gender.MALE, "", "", "", "");
 
         //when
         ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/api/member/n/add")
@@ -112,7 +112,7 @@ class NorMemberApiControllerTest {
     @DisplayName("회원가입 실패 - 이메일 인증 실패")
     void addFail_EmailNotVerified() throws Exception {
         //given
-        MemberSaveDto memberSaveDto = createMemberSaveDto("loginId", "password",
+        MemberSaveDto memberSaveDto = createMemberSaveDto("password",
                 "name", "email", Gender.MALE, "zoneCode", "address", "detailAddress", "buildingName");
 
         when(emailService.isEmailVerified(anyString(), anyString())).thenReturn(false);
@@ -137,7 +137,6 @@ class NorMemberApiControllerTest {
     void mypage() throws Exception {
         //given
         NorMember norMember = NorMember.builder()
-                .loginId("loginId")
                 .password("password")
                 .name("name")
                 .email("email")
@@ -159,7 +158,7 @@ class NorMemberApiControllerTest {
         resultActions
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.loginId").value("loginId"));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.email").value("email"));
 
         verify(norMemberService, times(1)).findOne(1L);
     }
@@ -169,7 +168,6 @@ class NorMemberApiControllerTest {
     void createEditDto() throws Exception {
         //given
         NorMember norMember = NorMember.builder()
-                .loginId("loginId")
                 .password("password")
                 .name("name")
                 .email("email")
@@ -191,7 +189,7 @@ class NorMemberApiControllerTest {
         resultActions
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.data.loginId").value(norMember.getLoginId()));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.data.email").value(norMember.getEmail()));
 
         verify(norMemberService, times(1)).findOne(1L);
     }
@@ -201,7 +199,6 @@ class NorMemberApiControllerTest {
     void editSuccess() throws Exception {
         //given
         NorMember norMember = NorMember.builder()
-                .loginId("oldLoginId")
                 .password("oldPassword")
                 .name("oldName")
                 .email("email")
@@ -210,7 +207,6 @@ class NorMemberApiControllerTest {
                 .build();
 
         MemberEditDto memberEditDto = MemberEditDto.builder()
-                .loginId("newLoginId")
                 .password("newPassword")
                 .name("newName")
                 .zoneCode("zoneCode")
@@ -242,7 +238,7 @@ class NorMemberApiControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data").value("edit successful"));
 
-        verify(norMemberService, times(1)).updateMember(eq(1L), eq(memberEditDto.getLoginId()), eq(memberEditDto.getPassword()), eq(memberEditDto.getName()), any(Address.class));
+        verify(norMemberService, times(1)).updateMember(eq(1L), eq(memberEditDto.getPassword()), eq(memberEditDto.getName()), any(Address.class));
     }
 
     @Test
@@ -250,7 +246,6 @@ class NorMemberApiControllerTest {
     void editFail_WrongInput() throws Exception {
         //given
         NorMember norMember = NorMember.builder()
-                .loginId("oldLoginId")
                 .password("oldPassword")
                 .name("oldName")
                 .email("email")
@@ -259,7 +254,6 @@ class NorMemberApiControllerTest {
                 .build();
 
         MemberEditDto memberEditDto = MemberEditDto.builder()
-                .loginId("")
                 .password("")
                 .name("newName")
                 .zoneCode("zoneCode")
@@ -284,14 +278,13 @@ class NorMemberApiControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("입력값이 올바르지 않습니다."));
 
-        verify(norMemberService, never()).updateMember(eq(1L), eq(memberEditDto.getLoginId()), eq(memberEditDto.getPassword()), eq(memberEditDto.getName()), any(Address.class));
+        verify(norMemberService, never()).updateMember(eq(1L), eq(memberEditDto.getPassword()), eq(memberEditDto.getName()), any(Address.class));
     }
 
-    private static MemberSaveDto createMemberSaveDto(String loginId, String password, String name,
+    private static MemberSaveDto createMemberSaveDto(String password, String name,
                                                      String email, Gender gender, String zoneCode, String address,
                                                      String detailAddress, String buildingName) {
         return MemberSaveDto.builder()
-                .loginId(loginId)
                 .password(password)
                 .name(name)
                 .email(email)

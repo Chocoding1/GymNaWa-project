@@ -89,7 +89,7 @@ public class TrainerController {
 
         Trainer trainer = trainerService.findOne(id);
 
-        TrainerEditDto trainerEditDto = new TrainerEditDto(trainer.getLoginId(), trainer.getPassword(), trainer.getName(),
+        TrainerEditDto trainerEditDto = new TrainerEditDto(trainer.getPassword(), trainer.getName(),
                 trainer.getAddress().getZoneCode(), trainer.getAddress().getAddress(), trainer.getAddress().getDetailAddress(),
                 trainer.getAddress().getBuildingName());
 
@@ -116,8 +116,7 @@ public class TrainerController {
         }
         Address address = new Address(trainerEditDto.getZoneCode(), trainerEditDto.getAddress(), trainerEditDto.getDetailAddress(), trainerEditDto.getBuildingName());
 
-        //로그인 아이디 중복 체크 필요
-        trainerService.updateTrainer(id, trainerEditDto.getLoginId(), trainerEditDto.getPassword(), trainerEditDto.getName(), address);
+        trainerService.updateTrainer(id, trainerEditDto.getPassword(), trainerEditDto.getName(), address);
 
         return "redirect:/member/t/{id}/mypage";
     }
@@ -131,7 +130,6 @@ public class TrainerController {
                 .build();
 
         return Trainer.builder()
-                .loginId(trainerSaveDto.getLoginId())
                 .password(trainerSaveDto.getPassword())
                 .name(trainerSaveDto.getName())
                 .email(trainerSaveDto.getEmail())
@@ -143,7 +141,6 @@ public class TrainerController {
     private TrainerViewDto createTrainerViewDto(Trainer loginedTrainer) {
         return TrainerViewDto.builder()
                 .id(loginedTrainer.getId())
-                .loginId(loginedTrainer.getLoginId())
                 .password(loginedTrainer.getPassword())
                 .name(loginedTrainer.getName())
                 .email(loginedTrainer.getEmail())

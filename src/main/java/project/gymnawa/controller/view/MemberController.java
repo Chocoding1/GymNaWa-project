@@ -35,7 +35,7 @@ public class MemberController {
      * 로그인 성공하면 홈화면으로 redirect
      * 로그인 실패하면 로그인 화면으로 이동
      */
-//    @PostMapping("/login")
+    @PostMapping("/login")
     public String loginMember(@Validated MemberLoginDto memberLoginDto, BindingResult bindingResult,
                               HttpServletRequest request, @RequestParam(defaultValue = "/") String redirectURL) {
 
@@ -44,10 +44,10 @@ public class MemberController {
             return "/member/loginMemberForm";
         }
 
-        Member loginedMember = memberService.login(memberLoginDto.getLoginId(), memberLoginDto.getPassword());
+        Member loginedMember = memberService.login(memberLoginDto.getEmail(), memberLoginDto.getPassword());
 
         if (loginedMember == null) {
-            bindingResult.reject("loginFail", "아이디 또는 비밀번호가 맞지 않습니다.");
+            bindingResult.reject("loginFail", "이메일 또는 비밀번호가 맞지 않습니다.");
             return "/member/loginMemberForm";
         }
 

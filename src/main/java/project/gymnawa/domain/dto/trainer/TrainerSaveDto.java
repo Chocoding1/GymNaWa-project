@@ -10,9 +10,6 @@ import project.gymnawa.domain.etcfield.Gender;
 public class TrainerSaveDto {
 
     @NotBlank
-    private String loginId;
-
-    @NotBlank
     private String password;
 
     @NotBlank
@@ -32,8 +29,7 @@ public class TrainerSaveDto {
     private String buildingName;
 
     @Builder
-    public TrainerSaveDto(String loginId, String password, String name, String email, Gender gender, String zoneCode, String address, String detailAddress, String buildingName) {
-        this.loginId = loginId;
+    public TrainerSaveDto(String password, String name, String email, Gender gender, String zoneCode, String address, String detailAddress, String buildingName) {
         this.password = password;
         this.name = name;
         this.email = email;

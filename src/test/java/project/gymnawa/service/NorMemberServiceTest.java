@@ -38,7 +38,6 @@ class NorMemberServiceTest {
         Address address = new Address("12345", "서울", "강서구", "마곡동");
         NorMember norMember = NorMember.builder()
                 .id(1L)
-                .loginId("jsj012100")
                 .password("1234")
                 .name("조성진")
                 .email("galmeagi2@naver.com")
@@ -47,34 +46,34 @@ class NorMemberServiceTest {
                 .build();
 
         when(norMemberRepository.save(norMember)).thenReturn(norMember);
-        when(memberRepository.findByLoginId("jsj012100")).thenReturn(Optional.empty());
+        when(memberRepository.findByEmail("galmeagi2@naver.com")).thenReturn(Optional.empty());
 
         //when
         Long joinId = norMemberService.join(norMember);
 
         //then
         assertThat(joinId).isEqualTo(norMember.getId());
-        verify(memberRepository, times(1)).findByLoginId("jsj012100");
+        verify(memberRepository, times(1)).findByEmail("galmeagi2@naver.com");
         verify(norMemberRepository, times(1)).save(norMember);
 
         InOrder inOrder = inOrder(memberRepository, norMemberRepository);
-        inOrder.verify(memberRepository).findByLoginId("jsj012100");
+        inOrder.verify(memberRepository).findByEmail("galmeagi2@naver.com");
         inOrder.verify(norMemberRepository).save(norMember);
     }
 
     @Test
-    @DisplayName("회원가입 실패 - 중복 아이디는 입력 불가")
+    @DisplayName("회원가입 실패 - 중복 이메일은 입력 불가")
     void joinFail() {
         //given
-        NorMember norMember = createNorMember("jsj012100", "aadfad", "조성진");
-        NorMember dupliMember = createNorMember("jsj012100", "aadfad", "조성진");
+        NorMember norMember = createNorMember("galmeagi2@naver.com", "aadfad", "조성진");
+        NorMember dupliMember = createNorMember("galmeagi2@naver.com", "aadfad", "조성진");
 
-        when(memberRepository.findByLoginId("jsj012100")).thenReturn(Optional.of(norMember));
+        when(memberRepository.findByEmail("galmeagi2@naver.com")).thenReturn(Optional.of(norMember));
 
         //when & then
         assertThrows(IllegalStateException.class,
                 () -> norMemberService.join(dupliMember));
-        verify(memberRepository, times(1)).findByLoginId("jsj012100");
+        verify(memberRepository, times(1)).findByEmail("galmeagi2@naver.com");
     }
 
     @Test
@@ -83,7 +82,6 @@ class NorMemberServiceTest {
         //given
         NorMember norMember = NorMember.builder()
                 .id(1L)
-                .loginId("oldLoginId")
                 .password("oldPw")
                 .name("oldName")
                 .email("oldMail")
@@ -92,20 +90,17 @@ class NorMemberServiceTest {
                 .build();
 
         when(norMemberRepository.findById(1L)).thenReturn(Optional.of(norMember));
-        when(memberRepository.findByLoginId(anyString())).thenReturn(Optional.empty());
 
         //when
-        norMemberService.updateMember(1L, "newLoginId", "newPw", "newName", new Address("newZone", "newAddress", "newDetail", "newBuilding"));
+        norMemberService.updateMember(1L, "newPw", "newName", new Address("newZone", "newAddress", "newDetail", "newBuilding"));
 
         //then
-        assertThat(norMember.getLoginId()).isEqualTo("newLoginId");
         assertThat(norMember.getPassword()).isEqualTo("newPw");
         assertThat(norMember.getName()).isEqualTo("newName");
         assertThat(norMember.getAddress().getZoneCode()).isEqualTo("newZone");
         assertThat(norMember.getGender()).isEqualTo(Gender.MALE);
 
         verify(norMemberRepository, times(1)).findById(1L);
-        verify(memberRepository, times(1)).findByLoginId(anyString());
     }
 
     @Test
@@ -116,36 +111,9 @@ class NorMemberServiceTest {
 
         //when & then
         assertThrows(NoSuchElementException.class,
-                () -> norMemberService.updateMember(1L, "newLoginId", "newPw", "newName", new Address("newZone", "newAddress", "newDetail", "newBuilding")));
+                () -> norMemberService.updateMember(1L, "newPw", "newName", new Address("newZone", "newAddress", "newDetail", "newBuilding")));
 
         verify(norMemberRepository, times(1)).findById(1L);
-    }
-
-    @Test
-    @DisplayName("회원 정보 수정 실패 - 이미 존재하는 아이디")
-    void updateMemberFail_DupliLoginId() {
-        //given
-        String dupliLoginId = "loginId";
-
-        NorMember norMember = NorMember.builder()
-                .loginId("oldLoginId")
-                .password("oldPassword")
-                .build();
-
-        NorMember dupliNorMember = NorMember.builder()
-                .loginId(dupliLoginId)
-                .password("1234")
-                .build();
-
-        when(norMemberRepository.findById(1L)).thenReturn(Optional.of(norMember));
-        when(memberRepository.findByLoginId(dupliLoginId)).thenReturn(Optional.of(dupliNorMember));
-
-        //when & then
-        assertThrows(IllegalStateException.class,
-                () -> norMemberService.updateMember(1L, dupliLoginId, "newPw", "newName", new Address("newZone", "newAddress", "newDetail", "newBuilding")));
-
-        verify(norMemberRepository, times(1)).findById(1L);
-        verify(memberRepository, times(1)).findByLoginId(dupliLoginId);
     }
 
     @Test
@@ -154,7 +122,6 @@ class NorMemberServiceTest {
         //given
         NorMember norMember = NorMember.builder()
                 .id(1L)
-                .loginId("jsj012100")
                 .password("1234")
                 .email("galmeagi2@naver.com")
                 .build();
@@ -189,7 +156,6 @@ class NorMemberServiceTest {
         //given
         NorMember norMember = NorMember.builder()
                 .id(1L)
-                .loginId("jsj012100")
                 .password("1234")
                 .email("galmeagi2@naver.com")
                 .build();
@@ -207,9 +173,9 @@ class NorMemberServiceTest {
         inOrder.verify(norMemberRepository).delete(norMember);
     }
 
-    private NorMember createNorMember(String loginId, String password, String name) {
+    private NorMember createNorMember(String email, String password, String name) {
         return NorMember.builder()
-                .loginId(loginId)
+                .email(email)
                 .password(password)
                 .name(name)
                 .build();
