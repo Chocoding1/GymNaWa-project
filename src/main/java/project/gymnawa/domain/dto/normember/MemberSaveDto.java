@@ -4,6 +4,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
+import project.gymnawa.domain.entity.NorMember;
+import project.gymnawa.domain.etcfield.Address;
 import project.gymnawa.domain.etcfield.Gender;
 
 @Data
@@ -38,5 +40,17 @@ public class MemberSaveDto {
         this.address = address;
         this.detailAddress = detailAddress;
         this.buildingName = buildingName;
+    }
+
+    public NorMember toEntity() {
+        Address address = new Address(this.zoneCode, this.address, this.detailAddress, this.buildingName);
+
+        return NorMember.builder()
+                .email(this.email)
+                .password(this.password)
+                .name(this.name)
+                .gender(this.gender)
+                .address(address)
+                .build();
     }
 }
