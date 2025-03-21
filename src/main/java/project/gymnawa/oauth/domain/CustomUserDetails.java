@@ -1,13 +1,16 @@
 package project.gymnawa.oauth.domain;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import project.gymnawa.domain.entity.Member;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+@Getter
 @RequiredArgsConstructor
 public class CustomUserDetails implements UserDetails {
 
@@ -15,6 +18,7 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
+        Collection<GrantedAuthority> collect = new ArrayList<>();
         return List.of();
     }
 

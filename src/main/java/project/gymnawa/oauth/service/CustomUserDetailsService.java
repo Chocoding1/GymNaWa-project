@@ -6,6 +6,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import project.gymnawa.domain.entity.Member;
+import project.gymnawa.oauth.domain.CustomUserDetails;
 import project.gymnawa.repository.MemberRepository;
 
 import java.util.Optional;
@@ -21,6 +22,6 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         Optional<Member> member = memberRepository.findByEmail(email);
 
-        return null;
+        return member.map(CustomUserDetails::new).orElse(null);
     }
 }
