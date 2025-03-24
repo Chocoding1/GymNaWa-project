@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import project.gymnawa.domain.entity.Member;
 import project.gymnawa.oauth.domain.CustomOAuth2UserDetails;
 import project.gymnawa.oauth.domain.GoogleUserInfo;
+import project.gymnawa.oauth.domain.KakaoUserInfo;
 import project.gymnawa.oauth.domain.OAuth2UserInfo;
 import project.gymnawa.repository.MemberRepository;
 
@@ -44,6 +45,9 @@ public class CustomOauth2UserService extends DefaultOAuth2UserService {
         } else if (userRequest.getClientRegistration().getRegistrationId().equals("naver")) {
             log.info("네이버 로그인 요청");
 //            oAuth2UserInfo = new NaverUserInfo((Map) oAuth2User.getAttributes().get("response"));
+        } else if (userRequest.getClientRegistration().getRegistrationId().equals("kakao")){
+            log.info("카카오 로그인 요청");
+            oAuth2UserInfo = new KakaoUserInfo(oAuth2User.getAttributes());
         } else {
             log.info("구글, 페이스북, 네이버 로그인만 지원합니다.");
         }
@@ -57,12 +61,14 @@ public class CustomOauth2UserService extends DefaultOAuth2UserService {
         Member member = memberRepository.findByEmail(email).orElse(null);
 
         if (member != null) {
-            throw new IllegalStateException("마지막 로그인 : " + provider);
+            throw new IllegalStateException("마지막 로그인 : " + member.getProvider());
         } else {
             member = Member.builder()
                     .email(email)
                     .name(username)
                     .password(password)
+                    .provider(provider)
+                    .providerId(providerId)
                     .build();
 
             memberRepository.save(member); // 추후 일반 회원 or 트레이너로 저장 예정
