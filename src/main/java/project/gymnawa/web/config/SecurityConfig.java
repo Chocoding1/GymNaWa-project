@@ -39,15 +39,10 @@ public class SecurityConfig {
                 )
                 .oauth2Login(oauth2 -> oauth2 // oauth2 로그인 설정
                         .loginPage("/member/login")
+                        .defaultSuccessUrl("/") // 이거 설정해줘야 홈 url에 Authentication 객체 전달됨
                         .userInfoEndpoint(userInfoEndpoint -> userInfoEndpoint
                                 .userService(customOauth2UserService))
                 );
         return http.build();
     }
-
-    @Bean
-    public BCryptPasswordEncoder bCryptPasswordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
 }
