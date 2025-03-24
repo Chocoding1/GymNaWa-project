@@ -18,8 +18,8 @@ public class NorMember extends Member {
     /**
      * 회원 객체 생성
      */
-    public NorMember(Long id, String password, String name, String email, Address address, Gender gender) {
-        super(id, password, name, email, address, gender);
+    public NorMember(Long id, String password, String name, String email, Address address, Gender gender, String provider, String providerId) {
+        super(id, password, name, email, address, gender, provider, providerId);
     }
 
     /**
