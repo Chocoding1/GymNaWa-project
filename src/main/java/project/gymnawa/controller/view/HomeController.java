@@ -7,15 +7,10 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.SessionAttribute;
 import project.gymnawa.domain.entity.Member;
 import project.gymnawa.domain.entity.NorMember;
-import project.gymnawa.oauth.domain.CustomUserDetails;
-import project.gymnawa.repository.MemberRepository;
+import project.gymnawa.oauth.domain.CustomOAuth2UserDetails;
 import project.gymnawa.service.MemberService;
-import project.gymnawa.web.SessionConst;
-
-import java.util.Optional;
 
 @Controller
 @Slf4j
@@ -29,11 +24,11 @@ public class HomeController {
 
     @GetMapping("/")
     public String home(
-            @AuthenticationPrincipal CustomUserDetails customUserDetails,
+            @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails,
             Model model) {
 
-        if (customUserDetails != null) {
-            Member loginedMember = customUserDetails.getMember();
+        if (customOAuth2UserDetails != null) {
+            Member loginedMember = customOAuth2UserDetails.getMember();
 
             model.addAttribute("member", loginedMember);
 
