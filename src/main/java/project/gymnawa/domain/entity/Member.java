@@ -8,7 +8,6 @@ import lombok.experimental.SuperBuilder;
 import project.gymnawa.domain.etcfield.Address;
 import project.gymnawa.domain.etcfield.BaseTime;
 import project.gymnawa.domain.etcfield.Gender;
-import project.gymnawa.domain.etcfield.MemberRole;
 
 @Entity
 @DiscriminatorColumn
@@ -32,8 +31,8 @@ public class Member extends BaseTime {
     @Embedded
     private Address address;
 
-    @Enumerated(EnumType.STRING)
-    private MemberRole role;
+    private String provider;
+    private String providerId;
 
     public Member(Long id, String password, String name, String email, Address address, Gender gender) {
         this.id = id;
