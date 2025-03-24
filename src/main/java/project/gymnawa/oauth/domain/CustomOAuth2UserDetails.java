@@ -1,5 +1,6 @@
 package project.gymnawa.oauth.domain;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
@@ -13,11 +14,15 @@ import java.util.List;
 import java.util.Map;
 
 @Getter
-@RequiredArgsConstructor
-public class CustomOauth2UserDetails implements UserDetails, OAuth2User {
+@AllArgsConstructor
+public class CustomOAuth2UserDetails implements UserDetails, OAuth2User {
 
     private final Member member;
     private Map<String, Object> attributes; // 소셜 계정에서 받아온 정보들
+
+    public CustomOAuth2UserDetails(Member member) {
+        this.member = member;
+    }
 
     @Override
     public Map<String, Object> getAttributes() {
