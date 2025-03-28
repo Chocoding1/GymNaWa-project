@@ -55,18 +55,19 @@ public class CustomOauth2UserService extends DefaultOAuth2UserService {
         String provider = oAuth2UserInfo.getProvider();
         String providerId = oAuth2UserInfo.getProviderId();
         String username = oAuth2UserInfo.getName(); // google_216543218921321
-        String password = bCryptPasswordEncoder.encode(provider + "_" + providerId + "gymnawapwd");
+        // 소셜 로그인 시 비밀번호는 필요 x (인증은 네이버, 카카오같은 인증 서버에서 하기 때문)
+//        String password = bCryptPasswordEncoder.encode(provider + "_" + providerId + "gymnawapwd");
         String email = oAuth2UserInfo.getEmail();
 
         Member member = memberRepository.findByEmail(email).orElse(null);
 
         if (member != null) {
-            throw new IllegalStateException("마지막 로그인 : " + member.getProvider());
+            log.info("마지막 로그인 : " + member.getProvider());
         } else {
             member = Member.builder()
                     .email(email)
                     .name(username)
-                    .password(password)
+//                    .password(password)
                     .provider(provider)
                     .providerId(providerId)
                     .build();
