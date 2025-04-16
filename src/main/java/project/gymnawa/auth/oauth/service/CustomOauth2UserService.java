@@ -1,21 +1,18 @@
-package project.gymnawa.oauth.service;
+package project.gymnawa.auth.oauth.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
+import project.gymnawa.auth.oauth.domain.GoogleUserInfo;
+import project.gymnawa.auth.oauth.domain.OAuth2UserInfo;
 import project.gymnawa.domain.entity.Member;
-import project.gymnawa.oauth.domain.CustomOAuth2UserDetails;
-import project.gymnawa.oauth.domain.GoogleUserInfo;
-import project.gymnawa.oauth.domain.KakaoUserInfo;
-import project.gymnawa.oauth.domain.OAuth2UserInfo;
+import project.gymnawa.auth.oauth.domain.KakaoUserInfo;
 import project.gymnawa.repository.MemberRepository;
-
-import java.util.Map;
 
 @Service
 @Slf4j
@@ -23,7 +20,6 @@ import java.util.Map;
 public class CustomOauth2UserService extends DefaultOAuth2UserService {
 
     private final MemberRepository memberRepository;
-    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -55,8 +51,6 @@ public class CustomOauth2UserService extends DefaultOAuth2UserService {
         String provider = oAuth2UserInfo.getProvider();
         String providerId = oAuth2UserInfo.getProviderId();
         String username = oAuth2UserInfo.getName(); // google_216543218921321
-        // 소셜 로그인 시 비밀번호는 필요 x (인증은 네이버, 카카오같은 인증 서버에서 하기 때문)
-//        String password = bCryptPasswordEncoder.encode(provider + "_" + providerId + "gymnawapwd");
         String email = oAuth2UserInfo.getEmail();
 
         Member member = memberRepository.findByEmail(email).orElse(null);
@@ -67,7 +61,6 @@ public class CustomOauth2UserService extends DefaultOAuth2UserService {
             member = Member.builder()
                     .email(email)
                     .name(username)
-//                    .password(password)
                     .provider(provider)
                     .providerId(providerId)
                     .build();
