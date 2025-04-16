@@ -9,6 +9,7 @@ import project.gymnawa.domain.entity.Member;
 import project.gymnawa.oauth.domain.CustomOAuth2UserDetails;
 import project.gymnawa.repository.MemberRepository;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -20,8 +21,9 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
 
-        Optional<Member> member = memberRepository.findByEmail(email);
+        Member member = memberRepository.findByEmail(email)
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
 
-        return member.map(CustomOAuth2UserDetails::new).orElse(null);
+        return new CustomOAuth2UserDetails(member);
     }
 }
