@@ -1,6 +1,8 @@
 package project.gymnawa.controller.view;
 
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -8,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import project.gymnawa.auth.jwt.util.JwtUtil;
 import project.gymnawa.domain.entity.Member;
 import project.gymnawa.domain.dto.member.MemberLoginDto;
 import project.gymnawa.web.SessionConst;
@@ -20,6 +23,7 @@ import project.gymnawa.service.MemberService;
 public class MemberController {
 
     private final MemberService memberService;
+    private final JwtUtil jwtUtil;
 
     @GetMapping("/add/select")
     public String selectMemberType() {
@@ -61,13 +65,28 @@ public class MemberController {
      * 로그아웃
      */
     @PostMapping("/logout")
-    public String logout(HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
-        if (session != null) {
-            // 세션을 아예 다 지우면 다른 정보까지도 지워질 위험이 있지 않은가?
-            // -> 로그아웃은 사용자의 정보를 다 지워야 하는 것이 맞기 때문에 모든 세션을 다 지워도 문제 없다.
-            session.invalidate();
-        }
+    public String logout(HttpServletRequest request, HttpServletResponse response) {
+
+        // 브라우저에서 쿠키 삭제
+        removeCookie(response, "access_token");
+        removeCookie(response, "refresh_token");
+
+        String refreshToken = jwtUtil.resolveTokenFromCookie(request, "refresh_token");
+
+        Long id = jwtUtil.getId(refreshToken);
+
+        // redis의 refresh token 삭제
+        jwtUtil.removeRefreshToken(id);
+
         return "redirect:/";
+    }
+
+    private void removeCookie(HttpServletResponse response, String cookieName) {
+        Cookie cookie = new Cookie(cookieName, null);
+        cookie.setMaxAge(0);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(false);
+        cookie.setPath("/");
+        response.addCookie(cookie);
     }
 }
