@@ -1,4 +1,4 @@
-package project.gymnawa.oauth.domain;
+package project.gymnawa.auth.oauth.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -31,18 +31,22 @@ public class CustomOAuth2UserDetails implements UserDetails, OAuth2User {
 
     @Override
     public String getName() {
-        return "";
+        return member.getName();
+    }
+
+    @Override
+    public String getPassword() {
+        return member.getPassword();
+    }
+
+    public Long getId() {
+        return member.getId();
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Collection<GrantedAuthority> collect = new ArrayList<>();
         return List.of();
-    }
-
-    @Override
-    public String getPassword() {
-        return member.getPassword();
     }
 
     // 메서드명은 username이지만, email 반환
