@@ -1,5 +1,8 @@
 package project.gymnawa.controller.view;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,8 +12,11 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import project.gymnawa.domain.entity.Member;
 import project.gymnawa.domain.entity.NorMember;
-import project.gymnawa.oauth.domain.CustomOAuth2UserDetails;
+import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
 import project.gymnawa.service.MemberService;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Controller
 @Slf4j
@@ -25,16 +31,25 @@ public class HomeController {
     @GetMapping("/")
     public String home(
             @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails,
+            HttpServletRequest request,
             Model model) {
 
+        log.info("homecontroller 진입");
+
         if (customOAuth2UserDetails != null) {
-            Member loginedMember = customOAuth2UserDetails.getMember();
+            log.info("oauthuserdetails 유저 존재");
+            Long id = customOAuth2UserDetails.getMember().getId();
+
+            Member loginedMember = memberService.findOne(id);
+            log.info("member.id : " + loginedMember.getId());
 
             model.addAttribute("member", loginedMember);
 
             if (loginedMember instanceof NorMember) {
+                log.info("일반 회원");
                 model.addAttribute("isTrainer", false);
             } else {
+                log.info("트레이너 회원");
                 model.addAttribute("isTrainer", true);
             }
         }
