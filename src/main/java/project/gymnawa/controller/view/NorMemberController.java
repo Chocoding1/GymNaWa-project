@@ -3,11 +3,14 @@ package project.gymnawa.controller.view;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
+import project.gymnawa.domain.entity.Member;
 import project.gymnawa.domain.etcfield.Address;
 import project.gymnawa.domain.entity.NorMember;
 import project.gymnawa.domain.dto.normember.MemberEditDto;
@@ -61,15 +64,16 @@ public class NorMemberController {
      */
     @GetMapping("/{id}/mypage")
     public String mypage(@PathVariable Long id, Model model,
-                         @SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) NorMember loginedMember) {
+                         @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
-        if (!loginedMember.getId().equals(id)) {
+        Long userId = customOAuth2UserDetails.getMember().getId();
+        NorMember loginedMember = norMemberService.findOne(userId);
+
+        if (!loginedMember.getId().equals(id)) { // url 조작으로 다른 id를 기입할 시, 본인의 mypage에만 접속하도록 설정
             return "redirect:/member/n/" + loginedMember.getId() + "/mypage";
         }
 
-        NorMember norMember = norMemberService.findOne(id);
-
-        MemberViewDto memberViewDto = createMemberViewDto(norMember);
+        MemberViewDto memberViewDto = createMemberViewDto(loginedMember);
         model.addAttribute("memberViewDto", memberViewDto);
 
         return "/normember/myPage";
@@ -80,15 +84,16 @@ public class NorMemberController {
      */
     @GetMapping("/{id}/edit")
     public String editForm(@PathVariable Long id, Model model,
-                           @SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) NorMember loginedMember) {
+                           @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
+
+        Long userId = customOAuth2UserDetails.getMember().getId();
+        NorMember loginedMember = norMemberService.findOne(userId);
 
         if (!loginedMember.getId().equals(id)) {
             return "redirect:/member/n/" + loginedMember.getId() + "/edit";
         }
 
-        NorMember norMember = norMemberService.findOne(id);
-
-        MemberEditDto memberEditDto = createMemberEditDto(norMember);
+        MemberEditDto memberEditDto = createMemberEditDto(loginedMember);
 
         model.addAttribute("memberEditDto", memberEditDto);
 
@@ -101,7 +106,10 @@ public class NorMemberController {
     @PostMapping("/{id}/edit")
     public String editMember(@Validated @ModelAttribute MemberEditDto memberEditDto, BindingResult bindingResult,
                              @PathVariable Long id,
-                             @SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) NorMember loginedMember) {
+                             @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
+
+        Long userId = customOAuth2UserDetails.getMember().getId();
+        NorMember loginedMember = norMemberService.findOne(userId);
 
         if (!loginedMember.getId().equals(id)) {
             return "redirect:/";
