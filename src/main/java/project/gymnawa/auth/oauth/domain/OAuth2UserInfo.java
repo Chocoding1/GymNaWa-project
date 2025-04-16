@@ -1,4 +1,4 @@
-package project.gymnawa.oauth.domain;
+package project.gymnawa.auth.oauth.domain;
 
 public interface OAuth2UserInfo {
 
