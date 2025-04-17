@@ -4,12 +4,21 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.config.annotation.web.configurers.FormLoginConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HttpBasicConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import project.gymnawa.oauth.service.CustomOauth2UserService;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import project.gymnawa.auth.jwt.util.JwtUtil;
+import project.gymnawa.auth.oauth.service.CustomOauth2UserService;
+import project.gymnawa.auth.oauth.service.CustomUserDetailsService;
+import project.gymnawa.web.filter.JwtAuthenticationFilter;
+import project.gymnawa.web.filter.LoginFilter;
 
 
 @Configuration
@@ -19,11 +28,20 @@ import project.gymnawa.oauth.service.CustomOauth2UserService;
 public class SecurityConfig {
 
     private final CustomOauth2UserService customOauth2UserService;
+    private final CustomUserDetailsService customUserDetailsService;
+    private final JwtUtil jwtUtil;
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http, AuthenticationManager authenticationManager) throws Exception {
         http
                 .csrf(CsrfConfigurer::disable)
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/member/n/{id:\\d+}/**", "/member/t/{id:\\d+}/**").authenticated() // pathvariable은 정규 표현식 사용해야 함
                         .requestMatchers("/review/**").authenticated()
@@ -31,18 +49,25 @@ public class SecurityConfig {
                         .requestMatchers("/ptmembership/**").authenticated()
                         .anyRequest().permitAll()
                 )
+                .httpBasic(HttpBasicConfigurer::disable)
+                .formLogin(FormLoginConfigurer::disable) // jwt는 세션을 사용하지 않기 때문에 폼 로그인 기능 off
+/*
                 .formLogin(formLogin -> formLogin // 폼 로그인 설정
                         .loginPage("/member/login")
                         .loginProcessingUrl("/member/login")
                         .defaultSuccessUrl("/")
                         .usernameParameter("email")
                 )
+*/
                 .oauth2Login(oauth2 -> oauth2 // oauth2 로그인 설정
                         .loginPage("/member/login")
                         .defaultSuccessUrl("/") // 이거 설정해줘야 홈 url에 Authentication 객체 전달됨
                         .userInfoEndpoint(userInfoEndpoint -> userInfoEndpoint
                                 .userService(customOauth2UserService))
-                );
+                )
+                .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, customUserDetailsService), LoginFilter.class)
+                .addFilterAt(new LoginFilter(authenticationManager, jwtUtil), UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
     }
 }
