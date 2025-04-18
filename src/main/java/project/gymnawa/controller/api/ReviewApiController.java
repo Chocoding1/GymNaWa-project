@@ -4,9 +4,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
 import project.gymnawa.domain.entity.NorMember;
 import project.gymnawa.domain.entity.Review;
 import project.gymnawa.domain.entity.Trainer;
@@ -14,6 +16,7 @@ import project.gymnawa.domain.api.ApiResponse;
 import project.gymnawa.domain.dto.review.ReviewEditDto;
 import project.gymnawa.domain.dto.review.ReviewSaveDto;
 import project.gymnawa.domain.dto.review.ReviewViewDto;
+import project.gymnawa.service.NorMemberService;
 import project.gymnawa.service.ReviewService;
 import project.gymnawa.service.TrainerService;
 import project.gymnawa.web.SessionConst;
@@ -27,6 +30,7 @@ import java.util.List;
 public class ReviewApiController {
 
     private final ReviewService reviewService;
+    private final NorMemberService norMemberService;
     private final TrainerService trainerService;
 
     /**
@@ -35,8 +39,11 @@ public class ReviewApiController {
     @PostMapping("/add")
     public ResponseEntity<ApiResponse<Long>> addReview(@Validated @RequestBody ReviewSaveDto reviewSaveDto,
                                                         BindingResult bindingResult,
-                                                        @SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) NorMember loginedNorMember,
+                                                        @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails,
                                                         @RequestParam("trainerId") Long trainerId) {
+
+        Long userId = customOAuth2UserDetails.getMember().getId();
+        NorMember loginedMember = norMemberService.findOne(userId);
 
         if (bindingResult.hasErrors()) {
             log.info("errors = " + bindingResult);
@@ -46,7 +53,7 @@ public class ReviewApiController {
         Trainer trainer = trainerService.findOne(trainerId);
 
         Review review = Review.builder()
-                .norMember(loginedNorMember)
+                .norMember(loginedMember)
                 .trainer(trainer)
                 .content(reviewSaveDto.getContent())
                 .build();
@@ -63,16 +70,19 @@ public class ReviewApiController {
     public ResponseEntity<ApiResponse<ReviewViewDto>> reviewEdit(@PathVariable Long id,
                                                                  @Validated @RequestBody ReviewEditDto reviewEditDto,
                                                                  BindingResult bindingResult,
-                                                                 @SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) NorMember loginedNorMember) {
+                                                                 @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
+
+        Long userId = customOAuth2UserDetails.getMember().getId();
+        NorMember loginedMember = norMemberService.findOne(userId);
 
         if (bindingResult.hasErrors()) {
             log.info("errors = " + bindingResult);
             return ResponseEntity.badRequest().body(ApiResponse.error("리뷰를 작성해주세요."));
         }
 
-        reviewService.updateReview(id, reviewEditDto.getContent());
+        reviewService.updateReview(id, loginedMember, reviewEditDto.getContent());
 
-        Review review = reviewService.findById(id);
+        Review review = reviewService.findByIdAndNorMember(id, loginedMember);
 
         ReviewViewDto reviewViewDto = createReviewViewDto(review);
 
@@ -84,8 +94,12 @@ public class ReviewApiController {
      */
     @PostMapping("/{id}/delete")
     public ResponseEntity<ApiResponse<String>> reviewDelete(@PathVariable Long id,
-                                                            @SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) NorMember loginedNorMember) {
-        reviewService.deleteReview(id);
+                                                            @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
+
+        Long userId = customOAuth2UserDetails.getMember().getId();
+        NorMember loginedMember = norMemberService.findOne(userId);
+
+        reviewService.deleteReview(id, loginedMember);
 
         return ResponseEntity.ok().body(ApiResponse.success("delete successful"));
     }
@@ -94,7 +108,11 @@ public class ReviewApiController {
      * 내가 쓴 리뷰 조회
      */
     @GetMapping("/n/list")
-    public ResponseEntity<ApiResponse<List<ReviewViewDto>>> findReviewsByMember(@SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) NorMember loginedMember) {
+    public ResponseEntity<ApiResponse<List<ReviewViewDto>>> findReviewsByMember(@AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
+
+        Long userId = customOAuth2UserDetails.getMember().getId();
+        NorMember loginedMember = norMemberService.findOne(userId);
+
         List<ReviewViewDto> reviewViewDtos = reviewService.findByMember(loginedMember).stream()
                 .map(r -> new ReviewViewDto(r.getId(), loginedMember.getName(), r.getTrainer().getName(),
                         r.getContent(), r.getCreatedDateTime(), r.getModifiedDateTime()))
