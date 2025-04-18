@@ -108,7 +108,7 @@ class ReviewServiceTest {
         when(reviewRepository.findById(1L)).thenReturn(Optional.of(review));
 
         //when
-        reviewService.updateReview(1L, newContent);
+        reviewService.updateReview(1L, norMember, newContent);
 
         //then
         assertThat(review.getContent()).isEqualTo(newContent);
@@ -120,12 +120,13 @@ class ReviewServiceTest {
     @DisplayName("리뷰 수정 실패 - 존재하지 않는 리뷰")
     void updateReviewFail() {
         //given
+        NorMember norMember = createNorMember("galmeagi2@naver.com", "1234", "조성진");
         String newContent = "newContent";
         when(reviewRepository.findById(1L)).thenReturn(Optional.empty());
 
         //when & then
         assertThrows(NoSuchElementException.class,
-                () -> reviewService.updateReview(1L, newContent));
+                () -> reviewService.updateReview(1L, norMember, newContent));
 
         verify(reviewRepository, times(1)).findById(1L);
     }
@@ -146,7 +147,7 @@ class ReviewServiceTest {
         when(reviewRepository.findById(1L)).thenReturn(Optional.of(review));
 
         //when
-        reviewService.deleteReview(1L);
+        reviewService.deleteReview(1L, norMember);
 
         //then
         verify(reviewRepository, times(1)).findById(1L);
@@ -161,11 +162,13 @@ class ReviewServiceTest {
     @DisplayName("리뷰 삭제 실패")
     void ReviewDeleteFail() {
         //given
+        NorMember norMember = createNorMember("galmeagi2@naver.com", "1234", "조성진");
+
         when(reviewRepository.findById(1L)).thenReturn(Optional.empty());
 
         //when & then
         assertThrows(NoSuchElementException.class,
-                () -> reviewService.deleteReview(1L));
+                () -> reviewService.deleteReview(1L, norMember));
 
         //then
         verify(reviewRepository, times(1)).findById(1L);
