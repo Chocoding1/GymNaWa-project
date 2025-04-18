@@ -6,6 +6,7 @@ import project.gymnawa.domain.entity.Review;
 import project.gymnawa.domain.entity.Trainer;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ReviewRepository extends JpaRepository<Review, Long> {
 
@@ -14,9 +15,9 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
      */
 
     /**
-     * 리뷰 단 건 조회
+     * 특정 회원의 리뷰 단 건 조회
      */
-
+    Optional<Review> findByIdAndNorMember(Long id, NorMember norMember);
     /**
      * 리뷰 삭제
      */

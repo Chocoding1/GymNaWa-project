@@ -28,10 +28,10 @@ public class ReviewService {
     }
 
     /**
-     * 리뷰 단 건 조회
+     * 특정 회원의 리뷰 단 건 조회
      */
-    public Review findById(Long id) {
-        return reviewRepository.findById(id)
+    public Review findByIdAndNorMember(Long id, NorMember norMember) {
+        return reviewRepository.findByIdAndNorMember(id, norMember)
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 리뷰입니다."));
     }
 
@@ -53,8 +53,8 @@ public class ReviewService {
      * 리뷰 수정
      */
     @Transactional
-    public void updateReview(Long id, String newContent) {
-        Review review = reviewRepository.findById(id)
+    public void updateReview(Long id, NorMember norMember, String newContent) {
+        Review review = reviewRepository.findByIdAndNorMember(id, norMember)
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 리뷰입니다."));
 
         review.updateContent(newContent);
@@ -64,8 +64,8 @@ public class ReviewService {
      * 리뷰 삭제
      */
     @Transactional
-    public void deleteReview(Long id) {
-        Review review = reviewRepository.findById(id)
+    public void deleteReview(Long id, NorMember norMember) {
+        Review review = reviewRepository.findByIdAndNorMember(id, norMember)
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 리뷰입니다."));
 
         reviewRepository.delete(review);
