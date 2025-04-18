@@ -30,8 +30,10 @@ public class MemberSaveDto {
     private String detailAddress;
     private String buildingName;
 
+    private String loginType;
+
     @Builder
-    public MemberSaveDto(String password, String name, String email, Gender gender, String zoneCode, String address, String detailAddress, String buildingName) {
+    public MemberSaveDto(String password, String name, String email, Gender gender, String zoneCode, String address, String detailAddress, String buildingName, String loginType) {
         this.password = password;
         this.name = name;
         this.email = email;
@@ -40,6 +42,7 @@ public class MemberSaveDto {
         this.address = address;
         this.detailAddress = detailAddress;
         this.buildingName = buildingName;
+        this.loginType = loginType;
     }
 
     public NorMember toEntity() {
@@ -51,6 +54,7 @@ public class MemberSaveDto {
                 .name(this.name)
                 .gender(this.gender)
                 .address(address)
+                .loginType(this.loginType)
                 .build();
     }
 }

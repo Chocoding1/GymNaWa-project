@@ -18,8 +18,8 @@ public class Trainer extends Member {
     /**
      * 트레이너 객체 생성
      */
-    public Trainer(Long id, String password, String name, String email, Address address, Gender gender, String provider, String providerId) {
-        super(id, password, name, email, address, gender, provider, providerId);
+    public Trainer(Long id, String password, String name, String email, Address address, Gender gender, String provider, String providerId, String loginType) {
+        super(id, password, name, email, address, gender, provider, providerId, loginType);
     }
 
     /**

@@ -33,8 +33,9 @@ public class Member extends BaseTime {
 
     private String provider;
     private String providerId;
+    private String loginType;
 
-    public Member(Long id, String password, String name, String email, Address address, Gender gender, String provider, String providerId) {
+    public Member(Long id, String password, String name, String email, Address address, Gender gender, String provider, String providerId, String loginType) {
         this.id = id;
         this.password = password;
         this.name = name;
@@ -43,6 +44,7 @@ public class Member extends BaseTime {
         this.gender = gender;
         this.provider = provider;
         this.providerId = providerId;
+        this.loginType = loginType;
     }
 
     public void updateInfo(String password, String name, Address address) {
