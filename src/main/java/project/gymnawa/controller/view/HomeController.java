@@ -1,8 +1,5 @@
 package project.gymnawa.controller.view;
 
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,9 +11,6 @@ import project.gymnawa.domain.entity.Member;
 import project.gymnawa.domain.entity.NorMember;
 import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
 import project.gymnawa.service.MemberService;
-
-import java.util.Arrays;
-import java.util.List;
 
 @Controller
 @Slf4j
@@ -31,7 +25,6 @@ public class HomeController {
     @GetMapping("/")
     public String home(
             @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails,
-            HttpServletRequest request,
             Model model) {
 
         log.info("homecontroller 진입");
