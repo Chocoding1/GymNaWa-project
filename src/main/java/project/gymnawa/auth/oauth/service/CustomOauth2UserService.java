@@ -23,25 +23,25 @@ public class CustomOauth2UserService extends DefaultOAuth2UserService {
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-        System.out.println("loadUser 함수 진입");
         log.info("loadUser 함수 진입");
         log.info("getClientRegistration : " + userRequest.getClientRegistration());
         log.info("getAccessToken : " + userRequest.getAccessToken());
 
         OAuth2User oAuth2User = super.loadUser(userRequest);
         log.info("oAuth2User.getAttributes : " + oAuth2User.getAttributes());
+        String registrationId = userRequest.getClientRegistration().getRegistrationId();
 
         OAuth2UserInfo oAuth2UserInfo = null;
-        if (userRequest.getClientRegistration().getRegistrationId().equals("google")) {
+        if (registrationId.equals("google")) {
             log.info("구글 로그인 요청");
             oAuth2UserInfo = new GoogleUserInfo(oAuth2User.getAttributes());
-        } else if (userRequest.getClientRegistration().getRegistrationId().equals("facebook")) {
+        } else if (registrationId.equals("facebook")) {
             log.info("페이스북 로그인 요청");
 //            oAuth2UserInfo = new FacebookUserInfo(oAuth2User.getAttributes());
-        } else if (userRequest.getClientRegistration().getRegistrationId().equals("naver")) {
+        } else if (registrationId.equals("naver")) {
             log.info("네이버 로그인 요청");
 //            oAuth2UserInfo = new NaverUserInfo((Map) oAuth2User.getAttributes().get("response"));
-        } else if (userRequest.getClientRegistration().getRegistrationId().equals("kakao")){
+        } else if (registrationId.equals("kakao")){
             log.info("카카오 로그인 요청");
             oAuth2UserInfo = new KakaoUserInfo(oAuth2User.getAttributes());
         } else {
@@ -50,10 +50,10 @@ public class CustomOauth2UserService extends DefaultOAuth2UserService {
 
         String provider = oAuth2UserInfo.getProvider();
         String providerId = oAuth2UserInfo.getProviderId();
-        String username = oAuth2UserInfo.getName(); // google_216543218921321
+        String username = oAuth2UserInfo.getName();
         String email = oAuth2UserInfo.getEmail();
 
-        Member member = memberRepository.findByEmail(email).orElse(null);
+        Member member = memberRepository.findByProviderId(providerId).orElse(null);
 
         if (member != null) {
             log.info("마지막 로그인 : " + member.getProvider());
@@ -63,6 +63,7 @@ public class CustomOauth2UserService extends DefaultOAuth2UserService {
                     .name(username)
                     .provider(provider)
                     .providerId(providerId)
+                    .loginType("social")
                     .build();
 
             memberRepository.save(member); // 추후 일반 회원 or 트레이너로 저장 예정
