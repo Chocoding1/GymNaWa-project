@@ -15,6 +15,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import project.gymnawa.auth.jwt.util.JwtUtil;
+import project.gymnawa.auth.oauth.handler.CustomSuccessHandler;
 import project.gymnawa.auth.oauth.service.CustomOauth2UserService;
 import project.gymnawa.auth.oauth.service.CustomUserDetailsService;
 import project.gymnawa.web.filter.JwtAuthenticationFilter;
@@ -29,6 +30,7 @@ public class SecurityConfig {
 
     private final CustomOauth2UserService customOauth2UserService;
     private final CustomUserDetailsService customUserDetailsService;
+    private final CustomSuccessHandler customSuccessHandler;
     private final JwtUtil jwtUtil;
 
     @Bean
@@ -41,7 +43,7 @@ public class SecurityConfig {
         http
                 .csrf(CsrfConfigurer::disable)
                 .sessionManagement(session -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // stateless 방식에서는 단순 소셜 로그인 진행해도 Authentication 객체 유지 X
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/member/n/{id:\\d+}/**", "/member/t/{id:\\d+}/**").authenticated() // pathvariable은 정규 표현식 사용해야 함
                         .requestMatchers("/review/**").authenticated()
@@ -60,10 +62,10 @@ public class SecurityConfig {
                 )
 */
                 .oauth2Login(oauth2 -> oauth2 // oauth2 로그인 설정
-                        .loginPage("/member/login")
                         .defaultSuccessUrl("/") // 이거 설정해줘야 홈 url에 Authentication 객체 전달됨
                         .userInfoEndpoint(userInfoEndpoint -> userInfoEndpoint
                                 .userService(customOauth2UserService))
+                        .successHandler(customSuccessHandler)
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, customUserDetailsService), LoginFilter.class)
                 .addFilterAt(new LoginFilter(authenticationManager, jwtUtil), UsernamePasswordAuthenticationFilter.class);
