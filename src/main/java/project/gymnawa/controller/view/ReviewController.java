@@ -2,11 +2,13 @@ package project.gymnawa.controller.view;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
 import project.gymnawa.domain.dto.review.ReviewEditDto;
 import project.gymnawa.domain.dto.review.ReviewSaveDto;
 import project.gymnawa.domain.dto.review.ReviewViewDto;
@@ -14,6 +16,7 @@ import project.gymnawa.domain.entity.NorMember;
 import project.gymnawa.domain.entity.PtMembership;
 import project.gymnawa.domain.entity.Review;
 import project.gymnawa.domain.entity.Trainer;
+import project.gymnawa.service.NorMemberService;
 import project.gymnawa.service.PtMembershipService;
 import project.gymnawa.service.ReviewService;
 import project.gymnawa.service.TrainerService;
@@ -28,6 +31,7 @@ import java.util.List;
 public class ReviewController {
 
     private final ReviewService reviewService;
+    private final NorMemberService norMemberService;
     private final TrainerService trainerService;
     private final PtMembershipService ptMembershipService;
 
@@ -36,9 +40,12 @@ public class ReviewController {
      */
     @GetMapping("/add")
     public String reviewAddForm(@ModelAttribute ReviewSaveDto reviewSaveDto,
-                             @RequestParam("trainerId") Long trainerId,
-                             @SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) NorMember loginedMember,
-                             Model model) {
+                                @RequestParam("trainerId") Long trainerId,
+                                @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails,
+                                Model model) {
+
+        Long userId = customOAuth2UserDetails.getMember().getId();
+        NorMember loginedMember = norMemberService.findOne(userId);
 
         Trainer trainer = trainerService.findOne(trainerId);
 
@@ -61,7 +68,10 @@ public class ReviewController {
      */
     @PostMapping("/add")
     public String addReview(@Validated ReviewSaveDto reviewSaveDto, BindingResult bindingResult,
-                            @SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) NorMember loginedMember) {
+                            @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
+
+        Long userId = customOAuth2UserDetails.getMember().getId();
+        NorMember loginedMember = norMemberService.findOne(userId);
 
         if (bindingResult.hasErrors()) {
             log.info("errors = " + bindingResult);
@@ -83,11 +93,13 @@ public class ReviewController {
      * 리뷰 수정 폼
      */
     @GetMapping("/{reviewId}/edit")
-    public String reviewEditForm(@PathVariable Long reviewId,
-                                 @SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) NorMember loginedMember,
-                                 Model model) {
+    public String reviewEditForm(@PathVariable Long reviewId, Model model,
+                                 @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
-        Review review = reviewService.findById(reviewId);
+        Long userId = customOAuth2UserDetails.getMember().getId();
+        NorMember loginedMember = norMemberService.findOne(userId);
+
+        Review review = reviewService.findByIdAndNorMember(reviewId, loginedMember);
 
         ReviewEditDto reviewEditDto = ReviewEditDto.builder()
                 .content(review.getContent())
@@ -106,14 +118,17 @@ public class ReviewController {
     @PostMapping("/{reviewId}/edit")
     public String editReview(@Validated @ModelAttribute ReviewEditDto reviewEditDto, BindingResult bindingResult,
                              @PathVariable Long reviewId,
-                             @SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) NorMember loginedMember) {
+                             @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
+
+        Long userId = customOAuth2UserDetails.getMember().getId();
+        NorMember loginedMember = norMemberService.findOne(userId);
 
         if (bindingResult.hasErrors()) {
             log.info("errors = " + bindingResult);
             return "/review/reviewEditForm";
         }
 
-        reviewService.updateReview(reviewId, reviewEditDto.getContent());
+        reviewService.updateReview(reviewId, loginedMember, reviewEditDto.getContent());
 
         return "redirect:/review/n/list";
     }
@@ -122,8 +137,11 @@ public class ReviewController {
      * 내가 쓴 리뷰 조회
      */
     @GetMapping("/n/list")
-    public String findReviewsByMember(@SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) NorMember loginedMember,
+    public String findReviewsByMember(@AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails,
                                       Model model) {
+
+        Long userId = customOAuth2UserDetails.getMember().getId();
+        NorMember loginedMember = norMemberService.findOne(userId);
 
         List<ReviewViewDto> reviewList = reviewService.findByMember(loginedMember).stream()
                 .map(r -> new ReviewViewDto(r.getId(), loginedMember.getName(), r.getTrainer().getName(),
@@ -139,9 +157,13 @@ public class ReviewController {
      * 리뷰 삭제
      */
     @PostMapping("/{reviewId}/delete")
-    public String deleteReview(@SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) NorMember loginedMember,
-                               @PathVariable Long reviewId) {
-        reviewService.deleteReview(reviewId);
+    public String deleteReview(@PathVariable Long reviewId,
+                               @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
+
+        Long userId = customOAuth2UserDetails.getMember().getId();
+        NorMember loginedMember = norMemberService.findOne(userId);
+
+        reviewService.deleteReview(reviewId, loginedMember);
 
         return "redirect:/review/n/list";
     }
