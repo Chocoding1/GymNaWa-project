@@ -56,7 +56,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 log.info("accessToken 만료. 재발급 진행");
                 log.info("refreshToken 만료 여부 검사");
 
-                if (jwtUtil.isExpired(refreshToken)) {
+                if (refreshToken == null || jwtUtil.isExpired(refreshToken)) {
                     log.info("refreshToken 만료. 재로그인 필요");
 
                     filterChain.doFilter(request, response);
