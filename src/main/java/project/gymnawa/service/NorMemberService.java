@@ -37,6 +37,8 @@ public class NorMemberService {
         // 비밀번호 암호화
         memberSaveDto.setPassword(bCryptPasswordEncoder.encode(memberSaveDto.getPassword()));
 
+        memberSaveDto.setLoginType("normal");
+
         NorMember joinedMember = norMemberRepository.save(memberSaveDto.toEntity());
 
         return joinedMember.getId();
