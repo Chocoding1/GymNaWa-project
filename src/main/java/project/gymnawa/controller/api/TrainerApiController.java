@@ -65,9 +65,7 @@ public class TrainerApiController {
             return ResponseEntity.badRequest().body(ApiResponse.error("이메일 인증이 필요합니다."));
         }
 
-        Trainer trainer = createTrainer(trainerSaveDto);
-
-        Long joinId = trainerService.join(trainer);
+        Long joinId = trainerService.join(trainerSaveDto);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(joinId));
     }
@@ -132,23 +130,6 @@ public class TrainerApiController {
         trainerService.updateTrainer(id, trainerEditDto.getPassword(), trainerEditDto.getName(), address);
 
         return ResponseEntity.ok().body(ApiResponse.success("edit successful"));
-    }
-
-    private static Trainer createTrainer(TrainerSaveDto trainerSaveDto) {
-        Address address = Address.builder()
-                .zoneCode(trainerSaveDto.getZoneCode())
-                .address(trainerSaveDto.getAddress())
-                .detailAddress(trainerSaveDto.getDetailAddress())
-                .buildingName(trainerSaveDto.getBuildingName())
-                .build();
-
-        return Trainer.builder()
-                .password(trainerSaveDto.getPassword())
-                .name(trainerSaveDto.getName())
-                .email(trainerSaveDto.getEmail())
-                .gender(trainerSaveDto.getGender())
-                .address(address)
-                .build();
     }
 
     private TrainerViewDto createTrainerViewDto(Trainer loginedTrainer) {
