@@ -49,4 +49,11 @@ public class MemberService {
         return memberRepository.findByEmail(email)
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
     }
+
+    /**
+     * 임시 회원 정보 삭제
+     */
+    public void deleteOne(Long id) {
+        memberRepository.deleteById(id);
+    }
 }
