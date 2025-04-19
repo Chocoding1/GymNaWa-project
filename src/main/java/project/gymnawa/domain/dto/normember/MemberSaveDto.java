@@ -2,13 +2,17 @@ package project.gymnawa.domain.dto.normember;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import project.gymnawa.domain.entity.NorMember;
 import project.gymnawa.domain.etcfield.Address;
 import project.gymnawa.domain.etcfield.Gender;
+import project.gymnawa.domain.etcfield.Role;
 
 @Data
+@AllArgsConstructor
+@Builder
 public class MemberSaveDto {
 
     @NotBlank
@@ -32,18 +36,10 @@ public class MemberSaveDto {
 
     private String loginType;
 
-    @Builder
-    public MemberSaveDto(String password, String name, String email, Gender gender, String zoneCode, String address, String detailAddress, String buildingName, String loginType) {
-        this.password = password;
-        this.name = name;
-        this.email = email;
-        this.gender = gender;
-        this.zoneCode = zoneCode;
-        this.address = address;
-        this.detailAddress = detailAddress;
-        this.buildingName = buildingName;
-        this.loginType = loginType;
-    }
+    private String provider;
+    private String providerId;
+
+    private Role role;
 
     public NorMember toEntity() {
         Address address = new Address(this.zoneCode, this.address, this.detailAddress, this.buildingName);
@@ -55,6 +51,9 @@ public class MemberSaveDto {
                 .gender(this.gender)
                 .address(address)
                 .loginType(this.loginType)
+                .provider(this.provider)
+                .providerId(this.providerId)
+                .role(this.role)
                 .build();
     }
 }
