@@ -4,6 +4,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import project.gymnawa.domain.dto.normember.MemberSaveDto;
+import project.gymnawa.domain.dto.trainer.TrainerSaveDto;
 import project.gymnawa.domain.entity.NorMember;
 import project.gymnawa.domain.entity.PtMembership;
 import project.gymnawa.domain.entity.Review;
@@ -23,14 +24,13 @@ public class TestData {
 
     @PostConstruct
     public void testDataInit() {
-        Address address = new Address("07809", "서울 강서구 마곡중앙1로 71", "1307동 803호", "마곡 13단지 힐스테이트 마스터");
-
         MemberSaveDto memberSaveDto = createMemberSaveDto("1234", "조성진", "whtjdwls@naver.com", "07809", "서울 강서구 마곡중앙1로 71", "1307동 803호", "마곡 13단지 힐스테이트 마스터", Gender.MALE);
         Long joinId = norMemberService.join(memberSaveDto);
         NorMember joinedMember = norMemberService.findOne(joinId);
 
-        Trainer trainer = createTrainer("123456", "조성모", "whtjdah@gmail.com", address, Gender.FEMALE);
-        trainerService.join(trainer);
+        TrainerSaveDto trainerSaveDto = createTrainerSaveDto("123456", "조성모", "whtjdah@gmail.com", "07809", "서울 강서구 마곡중앙1로 71", "1307동 803호", "마곡 13단지 힐스테이트 마스터", Gender.FEMALE);
+        Long trainerId = trainerService.join(trainerSaveDto);
+        Trainer trainer = trainerService.findOne(trainerId);
 
         Review review1 = createReview("운동 잘 가르치십니다:)", joinedMember, trainer);
         reviewService.save(review1);
@@ -55,12 +55,15 @@ public class TestData {
                 .build();
     }
 
-    private Trainer createTrainer(String password, String name, String email, Address address, Gender gender) {
-        return Trainer.builder()
+    private TrainerSaveDto createTrainerSaveDto(String password, String name, String email, String zoneCode, String address, String detailAddress, String buildingName, Gender gender) {
+        return TrainerSaveDto.builder()
                 .password(password)
                 .name(name)
                 .email(email)
+                .zoneCode(zoneCode)
                 .address(address)
+                .detailAddress(detailAddress)
+                .buildingName(buildingName)
                 .gender(gender)
                 .build();
     }
