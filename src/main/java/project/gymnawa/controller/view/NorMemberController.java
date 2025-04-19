@@ -127,23 +127,6 @@ public class NorMemberController {
         return "redirect:/member/n/{id}/mypage";
     }
 
-    private static NorMember createNorMember(MemberSaveDto memberSaveDto) {
-        Address address = Address.builder()
-                .zoneCode(memberSaveDto.getZoneCode())
-                .address(memberSaveDto.getAddress())
-                .detailAddress(memberSaveDto.getDetailAddress())
-                .buildingName(memberSaveDto.getBuildingName())
-                .build();
-
-        return NorMember.builder()
-                .password(memberSaveDto.getPassword())
-                .name(memberSaveDto.getName())
-                .email(memberSaveDto.getEmail())
-                .gender(memberSaveDto.getGender())
-                .address(address)
-                .build();
-    }
-
     private MemberViewDto createMemberViewDto(NorMember norMember) {
         return MemberViewDto.builder()
                 .id(norMember.getId())

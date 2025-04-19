@@ -51,9 +51,7 @@ public class TrainerController {
             return "/trainer/createTrainerForm";
         }
 
-        // @ModelAttribute로 임베디드 타입도 자동으로 바인딩이 될 줄 알았는데, 계속 null로 들어와서 일단 요청 파라미터로 반환 값 가져와서 임베디드값 따로 생성
-        Trainer trainer = createTrainer(trainerSaveDto);
-        trainerService.join(trainer);
+        trainerService.join(trainerSaveDto);
 
         return "redirect:/member/login";
     }
@@ -119,23 +117,6 @@ public class TrainerController {
         trainerService.updateTrainer(id, trainerEditDto.getPassword(), trainerEditDto.getName(), address);
 
         return "redirect:/member/t/{id}/mypage";
-    }
-
-    private static Trainer createTrainer(TrainerSaveDto trainerSaveDto) {
-        Address address = Address.builder()
-                .zoneCode(trainerSaveDto.getZoneCode())
-                .address(trainerSaveDto.getAddress())
-                .detailAddress(trainerSaveDto.getDetailAddress())
-                .buildingName(trainerSaveDto.getBuildingName())
-                .build();
-
-        return Trainer.builder()
-                .password(trainerSaveDto.getPassword())
-                .name(trainerSaveDto.getName())
-                .email(trainerSaveDto.getEmail())
-                .gender(trainerSaveDto.getGender())
-                .address(address)
-                .build();
     }
 
     private TrainerViewDto createTrainerViewDto(Trainer loginedTrainer) {
