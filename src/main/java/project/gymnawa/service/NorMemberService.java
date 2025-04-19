@@ -8,6 +8,7 @@ import project.gymnawa.domain.dto.normember.MemberSaveDto;
 import project.gymnawa.domain.etcfield.Address;
 import project.gymnawa.domain.entity.Member;
 import project.gymnawa.domain.entity.NorMember;
+import project.gymnawa.domain.etcfield.Role;
 import project.gymnawa.repository.MemberRepository;
 import project.gymnawa.repository.NorMemberRepository;
 
@@ -34,10 +35,14 @@ public class NorMemberService {
         // 중복 회원 검증 필요
         validateDuplicateMember(memberSaveDto);
 
-        // 비밀번호 암호화
-        memberSaveDto.setPassword(bCryptPasswordEncoder.encode(memberSaveDto.getPassword()));
+        // 일반 로그인 사용자일 경우에만 비밀번호 암호화 진행
+        if (memberSaveDto.getLoginType() == null) {
+            // 비밀번호 암호화
+            memberSaveDto.setPassword(bCryptPasswordEncoder.encode(memberSaveDto.getPassword()));
 
-        memberSaveDto.setLoginType("normal");
+            memberSaveDto.setLoginType("normal");
+        }
+        memberSaveDto.setRole(Role.USER);
 
         NorMember joinedMember = norMemberRepository.save(memberSaveDto.toEntity());
 

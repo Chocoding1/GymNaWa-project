@@ -1,11 +1,14 @@
 package project.gymnawa.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import project.gymnawa.domain.dto.trainer.TrainerSaveDto;
 import project.gymnawa.domain.entity.Member;
 import project.gymnawa.domain.entity.Trainer;
 import project.gymnawa.domain.etcfield.Address;
+import project.gymnawa.domain.etcfield.Role;
 import project.gymnawa.repository.MemberRepository;
 import project.gymnawa.repository.TrainerRepository;
 
@@ -22,24 +25,33 @@ public class TrainerService {
 
     private final TrainerRepository trainerRepository;
     private final MemberRepository memberRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     /**
      * 회원가입
      */
     @Transactional
-    public Long join(Trainer trainer) {
-        validateDuplicateTrainer(trainer); // 중복 회원가입 방지
-        trainerRepository.save(trainer);
-        return trainer.getId();
+    public Long join(TrainerSaveDto trainerSaveDto) {
+        validateDuplicateTrainer(trainerSaveDto); // 중복 회원가입 방지
+
+        if (trainerSaveDto.getLoginType() == null) {
+            // 비밀번호 암호화
+            trainerSaveDto.setPassword(bCryptPasswordEncoder.encode(trainerSaveDto.getPassword()));
+
+            trainerSaveDto.setLoginType("normal");
+        }
+        trainerSaveDto.setRole(Role.USER);
+
+        Trainer joinedTrainer = trainerRepository.save(trainerSaveDto.toEntity());
+        return joinedTrainer.getId();
     }
 
     /**
      * 이메일 중복 체크
      */
-    private void validateDuplicateTrainer(Trainer trainer) {
-        Optional<Member> result = memberRepository.findByEmail(trainer.getEmail());
-        if (result.isPresent()) {
-            throw new IllegalStateException("이미 존재하는 이메일입니다.");
+    private void validateDuplicateTrainer(TrainerSaveDto trainerSaveDto) {
+        if (memberRepository.existsByEmail(trainerSaveDto.getEmail())) {
+            throw new IllegalStateException("이미 가입된 이메일입니다.");
         }
     }
 
