@@ -7,6 +7,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import project.gymnawa.domain.entity.Member;
+import project.gymnawa.domain.etcfield.Role;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -41,6 +42,10 @@ public class CustomOAuth2UserDetails implements UserDetails, OAuth2User {
 
     public Long getId() {
         return member.getId();
+    }
+
+    public Role getRole() {
+        return member.getRole();
     }
 
     @Override
