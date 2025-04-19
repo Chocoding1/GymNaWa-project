@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import project.gymnawa.auth.jwt.domain.JwtInfoDto;
 import project.gymnawa.auth.jwt.util.JwtUtil;
 import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
+import project.gymnawa.domain.etcfield.Role;
 
 import java.io.IOException;
 
@@ -46,6 +47,10 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         response.addCookie(accessCookie);
         response.addCookie(refreshCookie);
 
-        response.sendRedirect("http://localhost:8080/");
+        if (oAuth2UserDetails.getRole() == Role.GUEST) {
+            response.sendRedirect("http://localhost:8080/member/add-info");
+        } else {
+            response.sendRedirect("http://localhost:8080/");
+        }
     }
 }
