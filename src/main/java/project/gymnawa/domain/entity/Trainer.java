@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import project.gymnawa.domain.etcfield.Address;
 import project.gymnawa.domain.etcfield.Gender;
+import project.gymnawa.domain.etcfield.Role;
 
 @Entity
 @Getter
@@ -18,8 +19,8 @@ public class Trainer extends Member {
     /**
      * 트레이너 객체 생성
      */
-    public Trainer(Long id, String password, String name, String email, Address address, Gender gender, String provider, String providerId, String loginType) {
-        super(id, password, name, email, address, gender, provider, providerId, loginType);
+    public Trainer(Long id, String password, String name, String email, Gender gender, Address address, String provider, String providerId, String loginType, Role role) {
+        super(id, password, name, email, gender, address, provider, providerId, loginType, role);
     }
 
     /**

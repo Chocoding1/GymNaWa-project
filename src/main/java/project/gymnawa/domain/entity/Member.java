@@ -2,12 +2,14 @@ package project.gymnawa.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import project.gymnawa.domain.etcfield.Address;
 import project.gymnawa.domain.etcfield.BaseTime;
 import project.gymnawa.domain.etcfield.Gender;
+import project.gymnawa.domain.etcfield.Role;
 
 @Entity
 @DiscriminatorColumn
@@ -15,6 +17,7 @@ import project.gymnawa.domain.etcfield.Gender;
 @Getter
 @SuperBuilder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class Member extends BaseTime {
 
     @Id
@@ -35,17 +38,8 @@ public class Member extends BaseTime {
     private String providerId;
     private String loginType;
 
-    public Member(Long id, String password, String name, String email, Address address, Gender gender, String provider, String providerId, String loginType) {
-        this.id = id;
-        this.password = password;
-        this.name = name;
-        this.email = email;
-        this.address = address;
-        this.gender = gender;
-        this.provider = provider;
-        this.providerId = providerId;
-        this.loginType = loginType;
-    }
+    @Enumerated(value = EnumType.STRING)
+    private Role role;
 
     public void updateInfo(String password, String name, Address address) {
         this.password = password;
