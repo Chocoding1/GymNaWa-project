@@ -12,6 +12,7 @@ import project.gymnawa.auth.oauth.domain.GoogleUserInfo;
 import project.gymnawa.auth.oauth.domain.OAuth2UserInfo;
 import project.gymnawa.domain.entity.Member;
 import project.gymnawa.auth.oauth.domain.KakaoUserInfo;
+import project.gymnawa.domain.etcfield.Role;
 import project.gymnawa.repository.MemberRepository;
 
 @Service
@@ -64,6 +65,7 @@ public class CustomOauth2UserService extends DefaultOAuth2UserService {
                     .provider(provider)
                     .providerId(providerId)
                     .loginType("social")
+                    .role(Role.GUEST)
                     .build();
 
             memberRepository.save(member); // 추후 일반 회원 or 트레이너로 저장 예정
