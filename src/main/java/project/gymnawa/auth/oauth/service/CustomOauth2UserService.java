@@ -54,7 +54,7 @@ public class CustomOauth2UserService extends DefaultOAuth2UserService {
         String username = oAuth2UserInfo.getName();
         String email = oAuth2UserInfo.getEmail();
 
-        Member member = memberRepository.findByProviderId(providerId).orElse(null);
+        Member member = memberRepository.findByProviderId(providerId).orElse(null); // providerId로 조회
 
         if (member != null) {
             log.info("마지막 로그인 : " + member.getProvider());
