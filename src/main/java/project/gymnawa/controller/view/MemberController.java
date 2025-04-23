@@ -85,10 +85,8 @@ public class MemberController {
 
         String refreshToken = jwtUtil.resolveTokenFromCookie(request, "refresh_token");
 
-        Long id = jwtUtil.getId(refreshToken);
-
         // redis의 refresh token 삭제
-        jwtUtil.removeRefreshToken(id);
+        jwtUtil.removeRefreshToken(refreshToken);
 
         return "redirect:/";
     }
@@ -129,10 +127,8 @@ public class MemberController {
         // redis에서 refresh token 삭제
         String refreshToken = jwtUtil.resolveTokenFromCookie(request, "refresh_token");
 
-        Long id = jwtUtil.getId(refreshToken);
-
         // redis의 refresh token 삭제
-        jwtUtil.removeRefreshToken(id);
+        jwtUtil.removeRefreshToken(refreshToken);
 
         Long newJoinId;
         if (memberOauthInfoDto.getIsTrainer()) {
@@ -181,7 +177,7 @@ public class MemberController {
         refreshCookie.setHttpOnly(true);
         refreshCookie.setSecure(false);
         refreshCookie.setPath("/");
-        refreshCookie.setMaxAge(60 * 60 * 24 * 14); // 2주
+        refreshCookie.setMaxAge(60 * 60 * 24); // 24시간
 
         response.addCookie(accessCookie);
         response.addCookie(refreshCookie);
