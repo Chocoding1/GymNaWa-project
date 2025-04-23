@@ -14,6 +14,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import project.gymnawa.auth.cookie.CookieUtil;
 import project.gymnawa.auth.jwt.domain.JwtInfoDto;
 import project.gymnawa.auth.jwt.util.JwtUtil;
 import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
@@ -31,6 +32,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
+    private final CookieUtil cookieUtil;
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
@@ -65,17 +67,8 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         System.out.println("id : " + oAuth2UserDetails.getId());
         JwtInfoDto jwtInfoDto = jwtUtil.createJwt(oAuth2UserDetails.getId());
 
-        Cookie accessCookie = new Cookie("access_token", jwtInfoDto.getAccessToken());
-        accessCookie.setHttpOnly(true);
-        accessCookie.setSecure(false);
-        accessCookie.setPath("/");
-        accessCookie.setMaxAge(60); // 1분
-
-        Cookie refreshCookie = new Cookie("refresh_token", jwtInfoDto.getRefreshToken());
-        refreshCookie.setHttpOnly(true);
-        refreshCookie.setSecure(false);
-        refreshCookie.setPath("/");
-        refreshCookie.setMaxAge(60 * 60 * 24 * 14); // 2주
+        Cookie accessCookie = cookieUtil.createAT(jwtInfoDto.getAccessToken());
+        Cookie refreshCookie = cookieUtil.createRT(jwtInfoDto.getRefreshToken());
 
         response.addCookie(accessCookie);
         response.addCookie(refreshCookie);

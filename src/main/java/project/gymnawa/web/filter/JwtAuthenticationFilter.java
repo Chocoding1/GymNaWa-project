@@ -13,6 +13,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
+import project.gymnawa.auth.cookie.CookieUtil;
 import project.gymnawa.auth.jwt.domain.JwtInfoDto;
 import project.gymnawa.auth.jwt.util.JwtUtil;
 import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
@@ -30,7 +31,7 @@ import java.util.List;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
-    private final CustomUserDetailsService customUserDetailsService;
+    private final CookieUtil cookieUtil;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -53,11 +54,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 saveAuthentication(id);
 
             } else {
-                log.info("accessToken 만료. 재발급 진행");
+                log.warn("accessToken 만료. 재발급 진행");
                 log.info("refreshToken 만료 여부 검사");
 
                 if (refreshToken == null || jwtUtil.isExpired(refreshToken)) {
-                    log.info("refreshToken 만료. 재로그인 필요");
+                    log.warn("refreshToken 만료. 재로그인 필요");
 
                     filterChain.doFilter(request, response);
 
@@ -85,24 +86,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     log.info("refresh token : " + refreshToken);
 
                     // AT, RT 쿠키에 새로 저장
-                    Cookie accessCookie = new Cookie("access_token", jwtInfoDto.getAccessToken());
-                    accessCookie.setHttpOnly(true);
-                    accessCookie.setSecure(false);
-                    accessCookie.setPath("/");
-                    accessCookie.setMaxAge(60); // 1분
-
-                    Cookie refreshCookie = new Cookie("refresh_token", jwtInfoDto.getRefreshToken());
-                    refreshCookie.setHttpOnly(true);
-                    refreshCookie.setSecure(false);
-                    refreshCookie.setPath("/");
-                    refreshCookie.setMaxAge(60 * 60 * 24 * 14); // 2주
+                    Cookie accessCookie = cookieUtil.createAT(accessToken);
+                    Cookie refreshCookie = cookieUtil.createRT(refreshToken);
 
                     response.addCookie(accessCookie);
                     response.addCookie(refreshCookie);
 
                     saveAuthentication(id);
                 } else {
-                    log.info("refresh token 불일치. 재로그인 필요");
+                    log.warn("refresh token 불일치. 재로그인 필요");
 
                     filterChain.doFilter(request, response);
 
@@ -110,7 +102,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
             }
         } catch (Exception e) {
-            log.info("예외 발생 : " + e.getMessage() );
+            log.error("예외 발생 : " + e.getMessage() );
+            log.error("예외 종류 : " + e);
         }
 
         // 다음 필터로 패스
