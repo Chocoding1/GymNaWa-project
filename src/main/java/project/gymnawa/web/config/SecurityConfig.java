@@ -14,6 +14,7 @@ import org.springframework.security.config.annotation.web.configurers.HttpBasicC
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import project.gymnawa.auth.cookie.CookieUtil;
 import project.gymnawa.auth.jwt.util.JwtUtil;
 import project.gymnawa.auth.oauth.handler.CustomSuccessHandler;
 import project.gymnawa.auth.oauth.service.CustomOauth2UserService;
@@ -29,9 +30,9 @@ import project.gymnawa.web.filter.LoginFilter;
 public class SecurityConfig {
 
     private final CustomOauth2UserService customOauth2UserService;
-    private final CustomUserDetailsService customUserDetailsService;
     private final CustomSuccessHandler customSuccessHandler;
     private final JwtUtil jwtUtil;
+    private final CookieUtil cookieUtil;
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
@@ -67,8 +68,8 @@ public class SecurityConfig {
                                 .userService(customOauth2UserService))
                         .successHandler(customSuccessHandler)
                 )
-                .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, customUserDetailsService), LoginFilter.class)
-                .addFilterAt(new LoginFilter(authenticationManager, jwtUtil), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, cookieUtil), LoginFilter.class)
+                .addFilterAt(new LoginFilter(authenticationManager, jwtUtil, cookieUtil), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
