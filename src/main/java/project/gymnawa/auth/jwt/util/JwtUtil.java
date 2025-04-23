@@ -10,7 +10,6 @@ import org.springframework.stereotype.Component;
 import project.gymnawa.auth.jwt.domain.JwtInfoDto;
 import project.gymnawa.auth.jwt.domain.RefreshToken;
 import project.gymnawa.auth.jwt.repository.JwtRepository;
-import project.gymnawa.service.RedisService;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
@@ -80,8 +79,8 @@ public class JwtUtil {
                 .build();
     }
 
-    public void removeRefreshToken(Long id) {
-        jwtRepository.deleteById(id);
+    public void removeRefreshToken(String refreshToken) {
+        jwtRepository.deleteByRefreshToken(refreshToken);
     }
 
     private String createAccessToken(Long id) {
