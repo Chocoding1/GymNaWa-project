@@ -9,6 +9,7 @@ import java.util.Optional;
 @Repository
 public interface JwtRepository extends CrudRepository<RefreshToken, Long> {
 
-    @Override
-    Optional<RefreshToken> findById(Long userId);
+    Optional<RefreshToken> findByRefreshToken(String refreshToken);
+
+    void deleteByRefreshToken(String refreshToken);
 }
