@@ -14,6 +14,9 @@ public class PtMembershipSaveDto {
     private Long trainerId;
 
     @NotNull
+    private Long norMemberId;
+
+    @NotNull
     private int initCount;
 
     @NotNull
