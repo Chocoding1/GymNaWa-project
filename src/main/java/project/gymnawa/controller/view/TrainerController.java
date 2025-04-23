@@ -3,11 +3,14 @@ package project.gymnawa.controller.view;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
+import project.gymnawa.domain.entity.NorMember;
 import project.gymnawa.domain.etcfield.Address;
 import project.gymnawa.domain.entity.Trainer;
 import project.gymnawa.domain.dto.trainer.TrainerEditDto;
@@ -61,7 +64,10 @@ public class TrainerController {
      */
     @GetMapping("/{id}/mypage")
     public String mypage(@PathVariable Long id, Model model,
-                         @SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) Trainer loginedTrainer) {
+                         @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
+
+        Long userId = customOAuth2UserDetails.getMember().getId();
+        Trainer loginedTrainer = trainerService.findOne(userId);
 
         if (!loginedTrainer.getId().equals(id)) {
             return "redirect:/member/t/" + loginedTrainer.getId() + "/mypage";
@@ -79,7 +85,10 @@ public class TrainerController {
      */
     @GetMapping("/{id}/edit")
     public String editForm(@PathVariable Long id, Model model,
-                           @SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) Trainer loginedTrainer) {
+                           @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
+
+        Long userId = customOAuth2UserDetails.getMember().getId();
+        Trainer loginedTrainer = trainerService.findOne(userId);
 
         if (!loginedTrainer.getId().equals(id)) {
             return "redirect:/member/t/" + loginedTrainer.getId() + "/edit";
@@ -102,7 +111,10 @@ public class TrainerController {
     @PostMapping("/{id}/edit")
     public String editMember(@Validated @ModelAttribute TrainerEditDto trainerEditDto, BindingResult bindingResult,
                              @PathVariable Long id,
-                             @SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) Trainer loginedTrainer) {
+                             @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
+
+        Long userId = customOAuth2UserDetails.getMember().getId();
+        Trainer loginedTrainer = trainerService.findOne(userId);
 
         if (!loginedTrainer.getId().equals(id)) {
             return "redirect:/";

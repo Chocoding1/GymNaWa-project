@@ -2,16 +2,19 @@ package project.gymnawa.controller.view;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
 import project.gymnawa.domain.dto.ptmembership.PtMembershipSaveDto;
 import project.gymnawa.domain.dto.ptmembership.PtMembershipViewDto;
 import project.gymnawa.domain.entity.NorMember;
 import project.gymnawa.domain.entity.PtMembership;
 import project.gymnawa.domain.entity.Trainer;
+import project.gymnawa.service.NorMemberService;
 import project.gymnawa.service.PtMembershipService;
 import project.gymnawa.service.TrainerService;
 import project.gymnawa.web.SessionConst;
@@ -26,16 +29,20 @@ public class PtMembershipController {
 
     private final PtMembershipService ptMembershipService;
     private final TrainerService trainerService;
+    private final NorMemberService norMemberService;
 
     /**
      * PT 등록 폼
      */
     @GetMapping("/register")
-    public String ptRegisterForm(@SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) NorMember loginedMember,
-                                 @RequestParam("trainerId") Long trainerId,
-                                 Model model) {
+    public String ptRegisterForm(@RequestParam("trainerId") Long trainerId,
+                                 Model model,
+                                 @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
+
+        Long userId = customOAuth2UserDetails.getMember().getId();
 
         PtMembershipSaveDto ptMembershipSaveDto = PtMembershipSaveDto.builder()
+                .norMemberId(userId)
                 .trainerId(trainerId)
                 .build();
 
@@ -48,8 +55,12 @@ public class PtMembershipController {
      * PT 등록
      */
     @PostMapping("/register")
-    public String ptRegister(@SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) NorMember loginedMember,
+    public String ptRegister(@AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails,
                              @Validated PtMembershipSaveDto ptMembershipSaveDto, BindingResult bindingResult) {
+
+
+        Long userId = customOAuth2UserDetails.getMember().getId();
+        NorMember loginedMember = norMemberService.findOne(userId);
 
         if (bindingResult.hasErrors()) {
             log.info("errors = " + bindingResult);
@@ -75,8 +86,11 @@ public class PtMembershipController {
      * 회원이 진행 중인 PT 조회
      */
     @GetMapping("/n/list")
-    public String ptMembershipByMember(@SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) NorMember loginedMember,
+    public String ptMembershipByMember(@AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails,
                                        Model model) {
+
+        Long userId = customOAuth2UserDetails.getMember().getId();
+        NorMember loginedMember = norMemberService.findOne(userId);
 
         List<PtMembershipViewDto> ptMembershipList = ptMembershipService.findByMember(loginedMember).stream()
                 .map(pms -> PtMembershipViewDto.builder()
