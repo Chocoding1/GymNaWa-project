@@ -1,4 +1,4 @@
-package project.gymnawa.controller.api;
+package project.gymnawa.controller.view;
 
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +17,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Slf4j
 @RequestMapping("/email")
-public class EmailApiController {
+public class EmailController {
 
     private final EmailService emailService;
 
