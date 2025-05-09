@@ -8,13 +8,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import project.gymnawa.auth.cookie.CookieUtil;
+import project.gymnawa.auth.cookie.util.CookieUtil;
 import project.gymnawa.auth.jwt.domain.JwtInfoDto;
 import project.gymnawa.auth.jwt.util.JwtUtil;
 import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
@@ -66,16 +67,19 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
         System.out.println("oAuth2UserDetails = " + oAuth2UserDetails);
         System.out.println("id : " + oAuth2UserDetails.getId());
         JwtInfoDto jwtInfoDto = jwtUtil.createJwt(oAuth2UserDetails.getId());
+        log.info("refresh token 생성 : " + jwtInfoDto.getRefreshToken());
 
-        Cookie accessCookie = cookieUtil.createAT(jwtInfoDto.getAccessToken());
-        Cookie refreshCookie = cookieUtil.createRT(jwtInfoDto.getRefreshToken());
+//        Cookie accessCookie = cookieUtil.createAT(jwtInfoDto.getAccessToken());
+//        ResponseCookie refreshCookie = cookieUtil.createRT(jwtInfoDto.getRefreshToken());
 
-        response.addCookie(accessCookie);
-        response.addCookie(refreshCookie);
+//        response.addCookie(accessCookie);
+//        response.setHeader("Set-Cookie", refreshCookie.toString());
+        response.setHeader("Authorization-Refresh", jwtInfoDto.getRefreshToken());
     }
 
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
         log.info("로그인 실패..");
+        response.setStatus(401);
     }
 }
