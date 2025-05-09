@@ -9,23 +9,24 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.CorsConfigurer;
-import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
-import org.springframework.security.config.annotation.web.configurers.FormLoginConfigurer;
-import org.springframework.security.config.annotation.web.configurers.HttpBasicConfigurer;
+import org.springframework.security.config.annotation.web.configurers.*;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import project.gymnawa.auth.cookie.util.CookieUtil;
+import project.gymnawa.auth.jwt.repository.JwtRepository;
 import project.gymnawa.auth.jwt.util.JwtUtil;
 import project.gymnawa.auth.oauth.handler.CustomSuccessHandler;
 import project.gymnawa.auth.oauth.service.CustomOauth2UserService;
+import project.gymnawa.web.filter.CustomLogoutFilter;
 import project.gymnawa.web.filter.JwtAuthenticationFilter;
 import project.gymnawa.web.filter.LoginFilter;
 
 import java.util.Collections;
+import java.util.List;
 
 
 @Configuration
@@ -38,6 +39,7 @@ public class SecurityConfig {
     private final CustomSuccessHandler customSuccessHandler;
     private final JwtUtil jwtUtil;
     private final CookieUtil cookieUtil;
+    private final JwtRepository jwtRepository;
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
@@ -57,9 +59,8 @@ public class SecurityConfig {
                         configuration.setAllowedMethods(Collections.singletonList("*"));
                         configuration.setAllowCredentials(true);
                         configuration.setAllowedHeaders(Collections.singletonList("*"));
+                        configuration.setExposedHeaders(List.of("Authorization", "Authorization-Refresh"));
                         configuration.setMaxAge(3600L);
-
-                        configuration.setExposedHeaders(Collections.singletonList("Authorization"));
 
                         return configuration;
                     }
@@ -84,6 +85,7 @@ public class SecurityConfig {
                         .usernameParameter("email")
                 )
 */
+                .logout(LogoutConfigurer::disable) // 기존 로그아웃 필터 off
                 .oauth2Login(oauth2 -> oauth2 // oauth2 로그인 설정
                         .defaultSuccessUrl("/") // 이거 설정해줘야 홈 url에 Authentication 객체 전달됨
                         .userInfoEndpoint(userInfoEndpoint -> userInfoEndpoint
@@ -91,7 +93,8 @@ public class SecurityConfig {
                         .successHandler(customSuccessHandler)
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, cookieUtil), LoginFilter.class)
-                .addFilterAt(new LoginFilter(authenticationManager, jwtUtil, cookieUtil), UsernamePasswordAuthenticationFilter.class);
+                .addFilterAt(new LoginFilter(authenticationManager, jwtUtil, cookieUtil), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new CustomLogoutFilter(jwtUtil, jwtRepository), LogoutFilter.class);
 
         return http.build();
     }
