@@ -8,11 +8,13 @@ import project.gymnawa.web.interceptor.LoginCheckInterceptor;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
-    @Override
-    public void addCorsMappings(CorsRegistry corsRegistry) {
-        corsRegistry.addMapping("/**")
-                .allowedOrigins("https://chocoding1.github.io");
-    }
+//    @Override
+//    public void addCorsMappings(CorsRegistry corsRegistry) {
+//        corsRegistry.addMapping("/**")
+//                .allowedOrigins("https://chocoding1.github.io")
+//                .allowedMethods("*")
+//                .allowCredentials(true);
+//    }
 
     //    @Override
 //    public void addInterceptors(InterceptorRegistry registry) {
