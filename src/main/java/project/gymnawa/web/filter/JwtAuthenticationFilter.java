@@ -1,8 +1,8 @@
 package project.gymnawa.web.filter;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -13,14 +13,13 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
-import project.gymnawa.auth.cookie.CookieUtil;
-import project.gymnawa.auth.jwt.domain.JwtInfoDto;
+import project.gymnawa.auth.cookie.util.CookieUtil;
 import project.gymnawa.auth.jwt.util.JwtUtil;
 import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
-import project.gymnawa.auth.oauth.service.CustomUserDetailsService;
 import project.gymnawa.domain.entity.Member;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.List;
 
 @Slf4j
@@ -35,76 +34,48 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        log.info("request url : " + request.getRequestURI());
         log.info("JwtAuthenticationFilter 진입");
+        log.info("request url : " + request.getRequestURI());
 
-        String accessToken = jwtUtil.resolveTokenFromCookie(request, "access_token");
-        String refreshToken = jwtUtil.resolveTokenFromCookie(request, "refresh_token");
+        // Authorization 헤더 추출
+        String accessHeader = request.getHeader("Authorization");
 
-        log.info("access token : " + accessToken);
-        log.info("refresh token : " + refreshToken);
+        log.info("access header : " + accessHeader);
 
-        Long id;
-        try {
-            log.info("access token 유효성 검사");
-            if (accessToken != null && !jwtUtil.isExpired(accessToken)) {
-                log.info("access token 유효");
-                id = jwtUtil.getId(accessToken);
-
-                saveAuthentication(id);
-
-            } else {
-                log.warn("accessToken 만료. 재발급 진행");
-                log.info("refreshToken 만료 여부 검사");
-
-                if (refreshToken == null || jwtUtil.isExpired(refreshToken)) {
-                    log.warn("refreshToken 만료. 재로그인 필요");
-
-                    filterChain.doFilter(request, response);
-
-                    return;
-                }
-
-                log.info("refreshToken 유효. 실제 저장된 refreshToken과 일치하는지 비교");
-
-                id = jwtUtil.getId(refreshToken);
-                log.info("id : " + id);
-
-                String findRefreshToken = jwtUtil.getRefreshToken(id).getRefreshToken();
-                log.info("refreshToken : " + refreshToken);
-                log.info("findRefreshToken : " + findRefreshToken);
-
-                if (findRefreshToken.equals(refreshToken)) {
-                    log.info("실제 저장 refreshToken과 일치 확인");
-
-                    JwtInfoDto jwtInfoDto = jwtUtil.createJwt(id);
-
-                    accessToken = jwtInfoDto.getAccessToken();
-                    refreshToken = jwtInfoDto.getRefreshToken(); // redis에서 기존 refreshToken 최신화 필요
-
-                    log.info("access token : " + accessToken);
-                    log.info("refresh token : " + refreshToken);
-
-                    // AT, RT 쿠키에 새로 저장
-                    Cookie accessCookie = cookieUtil.createAT(accessToken);
-                    Cookie refreshCookie = cookieUtil.createRT(refreshToken);
-
-                    response.addCookie(accessCookie);
-                    response.addCookie(refreshCookie);
-
-                    saveAuthentication(id);
-                } else {
-                    log.warn("refresh token 불일치. 재로그인 필요");
-
-                    filterChain.doFilter(request, response);
-
-                    return;
-                }
-            }
-        } catch (Exception e) {
-            log.error("예외 발생 : " + e.getMessage() );
-            log.error("예외 종류 : " + e);
+        // 헤더가 없으면 다음 필터로 이동
+        if (accessHeader == null) {
+            filterChain.doFilter(request, response);
+            return;
         }
+
+        // 헤더에서 토큰 추출
+        String accessToken = accessHeader.split(" ")[1];
+
+        // AT가 만료되었으면 다음 필터로 넘기지 않음
+        try {
+            jwtUtil.isExpired(accessToken);
+        } catch (ExpiredJwtException e) {
+            PrintWriter writer = response.getWriter();
+            writer.print("access token expired");
+
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
+
+        // 토큰이 AT인지 확인
+        String category = jwtUtil.getCategory(accessToken);
+
+        if (!category.equals("access")) {
+            PrintWriter writer = response.getWriter();
+            writer.print("invalid access token");
+
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
+
+        // session에 회원 정보 저장
+        Long id = jwtUtil.getId(accessToken);
+        saveAuthentication(id);
 
         // 다음 필터로 패스
         filterChain.doFilter(request, response);
