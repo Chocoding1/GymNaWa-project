@@ -41,6 +41,8 @@ public class MemberSaveDto {
 
     private Role role;
 
+    private String emailCode;
+
     public NorMember toEntity() {
         Address address = new Address(this.zoneCode, this.address, this.detailAddress, this.buildingName);
 
