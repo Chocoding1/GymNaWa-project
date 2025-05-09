@@ -1,9 +1,15 @@
-package project.gymnawa.auth.cookie;
+package project.gymnawa.auth.cookie.util;
 
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
+
 @Component
+@Slf4j
 public class CookieUtil {
 
     public Cookie createAT(String accessToken) {
@@ -16,13 +22,29 @@ public class CookieUtil {
         return accessCookie;
     }
 
-    public Cookie createRT(String refreshToken) {
-        Cookie refreshCookie = new Cookie("refresh_token", refreshToken);
-        refreshCookie.setHttpOnly(true);
-        refreshCookie.setSecure(false);
-        refreshCookie.setPath("/");
-        refreshCookie.setMaxAge(60 * 60 * 24); // 24시간
+    public ResponseCookie createRT(String refreshToken) {
+        ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", refreshToken)
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .sameSite("None")
+                .maxAge(Duration.ofDays(1))
+                .build();
 
         return refreshCookie;
+    }
+
+    public String resolveTokenFromCookie(HttpServletRequest request, String cookieName) {
+        log.info("cookie resolve : " + cookieName);
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                log.info("cookie name : " + cookie.getName());
+                if (cookie.getName().equals(cookieName)) {
+                    return cookie.getValue();
+                }
+            }
+        }
+        return null;
     }
 }
