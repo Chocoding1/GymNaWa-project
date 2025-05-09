@@ -13,7 +13,6 @@ import project.gymnawa.domain.dto.email.EmailDto;
 import project.gymnawa.service.EmailService;
 
 import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -37,17 +36,12 @@ public class EmailApiController {
     public ResponseEntity<ApiResponse<?>> verifyCode(@RequestBody EmailDto emailDto) {
         HashMap<String, Object> response = new HashMap<>();
 
-        log.info("verify-code 진입");
-        log.info("email : " + emailDto.getEmail());
-        log.info("code : " + emailDto.getCode());
-
         if (emailService.verifyCode(emailDto.getEmail(), emailDto.getCode())) {
             response.put("success", true);
         } else {
             response.put("success", false);
             response.put("message", "인증코드가 올바르지 않습니다.");
         }
-        log.info("response 초기화 완료");
 
         return ResponseEntity.ok().body(ApiResponse.success(response));
     }
