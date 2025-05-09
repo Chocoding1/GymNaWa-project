@@ -6,10 +6,11 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
-import project.gymnawa.auth.cookie.CookieUtil;
+import project.gymnawa.auth.cookie.util.CookieUtil;
 import project.gymnawa.auth.jwt.domain.JwtInfoDto;
 import project.gymnawa.auth.jwt.util.JwtUtil;
 import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
@@ -34,11 +35,11 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         JwtInfoDto jwtInfoDto = jwtUtil.createJwt(oAuth2UserDetails.getId());
 
-        Cookie accessCookie = cookieUtil.createAT(jwtInfoDto.getAccessToken());
-        Cookie refreshCookie = cookieUtil.createRT(jwtInfoDto.getRefreshToken());
+//        Cookie accessCookie = cookieUtil.createAT(jwtInfoDto.getAccessToken());
+        ResponseCookie refreshCookie = cookieUtil.createRT(jwtInfoDto.getRefreshToken());
 
-        response.addCookie(accessCookie);
-        response.addCookie(refreshCookie);
+//        response.addCookie(accessCookie);
+        response.setHeader("Set-Cookie", refreshCookie.toString());
 
         if (oAuth2UserDetails.getRole() == Role.GUEST) {
             response.sendRedirect("http://localhost:8080/member/add-info");
