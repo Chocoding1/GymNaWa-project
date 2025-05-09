@@ -49,16 +49,8 @@ public class JwtUtil {
         return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("id", Long.class);
     }
 
-    public String resolveTokenFromCookie(HttpServletRequest request, String cookieName) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if (cookie.getName().equals(cookieName)) {
-                    return cookie.getValue();
-                }
-            }
-        }
-        return null;
+    public String getCategory(String token) {
+        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().get("category", String.class);
     }
 
     public JwtInfoDto createJwt(Long id) {
@@ -80,12 +72,13 @@ public class JwtUtil {
     }
 
     public void removeRefreshToken(String refreshToken) {
-        jwtRepository.deleteByRefreshToken(refreshToken);
+        Long id = getId(refreshToken);
+        jwtRepository.deleteById(id);
     }
 
     private String createAccessToken(Long id) {
         return Jwts.builder()
-                .subject("AccessToken")
+                .claim("category", "access")
                 .claim("id", id)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + accessTokenExpiredMs))
@@ -95,7 +88,7 @@ public class JwtUtil {
 
     private String createRefreshToken(Long id) {
         return Jwts.builder()
-                .subject("RefreshToken")
+                .claim("category", "refresh")
                 .claim("id", id)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + refreshTokenExpiredMs))
