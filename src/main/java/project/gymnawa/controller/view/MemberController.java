@@ -12,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import project.gymnawa.auth.cookie.util.CookieUtil;
 import project.gymnawa.auth.jwt.domain.JwtInfoDto;
 import project.gymnawa.auth.jwt.util.JwtUtil;
 import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
@@ -20,7 +21,6 @@ import project.gymnawa.domain.dto.normember.MemberSaveDto;
 import project.gymnawa.domain.dto.trainer.TrainerSaveDto;
 import project.gymnawa.domain.entity.Member;
 import project.gymnawa.domain.dto.member.MemberLoginDto;
-import project.gymnawa.domain.entity.NorMember;
 import project.gymnawa.service.NorMemberService;
 import project.gymnawa.service.TrainerService;
 import project.gymnawa.web.SessionConst;
@@ -36,6 +36,7 @@ public class MemberController {
     private final NorMemberService norMemberService;
     private final TrainerService trainerService;
     private final JwtUtil jwtUtil;
+    private final CookieUtil cookieUtil;
 
     @GetMapping("/add/select")
     public String selectMemberType() {
@@ -83,7 +84,7 @@ public class MemberController {
         removeCookie(response, "access_token");
         removeCookie(response, "refresh_token");
 
-        String refreshToken = jwtUtil.resolveTokenFromCookie(request, "refresh_token");
+        String refreshToken = cookieUtil.resolveTokenFromCookie(request, "refresh_token");
 
         // redis의 refresh token 삭제
         jwtUtil.removeRefreshToken(refreshToken);
@@ -125,7 +126,7 @@ public class MemberController {
         removeCookie(response, "refresh_token");
 
         // redis에서 refresh token 삭제
-        String refreshToken = jwtUtil.resolveTokenFromCookie(request, "refresh_token");
+        String refreshToken = cookieUtil.resolveTokenFromCookie(request, "refresh_token");
 
         // redis의 refresh token 삭제
         jwtUtil.removeRefreshToken(refreshToken);
