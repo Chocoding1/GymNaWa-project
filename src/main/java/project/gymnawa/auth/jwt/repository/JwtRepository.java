@@ -9,7 +9,9 @@ import java.util.Optional;
 @Repository
 public interface JwtRepository extends CrudRepository<RefreshToken, Long> {
 
-    Optional<RefreshToken> findByRefreshToken(String refreshToken);
+    // refresh token 조회
+    Optional<RefreshToken> findById(Long id);
 
-    void deleteByRefreshToken(String refreshToken);
+    // refresh token 삭제
+    void deleteById(Long id);
 }
