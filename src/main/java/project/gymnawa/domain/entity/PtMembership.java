@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import project.gymnawa.domain.etcfield.BaseTime;
 
-@Entity
+@Entity(name = "pt_membership")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PtMembership extends BaseTime {

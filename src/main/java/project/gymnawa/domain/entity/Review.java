@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import project.gymnawa.domain.etcfield.BaseTime;
 
-@Entity
+@Entity(name = "review")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Review extends BaseTime {

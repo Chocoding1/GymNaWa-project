@@ -11,7 +11,7 @@ import project.gymnawa.domain.etcfield.BaseTime;
 import project.gymnawa.domain.etcfield.Gender;
 import project.gymnawa.domain.etcfield.Role;
 
-@Entity
+@Entity(name = "member")
 @DiscriminatorColumn
 @Inheritance
 @Getter

@@ -10,7 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import project.gymnawa.domain.etcfield.Address;
 
-@Entity
+@Entity(name = "gym")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Gym {

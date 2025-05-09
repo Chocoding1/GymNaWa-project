@@ -9,7 +9,7 @@ import project.gymnawa.domain.etcfield.ContractStatus;
 
 import java.time.LocalDate;
 
-@Entity
+@Entity(name = "gym_membership")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class GymMembership {
