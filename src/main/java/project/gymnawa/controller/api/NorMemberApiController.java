@@ -9,7 +9,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import project.gymnawa.domain.etcfield.Address;
-import project.gymnawa.domain.etcfield.Gender;
 import project.gymnawa.domain.entity.NorMember;
 import project.gymnawa.domain.api.ApiResponse;
 import project.gymnawa.domain.dto.normember.MemberEditDto;
@@ -19,9 +18,12 @@ import project.gymnawa.service.EmailService;
 import project.gymnawa.service.NorMemberService;
 import project.gymnawa.web.SessionConst;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/member/n")
+@RequestMapping("/api/normembers")
 @Slf4j
 public class NorMemberApiController {
 
@@ -31,38 +33,24 @@ public class NorMemberApiController {
     /**
      * 회원가입
      */
-    @GetMapping("/add")
-    public ResponseEntity<MemberSaveDto> addForm() {
-        MemberSaveDto memberSaveDto = MemberSaveDto.builder()
-                .password("")
-                .name("")
-                .email("")
-                .gender(Gender.MALE)
-                .zoneCode("")
-                .address("")
-                .detailAddress("")
-                .buildingName("")
-                .build();
-
-        return ResponseEntity.ok().body(memberSaveDto);
-    }
-
-    /**
-     * 회원가입
-     */
-    @PostMapping("/add")
-    public ResponseEntity<ApiResponse<Long>> addMember(@Validated @RequestBody MemberSaveDto memberSaveDto,
+    @PostMapping
+    public ResponseEntity<ApiResponse<?>> addMember(@Validated @RequestBody MemberSaveDto memberSaveDto,
                                                             BindingResult bindingResult, HttpServletRequest request) {
 
         if (bindingResult.hasErrors()) {
             log.info("errors = " + bindingResult);
-            return ResponseEntity.badRequest().body(ApiResponse.error("입력값이 올바르지 않습니다."));
+            Map<String, String> errorMap = new HashMap<>();
+            bindingResult.getFieldErrors().forEach(error ->
+                    errorMap.put(error.getField(), error.getDefaultMessage())
+            );
+            return ResponseEntity.badRequest().body(ApiResponse.error("입력값 오류", errorMap));
         }
 
-        if (!emailService.isEmailVerified(memberSaveDto.getEmail(), request.getParameter("code"))) {
-            log.info("code : " + request.getParameter("code"));
-            bindingResult.rejectValue("email", "verified", "이메일 인증이 필요합니다.");
-            return ResponseEntity.badRequest().body(ApiResponse.error("이메일 인증이 필요합니다."));
+        if (!emailService.isEmailVerified(memberSaveDto.getEmail(), memberSaveDto.getEmailCode())) {
+            log.info("code : " + memberSaveDto.getEmailCode());
+            Map<String, String> errorMap = new HashMap<>();
+            errorMap.put("email", "이메일 인증이 필요합니다.");
+            return ResponseEntity.badRequest().body(ApiResponse.error("이메일 인증 오류", errorMap));
         }
 
         Long joinId = norMemberService.join(memberSaveDto);
@@ -73,7 +61,7 @@ public class NorMemberApiController {
     /**
      * 마이페이지
      */
-    @GetMapping("/{id}/mypage")
+    @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<MemberViewDto>> myPage(@PathVariable Long id,
                                                          @SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) NorMember loginedMember) {
 
@@ -90,6 +78,7 @@ public class NorMemberApiController {
     /**
      * 회원 정보 수정
      */
+/*
     @GetMapping("{id}/edit")
     public ResponseEntity<ApiResponse<MemberEditDto>> editForm(@PathVariable Long id,
                                                                @SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) NorMember loginedMember) {
@@ -102,11 +91,12 @@ public class NorMemberApiController {
 
         return ResponseEntity.ok().body(ApiResponse.success(memberEditDto));
     }
+*/
 
     /**
      * 회원 정보 수정
      */
-    @PostMapping("/{id}/edit")
+    @PatchMapping("/{id}")
     public ResponseEntity<ApiResponse<String>> editMember(@PathVariable Long id,
                                                           @Validated @RequestBody MemberEditDto memberEditDto,
                                                           BindingResult bindingResult,
