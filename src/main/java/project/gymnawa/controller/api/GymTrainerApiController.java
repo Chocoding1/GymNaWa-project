@@ -75,7 +75,8 @@ public class GymTrainerApiController {
      * 헬스장 별 소속 트레이너 조회
      */
     @GetMapping("/{gymId}/trainers")
-    public ResponseEntity<ApiResponse<List<GymTrainerViewDto>>> trainersByGym(@PathVariable String gymId) {
+    public ResponseEntity<ApiResponse<List<GymTrainerViewDto>>> trainersByGym(@PathVariable String gymId,
+                                                                              @RequestParam("placeName") String placeName) { // 응답으로 헬스장 이름도 전달할 예정
         List<GymTrainer> trainers = gymTrainerService.findByGymAndContractStatus(gymId, ContractStatus.ACTIVE);
 
         List<GymTrainerViewDto> trainerViewDtos = trainers.stream()
