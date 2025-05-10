@@ -1,12 +1,10 @@
 package project.gymnawa.auth.oauth.handler;
 
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -17,6 +15,8 @@ import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
 import project.gymnawa.domain.etcfield.Role;
 
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 
 @Component // spring security에 등록하기 위해 빈 등록
 @RequiredArgsConstructor
@@ -36,15 +36,18 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         JwtInfoDto jwtInfoDto = jwtUtil.createJwt(oAuth2UserDetails.getId());
 
 //        Cookie accessCookie = cookieUtil.createAT(jwtInfoDto.getAccessToken());
-        ResponseCookie refreshCookie = cookieUtil.createRT(jwtInfoDto.getRefreshToken());
+//        ResponseCookie refreshCookie = cookieUtil.createRT(jwtInfoDto.getRefreshToken());
 
 //        response.addCookie(accessCookie);
-        response.setHeader("Set-Cookie", refreshCookie.toString());
+//        response.setHeader("Set-Cookie", refreshCookie.toString());
 
         if (oAuth2UserDetails.getRole() == Role.GUEST) {
-            response.sendRedirect("http://localhost:8080/member/add-info");
+            String redirectUrl = "https://chocoding1.github.io/pages/member/addInfoForm.html"
+                    + "?refreshToken=" + jwtInfoDto.getRefreshToken()
+                    + "&username=" + URLEncoder.encode(oAuth2UserDetails.getName(), StandardCharsets.UTF_8);
+            response.sendRedirect(redirectUrl);
         } else {
-            response.sendRedirect("http://localhost:8080/");
+            response.sendRedirect("https://chocoding1.github.io?refreshToken=" + jwtInfoDto.getRefreshToken());
         }
     }
 }
