@@ -7,20 +7,18 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
-import project.gymnawa.auth.jwt.service.ReissueService;
+import project.gymnawa.auth.jwt.service.ReissueServiceImpl;
 
 @RestController
 @RequiredArgsConstructor
 @Slf4j
 public class JwtController {
 
-    private final ReissueService reissueService;
+    private final ReissueServiceImpl reissueServiceImpl;
 
     @PostMapping("/reissue")
     public ResponseEntity<?> reissue(HttpServletRequest request, HttpServletResponse response) {
-        log.info("reissue 컨트롤러 진입");
-        ResponseEntity<?> reissue = reissueService.reissue(request, response);
-        log.info("reissue 메서드 탈출");
+        ResponseEntity<?> reissue = reissueServiceImpl.reissue(request, response);
         return reissue;
     }
 }
