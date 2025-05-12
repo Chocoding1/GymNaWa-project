@@ -20,6 +20,9 @@ public class ReissueServiceImpl implements ReissueService {
     private final CookieUtil cookieUtil;
     private final JwtUtil jwtUtil;
 
+    /**
+     * 일반 로그인 시 호출 메서드
+     */
     @Override
     public ResponseEntity<?> reissue(HttpServletRequest request, HttpServletResponse response) {
         log.info("reissue 메서드 진입");
@@ -73,11 +76,14 @@ public class ReissueServiceImpl implements ReissueService {
 //        response.setHeader("Set-Cookie", refreshCookie.toString());
 
         log.info("Authorization : " + response.getHeader("Authorization"));
-        log.info("Refresh : " + response.getHeader("Refresh"));
+        log.info("Refresh : " + response.getHeader("Authorization-Refresh"));
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    /**
+     * 소셜 로그인 시 호출 메서드
+     */
     @Override
     public ResponseEntity<?> reissue(HttpServletRequest request, HttpServletResponse response, Long userId) {
         log.info("reissue 메서드 진입");
