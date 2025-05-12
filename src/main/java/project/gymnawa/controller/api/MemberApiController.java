@@ -54,6 +54,7 @@ public class MemberApiController {
         Member loginedMember = memberService.findOne(userId);
 
         String name = loginedMember.getName();
+        log.info("name : " + name);
         boolean isTrainer;
         if (loginedMember instanceof NorMember) {
             isTrainer = false;
@@ -77,6 +78,10 @@ public class MemberApiController {
     public ResponseEntity<?> addInfo(@RequestBody @Validated MemberOauthInfoDto memberOauthInfoDto, BindingResult bindingResult,
                           HttpServletRequest request, HttpServletResponse response) {
 
+        /**
+         * 이 요청은 AT를 가지고 요청하는 것이 아니기 때문에 security context에 회원 정보 X
+         * 따라서 헤더로 넘어온 RT를 가지고 직접 회원 정보 조회 필요
+         */
         String refreshToken = request.getHeader("Authorization-Refresh");
         Long userId = jwtUtil.getId(refreshToken);
         Member guestMember = memberService.findOne(userId);
@@ -130,48 +135,5 @@ public class MemberApiController {
         ResponseEntity<?> reissue = reissueServiceImpl.reissue(request, response, newJoinId);
 
         return reissue;
-    }
-    /**
-     * 로그인 (삭제 예정)
-     */
-    @ResponseBody
-    @PostMapping("/login")
-    public ResponseEntity<ApiResponse<?>> login(@Validated @RequestBody MemberLoginDto memberLoginDto,
-                                                BindingResult bindingResult,
-                                                HttpServletRequest request) {
-        if (bindingResult.hasErrors()) {
-            log.info("errors = " + bindingResult);
-            Map<String, String> errorMap = new HashMap<>();
-            bindingResult.getFieldErrors().forEach(error ->
-                    errorMap.put(error.getField(), error.getDefaultMessage())
-            );
-            return ResponseEntity.badRequest().body(ApiResponse.error("입력값 오류", errorMap));
-        }
-
-        Member loginedMember = memberService.login(memberLoginDto.getEmail(), memberLoginDto.getPassword());
-
-        if (loginedMember == null) {
-            Map<String, String> errorMap = new HashMap<>();
-            errorMap.put("global", "아이디 또는 비밀번호가 맞지 않습니다.");
-            return ResponseEntity.badRequest().body(ApiResponse.error("로그인 오류", errorMap));
-        }
-
-        HttpSession session = request.getSession();
-        session.setAttribute(SessionConst.LOGIN_MEMBER, loginedMember);
-
-        return ResponseEntity.ok().body(ApiResponse.success("login successful"));
-    }
-
-    /**
-     * 로그아웃 (삭제 예정)
-     */
-    @ResponseBody
-    @PostMapping("/logout")
-    public ResponseEntity<ApiResponse<String>> logout(HttpServletRequest request) {
-        HttpSession session = request.getSession(false);
-        if (session != null) {
-            session.invalidate();
-        }
-        return ResponseEntity.ok().body(ApiResponse.success("logout successful"));
     }
 }
