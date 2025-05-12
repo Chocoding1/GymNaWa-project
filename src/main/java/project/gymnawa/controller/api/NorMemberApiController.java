@@ -5,9 +5,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
+import project.gymnawa.domain.entity.Member;
 import project.gymnawa.domain.etcfield.Address;
 import project.gymnawa.domain.entity.NorMember;
 import project.gymnawa.domain.api.ApiResponse;
@@ -63,7 +66,10 @@ public class NorMemberApiController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<MemberViewDto>> myPage(@PathVariable Long id,
-                                                         @SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) NorMember loginedMember) {
+                                                             @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
+
+        Long userId = customOAuth2UserDetails.getMember().getId();
+        NorMember loginedMember = norMemberService.findOne(userId);
 
         // url 조작으로 다른 사용자 마이페이지 접속 방지
         if (!loginedMember.getId().equals(id)) {
@@ -78,29 +84,14 @@ public class NorMemberApiController {
     /**
      * 회원 정보 수정
      */
-/*
-    @GetMapping("{id}/edit")
-    public ResponseEntity<ApiResponse<MemberEditDto>> editForm(@PathVariable Long id,
-                                                               @SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) NorMember loginedMember) {
-
-        if (!loginedMember.getId().equals(id)) {
-            return ResponseEntity.badRequest().body(ApiResponse.error("잘못된 접근입니다."));
-        }
-
-        MemberEditDto memberEditDto = createMemberEditDto(loginedMember);
-
-        return ResponseEntity.ok().body(ApiResponse.success(memberEditDto));
-    }
-*/
-
-    /**
-     * 회원 정보 수정
-     */
     @PatchMapping("/{id}")
     public ResponseEntity<ApiResponse<String>> editMember(@PathVariable Long id,
                                                           @Validated @RequestBody MemberEditDto memberEditDto,
                                                           BindingResult bindingResult,
-                                                          @SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) NorMember loginedMember) {
+                                                          @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
+
+        Long userId = customOAuth2UserDetails.getMember().getId();
+        NorMember loginedMember = norMemberService.findOne(userId);
 
         if (!loginedMember.getId().equals(id)) {
             return ResponseEntity.badRequest().body(ApiResponse.error("잘못된 접근입니다."));
