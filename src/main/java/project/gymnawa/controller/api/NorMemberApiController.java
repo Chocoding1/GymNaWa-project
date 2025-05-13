@@ -10,6 +10,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
+import project.gymnawa.domain.dto.review.ReviewViewDto;
 import project.gymnawa.domain.entity.Member;
 import project.gymnawa.domain.etcfield.Address;
 import project.gymnawa.domain.entity.NorMember;
@@ -19,9 +20,11 @@ import project.gymnawa.domain.dto.normember.MemberSaveDto;
 import project.gymnawa.domain.dto.normember.MemberViewDto;
 import project.gymnawa.service.EmailService;
 import project.gymnawa.service.NorMemberService;
+import project.gymnawa.service.ReviewService;
 import project.gymnawa.web.SessionConst;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -32,6 +35,7 @@ public class NorMemberApiController {
 
     private final NorMemberService norMemberService;
     private final EmailService emailService;
+    private final ReviewService reviewService;
 
     /**
      * 회원가입
@@ -109,6 +113,23 @@ public class NorMemberApiController {
         norMemberService.updateMember(userId, memberEditDto);
 
         return ResponseEntity.ok().body(ApiResponse.success("edit successful"));
+    }
+
+    /**
+     * 내가 쓴 리뷰 조회
+     */
+    @GetMapping("/{id}/reviews")
+    public ResponseEntity<ApiResponse<List<ReviewViewDto>>> getReviewList(@AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
+
+        Long userId = customOAuth2UserDetails.getMember().getId();
+        NorMember loginedMember = norMemberService.findOne(userId);
+
+        List<ReviewViewDto> reviewList = reviewService.findByMember(loginedMember).stream()
+                .map(r -> new ReviewViewDto(r.getId(), loginedMember.getName(), r.getTrainer().getName(),
+                        r.getContent(), r.getCreatedDateTime(), r.getModifiedDateTime()))
+                .toList();
+
+        return ResponseEntity.ok().body(ApiResponse.success(reviewList));
     }
 
     private static NorMember createNorMember(MemberSaveDto memberSaveDto) {
