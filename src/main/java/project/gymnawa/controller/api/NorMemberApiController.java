@@ -85,7 +85,7 @@ public class NorMemberApiController {
      * 회원 정보 수정
      */
     @PatchMapping("/{id}")
-    public ResponseEntity<ApiResponse<String>> editMember(@PathVariable Long id,
+    public ResponseEntity<ApiResponse<?>> editMember(@PathVariable Long id,
                                                           @Validated @RequestBody MemberEditDto memberEditDto,
                                                           BindingResult bindingResult,
                                                           @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
@@ -99,17 +99,14 @@ public class NorMemberApiController {
 
         if (bindingResult.hasErrors()) {
             log.info("errors = " + bindingResult);
-            return ResponseEntity.badRequest().body(ApiResponse.error("입력값이 올바르지 않습니다."));
+            Map<String, String> errorMap = new HashMap<>();
+            bindingResult.getFieldErrors().forEach(error ->
+                    errorMap.put(error.getField(), error.getDefaultMessage())
+            );
+            return ResponseEntity.badRequest().body(ApiResponse.error("입력값 오류", errorMap));
         }
 
-        Address address = Address.builder()
-                .zoneCode(memberEditDto.getZoneCode())
-                .address(memberEditDto.getAddress())
-                .detailAddress(memberEditDto.getDetailAddress())
-                .buildingName(memberEditDto.getBuildingName())
-                .build();
-
-        norMemberService.updateMember(id, memberEditDto.getPassword(), memberEditDto.getName(), address);
+        norMemberService.updateMember(userId, memberEditDto);
 
         return ResponseEntity.ok().body(ApiResponse.success("edit successful"));
     }
