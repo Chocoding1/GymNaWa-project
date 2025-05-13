@@ -119,10 +119,9 @@ public class NorMemberController {
             log.info("errors = " + bindingResult);
             return "/normember/editMemberForm";
         }
-        Address address = new Address(memberEditDto.getZoneCode(), memberEditDto.getAddress(), memberEditDto.getDetailAddress(), memberEditDto.getBuildingName());
 
         //로그인 아이디 중복 체크 필요
-        norMemberService.updateMember(id, memberEditDto.getPassword(), memberEditDto.getName(), address);
+        norMemberService.updateMember(id, memberEditDto);
 
         return "redirect:/member/n/{id}/mypage";
     }

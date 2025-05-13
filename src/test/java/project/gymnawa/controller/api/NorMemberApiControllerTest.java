@@ -238,7 +238,7 @@ class NorMemberApiControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data").value("edit successful"));
 
-        verify(norMemberService, times(1)).updateMember(eq(1L), eq(memberEditDto.getPassword()), eq(memberEditDto.getName()), any(Address.class));
+        verify(norMemberService, times(1)).updateMember(eq(1L), eq(memberEditDto));
     }
 
     @Test
@@ -278,7 +278,7 @@ class NorMemberApiControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("입력값이 올바르지 않습니다."));
 
-        verify(norMemberService, never()).updateMember(eq(1L), eq(memberEditDto.getPassword()), eq(memberEditDto.getName()), any(Address.class));
+        verify(norMemberService, never()).updateMember(eq(1L), eq(memberEditDto));
     }
 
     private static MemberSaveDto createMemberSaveDto(String password, String name,

@@ -7,6 +7,7 @@ import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import project.gymnawa.domain.dto.normember.MemberEditDto;
 import project.gymnawa.domain.etcfield.Address;
 import project.gymnawa.domain.etcfield.Gender;
 import project.gymnawa.domain.entity.NorMember;
@@ -89,10 +90,19 @@ class NorMemberServiceTest {
                 .gender(Gender.MALE)
                 .build();
 
+        MemberEditDto memberEditDto = MemberEditDto.builder()
+                .password("newPw")
+                .name("newName")
+                .zoneCode("newZone")
+                .address("newAddress")
+                .detailAddress("newDetail")
+                .buildingName("newBuilding")
+                .build();
+
         when(norMemberRepository.findById(1L)).thenReturn(Optional.of(norMember));
 
         //when
-        norMemberService.updateMember(1L, "newPw", "newName", new Address("newZone", "newAddress", "newDetail", "newBuilding"));
+        norMemberService.updateMember(1L, memberEditDto);
 
         //then
         assertThat(norMember.getPassword()).isEqualTo("newPw");
@@ -109,9 +119,18 @@ class NorMemberServiceTest {
         //given
         when(norMemberRepository.findById(1L)).thenReturn(Optional.empty());
 
+        MemberEditDto memberEditDto = MemberEditDto.builder()
+                .password("newPw")
+                .name("newName")
+                .zoneCode("newZone")
+                .address("newAddress")
+                .detailAddress("newDetail")
+                .buildingName("newBuilding")
+                .build();
+
         //when & then
         assertThrows(NoSuchElementException.class,
-                () -> norMemberService.updateMember(1L, "newPw", "newName", new Address("newZone", "newAddress", "newDetail", "newBuilding")));
+                () -> norMemberService.updateMember(1L, memberEditDto));
 
         verify(norMemberRepository, times(1)).findById(1L);
     }
