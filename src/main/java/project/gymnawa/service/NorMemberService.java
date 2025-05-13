@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import project.gymnawa.domain.dto.normember.MemberEditDto;
 import project.gymnawa.domain.dto.normember.MemberSaveDto;
 import project.gymnawa.domain.etcfield.Address;
 import project.gymnawa.domain.entity.Member;
@@ -62,9 +63,15 @@ public class NorMemberService {
      * 일반 회원 정보 수정
      */
     @Transactional
-    public void updateMember(Long id, String password, String name, Address address) {
+    public void updateMember(long id, MemberEditDto memberEditDto) {
         NorMember norMember = norMemberRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
+
+        memberEditDto.setPassword(bCryptPasswordEncoder.encode(memberEditDto.getPassword()));
+
+        String password = memberEditDto.getPassword();
+        String name = memberEditDto.getName();
+        Address address = new Address(memberEditDto.getZoneCode(), memberEditDto.getAddress(), memberEditDto.getDetailAddress(), memberEditDto.getBuildingName());
 
         norMember.updateInfo(password, name, address);
     }
