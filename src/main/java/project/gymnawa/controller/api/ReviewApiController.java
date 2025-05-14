@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
 import project.gymnawa.domain.entity.NorMember;
 import project.gymnawa.domain.entity.Review;
-import project.gymnawa.domain.entity.Trainer;
 import project.gymnawa.domain.api.ApiResponse;
 import project.gymnawa.domain.dto.review.ReviewEditDto;
 import project.gymnawa.domain.dto.review.ReviewSaveDto;
@@ -19,10 +18,8 @@ import project.gymnawa.domain.dto.review.ReviewViewDto;
 import project.gymnawa.service.NorMemberService;
 import project.gymnawa.service.ReviewService;
 import project.gymnawa.service.TrainerService;
-import project.gymnawa.web.SessionConst;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -39,28 +36,24 @@ public class ReviewApiController {
      * 리뷰 추가
      */
     @PostMapping
-    public ResponseEntity<ApiResponse<Long>> addReview(@Validated @RequestBody ReviewSaveDto reviewSaveDto,
+    public ResponseEntity<ApiResponse<?>> addReview(@Validated @RequestBody ReviewSaveDto reviewSaveDto,
                                                         BindingResult bindingResult,
-                                                        @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails,
-                                                        @RequestParam("trainerId") Long trainerId) {
+                                                        @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
         Long userId = customOAuth2UserDetails.getMember().getId();
         NorMember loginedMember = norMemberService.findOne(userId);
 
         if (bindingResult.hasErrors()) {
             log.info("errors = " + bindingResult);
-            return ResponseEntity.badRequest().body(ApiResponse.error("리뷰를 작성해주세요."));
+            Map<String, String> errorMap = new HashMap<>();
+            bindingResult.getFieldErrors().forEach(error ->
+                    errorMap.put(error.getField(), error.getDefaultMessage())
+            );
+            return ResponseEntity.badRequest().body(ApiResponse.error("입력값 오류", errorMap));
         }
 
-        Trainer trainer = trainerService.findOne(trainerId);
 
-        Review review = Review.builder()
-                .norMember(loginedMember)
-                .trainer(trainer)
-                .content(reviewSaveDto.getContent())
-                .build();
-
-        Long savedId = reviewService.save(review);
+        Long savedId = reviewService.save(reviewSaveDto, loginedMember);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(savedId));
     }
