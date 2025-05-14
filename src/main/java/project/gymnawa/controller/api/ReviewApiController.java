@@ -21,11 +21,13 @@ import project.gymnawa.service.ReviewService;
 import project.gymnawa.service.TrainerService;
 import project.gymnawa.web.SessionConst;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @Slf4j
-@RequestMapping("/api/review")
+@RequestMapping("/api/reviews")
 @RequiredArgsConstructor
 public class ReviewApiController {
 
@@ -66,8 +68,8 @@ public class ReviewApiController {
     /**
      * 리뷰 수정
      */
-    @PostMapping("/{id}/edit")
-    public ResponseEntity<ApiResponse<ReviewViewDto>> reviewEdit(@PathVariable Long id,
+    @PatchMapping("/{id}")
+    public ResponseEntity<ApiResponse<?>> reviewEdit(@PathVariable Long id,
                                                                  @Validated @RequestBody ReviewEditDto reviewEditDto,
                                                                  BindingResult bindingResult,
                                                                  @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
@@ -77,7 +79,11 @@ public class ReviewApiController {
 
         if (bindingResult.hasErrors()) {
             log.info("errors = " + bindingResult);
-            return ResponseEntity.badRequest().body(ApiResponse.error("리뷰를 작성해주세요."));
+            Map<String, String> errorMap = new HashMap<>();
+            bindingResult.getFieldErrors().forEach(error ->
+                    errorMap.put(error.getField(), error.getDefaultMessage())
+            );
+            return ResponseEntity.badRequest().body(ApiResponse.error("입력값 오류", errorMap));
         }
 
         reviewService.updateReview(id, loginedMember, reviewEditDto.getContent());
