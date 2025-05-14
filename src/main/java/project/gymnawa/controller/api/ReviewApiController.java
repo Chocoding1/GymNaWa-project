@@ -38,7 +38,7 @@ public class ReviewApiController {
     /**
      * 리뷰 추가
      */
-    @PostMapping("/add")
+    @PostMapping
     public ResponseEntity<ApiResponse<Long>> addReview(@Validated @RequestBody ReviewSaveDto reviewSaveDto,
                                                         BindingResult bindingResult,
                                                         @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails,
@@ -98,7 +98,7 @@ public class ReviewApiController {
     /**
      * 리뷰 삭제
      */
-    @PostMapping("/{id}/delete")
+    @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<String>> reviewDelete(@PathVariable Long id,
                                                             @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
@@ -108,23 +108,6 @@ public class ReviewApiController {
         reviewService.deleteReview(id, loginedMember);
 
         return ResponseEntity.ok().body(ApiResponse.success("delete successful"));
-    }
-
-    /**
-     * 내가 쓴 리뷰 조회
-     */
-    @GetMapping("/n/list")
-    public ResponseEntity<ApiResponse<List<ReviewViewDto>>> findReviewsByMember(@AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
-
-        Long userId = customOAuth2UserDetails.getMember().getId();
-        NorMember loginedMember = norMemberService.findOne(userId);
-
-        List<ReviewViewDto> reviewViewDtos = reviewService.findByMember(loginedMember).stream()
-                .map(r -> new ReviewViewDto(r.getId(), loginedMember.getName(), r.getTrainer().getName(),
-                        r.getContent(), r.getCreatedDateTime(), r.getModifiedDateTime()))
-                .toList();
-
-        return ResponseEntity.ok().body(ApiResponse.success(reviewViewDtos));
     }
 
     private ReviewViewDto createReviewViewDto(Review review) {
