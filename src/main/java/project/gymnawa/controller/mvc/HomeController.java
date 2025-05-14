@@ -1,4 +1,4 @@
-package project.gymnawa.controller.view;
+package project.gymnawa.controller.mvc;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -1,4 +1,4 @@
-package project.gymnawa.controller.view;
+package project.gymnawa.controller.mvc;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;

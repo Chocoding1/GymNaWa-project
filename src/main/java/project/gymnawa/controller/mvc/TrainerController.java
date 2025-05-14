@@ -1,4 +1,4 @@
-package project.gymnawa.controller.view;
+package project.gymnawa.controller.mvc;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +10,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
-import project.gymnawa.domain.entity.NorMember;
 import project.gymnawa.domain.etcfield.Address;
 import project.gymnawa.domain.entity.Trainer;
 import project.gymnawa.domain.dto.trainer.TrainerEditDto;
@@ -18,7 +17,6 @@ import project.gymnawa.domain.dto.trainer.TrainerSaveDto;
 import project.gymnawa.domain.dto.trainer.TrainerViewDto;
 import project.gymnawa.service.EmailService;
 import project.gymnawa.service.TrainerService;
-import project.gymnawa.web.SessionConst;
 
 @Controller
 @RequestMapping("/member/t")

@@ -1,4 +1,4 @@
-package project.gymnawa.controller.view;
+package project.gymnawa.controller.mvc;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +17,6 @@ import project.gymnawa.domain.entity.Trainer;
 import project.gymnawa.service.NorMemberService;
 import project.gymnawa.service.PtMembershipService;
 import project.gymnawa.service.TrainerService;
-import project.gymnawa.web.SessionConst;
 
 import java.util.List;
 

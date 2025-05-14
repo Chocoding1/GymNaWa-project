@@ -1,4 +1,4 @@
-package project.gymnawa.controller.view;
+package project.gymnawa.controller.mvc;
 
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
