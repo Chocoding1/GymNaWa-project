@@ -3,6 +3,7 @@ package project.gymnawa.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import project.gymnawa.domain.dto.review.ReviewSaveDto;
 import project.gymnawa.domain.entity.NorMember;
 import project.gymnawa.domain.entity.Review;
 import project.gymnawa.domain.entity.Trainer;
@@ -17,13 +18,15 @@ import java.util.NoSuchElementException;
 public class ReviewService {
 
     private final ReviewRepository reviewRepository;
+    private final TrainerService trainerService;
 
     /**
      * 리뷰 저장
      */
     @Transactional
-    public Long save(Review review) {
-        reviewRepository.save(review);
+    public Long save(ReviewSaveDto reviewSaveDto, NorMember norMember) {
+        Trainer trainer = trainerService.findOne(reviewSaveDto.getTrainerId());
+        Review review = reviewRepository.save(reviewSaveDto.toEntity(norMember, trainer));
         return review.getId();
     }
 
