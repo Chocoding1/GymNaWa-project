@@ -34,7 +34,7 @@ public class ReissueServiceImpl implements ReissueService {
 
         log.info("refresh header : " + refreshToken);
 
-        // 쿠키에 refresh 토큰 x
+        // 헤더에 refresh 토큰 x
         if (refreshToken == null) {
             log.info("refresh token is null");
             return new ResponseEntity<>("refresh token is null", HttpStatus.BAD_REQUEST);
