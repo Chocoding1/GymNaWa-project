@@ -10,9 +10,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
+import project.gymnawa.domain.dto.ptmembership.PtMembershipViewDto;
 import project.gymnawa.domain.dto.review.ReviewViewDto;
-import project.gymnawa.domain.entity.Member;
-import project.gymnawa.domain.etcfield.Address;
 import project.gymnawa.domain.entity.NorMember;
 import project.gymnawa.domain.api.ApiResponse;
 import project.gymnawa.domain.dto.normember.MemberEditDto;
@@ -20,8 +19,8 @@ import project.gymnawa.domain.dto.normember.MemberSaveDto;
 import project.gymnawa.domain.dto.normember.MemberViewDto;
 import project.gymnawa.service.EmailService;
 import project.gymnawa.service.NorMemberService;
+import project.gymnawa.service.PtMembershipService;
 import project.gymnawa.service.ReviewService;
-import project.gymnawa.web.SessionConst;
 
 import java.util.HashMap;
 import java.util.List;
@@ -36,6 +35,7 @@ public class NorMemberApiController {
     private final NorMemberService norMemberService;
     private final EmailService emailService;
     private final ReviewService reviewService;
+    private final PtMembershipService ptMembershipService;
 
     /**
      * 회원가입
@@ -119,10 +119,15 @@ public class NorMemberApiController {
      * 내가 쓴 리뷰 조회
      */
     @GetMapping("/{id}/reviews")
-    public ResponseEntity<ApiResponse<List<ReviewViewDto>>> getReviewList(@AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
+    public ResponseEntity<ApiResponse<List<ReviewViewDto>>> getReviewList(@PathVariable Long id,
+                                                                          @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
         Long userId = customOAuth2UserDetails.getMember().getId();
         NorMember loginedMember = norMemberService.findOne(userId);
+
+        if (!loginedMember.getId().equals(id)) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("잘못된 접근입니다."));
+        }
 
         List<ReviewViewDto> reviewList = reviewService.findByMember(loginedMember).stream()
                 .map(r -> new ReviewViewDto(r.getId(), loginedMember.getName(), r.getTrainer().getName(),
@@ -132,21 +137,31 @@ public class NorMemberApiController {
         return ResponseEntity.ok().body(ApiResponse.success(reviewList));
     }
 
-    private static NorMember createNorMember(MemberSaveDto memberSaveDto) {
-        Address address = Address.builder()
-                .zoneCode(memberSaveDto.getZoneCode())
-                .address(memberSaveDto.getAddress())
-                .detailAddress(memberSaveDto.getDetailAddress())
-                .buildingName(memberSaveDto.getBuildingName())
-                .build();
+    /**
+     * 진행 중인 PT 조회
+     */
+    @GetMapping("/{id}/ptmemberships")
+    public ResponseEntity<ApiResponse<List<PtMembershipViewDto>>> getPtMembershipList(@PathVariable Long id,
+                                                                                      @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
-        return NorMember.builder()
-                .password(memberSaveDto.getPassword())
-                .name(memberSaveDto.getName())
-                .email(memberSaveDto.getEmail())
-                .gender(memberSaveDto.getGender())
-                .address(address)
-                .build();
+        Long userId = customOAuth2UserDetails.getMember().getId();
+        NorMember loginedMember = norMemberService.findOne(userId);
+
+        if (!loginedMember.getId().equals(id)) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("잘못된 접근입니다."));
+        }
+
+        List<PtMembershipViewDto> ptMembershipList = ptMembershipService.findByMember(loginedMember).stream()
+                .map(pms -> PtMembershipViewDto.builder()
+                        .memberName(loginedMember.getName())
+                        .trainerId(pms.getTrainer().getId())
+                        .trainerName(pms.getTrainer().getName())
+                        .initCount(pms.getInitCount())
+                        .remainCount(pms.getRemainPtCount())
+                        .build())
+                .toList();
+
+        return ResponseEntity.ok().body(ApiResponse.success(ptMembershipList));
     }
 
     private MemberViewDto createMemberViewDto(NorMember loginedMember) {
@@ -156,17 +171,6 @@ public class NorMemberApiController {
                 .email(loginedMember.getEmail())
                 .gender(loginedMember.getGender().getExp())
                 .address(loginedMember.getAddress())
-                .build();
-    }
-
-    private MemberEditDto createMemberEditDto(NorMember loginedMember) {
-        return MemberEditDto.builder()
-                .password(loginedMember.getPassword())
-                .name(loginedMember.getName())
-                .zoneCode(loginedMember.getAddress().getZoneCode())
-                .address(loginedMember.getAddress().getAddress())
-                .detailAddress(loginedMember.getAddress().getDetailAddress())
-                .buildingName(loginedMember.getAddress().getBuildingName())
                 .build();
     }
 }
