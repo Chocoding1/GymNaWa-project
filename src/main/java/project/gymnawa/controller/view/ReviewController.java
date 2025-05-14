@@ -84,7 +84,7 @@ public class ReviewController {
                 .trainer(trainerService.findOne(reviewSaveDto.getTrainerId()))
                 .build();
 
-        reviewService.save(review);
+        reviewService.save(reviewSaveDto, loginedMember);
 
         return "redirect:/review/n/list"; // 내가 쓴 리뷰 리스트로 redirect
     }

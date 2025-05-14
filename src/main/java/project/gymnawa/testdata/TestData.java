@@ -4,6 +4,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import project.gymnawa.domain.dto.normember.MemberSaveDto;
+import project.gymnawa.domain.dto.review.ReviewSaveDto;
 import project.gymnawa.domain.dto.trainer.TrainerSaveDto;
 import project.gymnawa.domain.entity.NorMember;
 import project.gymnawa.domain.entity.PtMembership;
@@ -32,11 +33,17 @@ public class TestData {
         Long trainerId = trainerService.join(trainerSaveDto);
         Trainer trainer = trainerService.findOne(trainerId);
 
-        Review review1 = createReview("운동 잘 가르치십니다:)", joinedMember, trainer);
-        reviewService.save(review1);
+        ReviewSaveDto reviewSaveDto1 = ReviewSaveDto.builder()
+                .content("운동 잘 가르치십니다:)")
+                .trainerId(trainerId)
+                .build();
+        reviewService.save(reviewSaveDto1, joinedMember);
 
-        Review review2 = createReview("친절하게 잘 가르져주세요ㅎㅎ", joinedMember, trainer);
-        reviewService.save(review2);
+        ReviewSaveDto reviewSaveDto2 = ReviewSaveDto.builder()
+                .content("친절하게 잘 가르져주세요ㅎㅎ")
+                .trainerId(trainerId)
+                .build();
+        reviewService.save(reviewSaveDto2, joinedMember);
 
         PtMembership ptMembership = createPtMembership(joinedMember, trainer, 10, 7, 490000);
         ptMembershipService.save(ptMembership);
