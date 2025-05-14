@@ -78,12 +78,6 @@ public class ReviewController {
             return "/review/reviewAddForm";
         }
 
-        Review review = Review.builder()
-                .content(reviewSaveDto.getContent())
-                .norMember(loginedMember)
-                .trainer(trainerService.findOne(reviewSaveDto.getTrainerId()))
-                .build();
-
         reviewService.save(reviewSaveDto, loginedMember);
 
         return "redirect:/review/n/list"; // 내가 쓴 리뷰 리스트로 redirect
