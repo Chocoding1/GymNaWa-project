@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import project.gymnawa.domain.dto.review.ReviewViewDto;
 import project.gymnawa.domain.etcfield.BaseTime;
 
 @Entity(name = "review")
@@ -37,5 +38,16 @@ public class Review extends BaseTime {
 
     public void updateContent(String content) {
         this.content = content;
+    }
+
+    public ReviewViewDto of() {
+        return ReviewViewDto.builder()
+                .id(id)
+                .content(content)
+                .memberName(norMember.getName())
+                .trainerName(trainer.getName())
+                .createdDateTime(this.getCreatedDateTime())
+                .modifiedDateTime(this.getModifiedDateTime())
+                .build();
     }
 }

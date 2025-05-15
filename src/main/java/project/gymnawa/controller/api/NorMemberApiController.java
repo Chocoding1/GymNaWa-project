@@ -17,6 +17,7 @@ import project.gymnawa.domain.api.ApiResponse;
 import project.gymnawa.domain.dto.normember.MemberEditDto;
 import project.gymnawa.domain.dto.normember.MemberSaveDto;
 import project.gymnawa.domain.dto.normember.MemberViewDto;
+import project.gymnawa.domain.entity.Review;
 import project.gymnawa.service.EmailService;
 import project.gymnawa.service.NorMemberService;
 import project.gymnawa.service.PtMembershipService;
@@ -130,8 +131,7 @@ public class NorMemberApiController {
         }
 
         List<ReviewViewDto> reviewList = reviewService.findByMember(loginedMember).stream()
-                .map(r -> new ReviewViewDto(r.getId(), loginedMember.getName(), r.getTrainer().getName(),
-                        r.getContent(), r.getCreatedDateTime(), r.getModifiedDateTime()))
+                .map(Review::of)
                 .toList();
 
         return ResponseEntity.ok().body(ApiResponse.success(reviewList));
