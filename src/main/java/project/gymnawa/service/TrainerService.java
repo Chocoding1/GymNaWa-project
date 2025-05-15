@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import project.gymnawa.domain.dto.trainer.TrainerEditDto;
 import project.gymnawa.domain.dto.trainer.TrainerSaveDto;
 import project.gymnawa.domain.entity.Member;
 import project.gymnawa.domain.entity.Trainer;
@@ -81,9 +82,14 @@ public class TrainerService {
      * 트레이너 정보 수정
      */
     @Transactional
-    public void updateTrainer(Long id, String password, String name, Address address) {
+    public void updateTrainer(Long id, TrainerEditDto trainerEditDto) {
         Trainer trainer = trainerRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 트레이너입니다."));
+
+        trainerEditDto.setPassword(bCryptPasswordEncoder.encode(trainerEditDto.getPassword()));
+        String password = trainerEditDto.getPassword();
+        String name = trainerEditDto.getName();
+        Address address = new Address(trainerEditDto.getZoneCode(), trainerEditDto.getAddress(), trainerEditDto.getDetailAddress(), trainerEditDto.getBuildingName());
 
         trainer.updateInfo(password, name, address);
     }
