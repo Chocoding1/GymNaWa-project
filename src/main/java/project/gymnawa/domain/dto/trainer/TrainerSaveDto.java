@@ -42,6 +42,8 @@ public class TrainerSaveDto {
 
     private Role role;
 
+    private String emailCode;
+
 
     public Trainer toEntity() {
         Address address = new Address(this.zoneCode, this.address, this.detailAddress, this.buildingName);

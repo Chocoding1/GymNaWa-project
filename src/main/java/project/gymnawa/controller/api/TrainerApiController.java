@@ -19,9 +19,12 @@ import project.gymnawa.service.EmailService;
 import project.gymnawa.service.TrainerService;
 import project.gymnawa.web.SessionConst;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/member/t")
+@RequestMapping("/api/trainers")
 @Slf4j
 public class TrainerApiController {
 
@@ -31,38 +34,24 @@ public class TrainerApiController {
     /**
      * 회원가입
      */
-    @GetMapping("/add")
-    public ResponseEntity<TrainerSaveDto> addForm() {
-        TrainerSaveDto trainerSaveDto = TrainerSaveDto.builder()
-                .password("")
-                .name("")
-                .email("")
-                .gender(Gender.MALE)
-                .zoneCode("")
-                .address("")
-                .detailAddress("")
-                .buildingName("")
-                .build();
-
-        return ResponseEntity.ok().body(trainerSaveDto);
-    }
-
-    /**
-     * 회원가입
-     */
-    @PostMapping("/add")
-    public ResponseEntity<ApiResponse<Long>> addTrainer(@Validated @RequestBody TrainerSaveDto trainerSaveDto,
+    @PostMapping
+    public ResponseEntity<ApiResponse<?>> addTrainer(@Validated @RequestBody TrainerSaveDto trainerSaveDto,
                                                           BindingResult bindingResult, HttpServletRequest request) {
 
         if (bindingResult.hasErrors()) {
             log.info("errors = " + bindingResult);
-            return ResponseEntity.badRequest().body(ApiResponse.error("입력값이 올바르지 않습니다."));
+            Map<String, String> errorMap = new HashMap<>();
+            bindingResult.getFieldErrors().forEach(error ->
+                    errorMap.put(error.getField(), error.getDefaultMessage())
+            );
+            return ResponseEntity.badRequest().body(ApiResponse.error("입력값 오류", errorMap));
         }
 
-        if (!emailService.isEmailVerified(trainerSaveDto.getEmail(), request.getParameter("code"))) {
+        if (!emailService.isEmailVerified(trainerSaveDto.getEmail(), trainerSaveDto.getEmailCode())) {
             log.info("code : " + request.getParameter("code"));
-            bindingResult.rejectValue("email", "verified", "이메일 인증이 필요합니다.");
-            return ResponseEntity.badRequest().body(ApiResponse.error("이메일 인증이 필요합니다."));
+            Map<String, String> errorMap = new HashMap<>();
+            errorMap.put("email", "이메일 인증이 필요합니다.");
+            return ResponseEntity.badRequest().body(ApiResponse.error("이메일 인증 오류", errorMap));
         }
 
         Long joinId = trainerService.join(trainerSaveDto);
