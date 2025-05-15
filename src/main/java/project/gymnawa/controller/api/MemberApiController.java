@@ -54,7 +54,6 @@ public class MemberApiController {
         Member loginedMember = memberService.findOne(userId);
 
         String name = loginedMember.getName();
-        log.info("name : " + name);
         boolean isTrainer;
         if (loginedMember instanceof NorMember) {
             isTrainer = false;
@@ -65,7 +64,7 @@ public class MemberApiController {
         MemberHomeInfoDto memberHomeInfoDto = MemberHomeInfoDto.builder()
                 .id(userId)
                 .name(name)
-                .isTrainer(isTrainer)
+                .trainer(isTrainer)
                 .build();
 
         return ResponseEntity.ok().body(ApiResponse.success(memberHomeInfoDto));
