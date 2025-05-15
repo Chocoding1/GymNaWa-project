@@ -5,21 +5,25 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import project.gymnawa.domain.etcfield.Address;
-import project.gymnawa.domain.etcfield.Gender;
+import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
+import project.gymnawa.domain.dto.ptmembership.PtMembershipViewDto;
+import project.gymnawa.domain.dto.review.ReviewViewDto;
 import project.gymnawa.domain.entity.Trainer;
 import project.gymnawa.domain.api.ApiResponse;
 import project.gymnawa.domain.dto.trainer.TrainerEditDto;
 import project.gymnawa.domain.dto.trainer.TrainerSaveDto;
 import project.gymnawa.domain.dto.trainer.TrainerViewDto;
 import project.gymnawa.service.EmailService;
+import project.gymnawa.service.PtMembershipService;
+import project.gymnawa.service.ReviewService;
 import project.gymnawa.service.TrainerService;
-import project.gymnawa.web.SessionConst;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -30,6 +34,8 @@ public class TrainerApiController {
 
     private final TrainerService trainerService;
     private final EmailService emailService;
+    private final ReviewService reviewService;
+    private final PtMembershipService ptMembershipService;
 
     /**
      * 회원가입
@@ -62,9 +68,12 @@ public class TrainerApiController {
     /**
      * 마이페이지
      */
-    @GetMapping("/{id}/mypage")
+    @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<TrainerViewDto>> myPage(@PathVariable Long id,
-                                                       @SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) Trainer loginedTrainer) {
+                                                              @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
+
+        Long userId = customOAuth2UserDetails.getMember().getId();
+        Trainer loginedTrainer = trainerService.findOne(userId);
 
         if (!loginedTrainer.getId().equals(id)) {
             return ResponseEntity.badRequest().body(ApiResponse.error("잘못된 접근입니다."));
@@ -78,27 +87,14 @@ public class TrainerApiController {
     /**
      * 회원 정보 수정
      */
-    @GetMapping("{id}/edit")
-    public ResponseEntity<ApiResponse<TrainerEditDto>> editForm(@PathVariable Long id,
-                                                                @SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) Trainer loginedTrainer) {
+    @PatchMapping("/{id}")
+    public ResponseEntity<ApiResponse<?>> editTrainer(@PathVariable Long id,
+                                                           @Validated @RequestBody TrainerEditDto trainerEditDto,
+                                                           BindingResult bindingResult,
+                                                           @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
-        if (!loginedTrainer.getId().equals(id)) {
-            return ResponseEntity.badRequest().body(ApiResponse.error("잘못된 접근입니다."));
-        }
-
-        TrainerEditDto trainerEditDto = createTrainerEditDto(loginedTrainer);
-
-        return ResponseEntity.ok().body(ApiResponse.success(trainerEditDto));
-    }
-
-    /**
-     * 회원 정보 수정
-     */
-    @PostMapping("/{id}/edit")
-    public ResponseEntity<ApiResponse<String>> editTrainer(@PathVariable Long id,
-                                                          @Validated @RequestBody TrainerEditDto trainerEditDto,
-                                                          BindingResult bindingResult,
-                                                           @SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) Trainer loginedTrainer) {
+        Long userId = customOAuth2UserDetails.getMember().getId();
+        Trainer loginedTrainer = trainerService.findOne(userId);
 
         if (!loginedTrainer.getId().equals(id)) {
             return ResponseEntity.badRequest().body(ApiResponse.error("잘못된 접근입니다."));
@@ -106,19 +102,66 @@ public class TrainerApiController {
 
         if (bindingResult.hasErrors()) {
             log.info("errors = " + bindingResult);
-            return ResponseEntity.badRequest().body(ApiResponse.error("입력값이 올바르지 않습니다."));
+            Map<String, String> errorMap = new HashMap<>();
+            bindingResult.getFieldErrors().forEach(error ->
+                    errorMap.put(error.getField(), error.getDefaultMessage())
+            );
+            return ResponseEntity.badRequest().body(ApiResponse.error("입력값 오류", errorMap));
         }
 
-        Address address = Address.builder()
-                .zoneCode(trainerEditDto.getZoneCode())
-                .address(trainerEditDto.getAddress())
-                .detailAddress(trainerEditDto.getDetailAddress())
-                .buildingName(trainerEditDto.getBuildingName())
-                .build();
-
-        trainerService.updateTrainer(id, trainerEditDto.getPassword(), trainerEditDto.getName(), address);
+        trainerService.updateTrainer(userId, trainerEditDto);
 
         return ResponseEntity.ok().body(ApiResponse.success("edit successful"));
+    }
+
+    /**
+     * 나에게 달린 리뷰 조회
+     */
+    @GetMapping("/{id}/reviews")
+    public ResponseEntity<ApiResponse<List<ReviewViewDto>>> getReviewList(@PathVariable Long id,
+                                                                          @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
+
+        Long userId = customOAuth2UserDetails.getMember().getId();
+        Trainer loginedTrainer = trainerService.findOne(userId);
+
+
+        if (!loginedTrainer.getId().equals(id)) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("잘못된 접근입니다."));
+        }
+
+        List<ReviewViewDto> reviewList = reviewService.findByTrainer(loginedTrainer).stream()
+                .map(r -> new ReviewViewDto(r.getId(), r.getNorMember().getName(), r.getTrainer().getName(),
+                        r.getContent(), r.getCreatedDateTime(), r.getModifiedDateTime()))
+                .toList();
+
+        return ResponseEntity.ok().body(ApiResponse.success(reviewList));
+    }
+
+    /**
+     * 진행 중인 PT 조회
+     */
+    @GetMapping("/{id}/ptmemberships")
+    public ResponseEntity<ApiResponse<List<PtMembershipViewDto>>> getPtMembershipList(@PathVariable Long id,
+                                                                                      @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
+
+        Long userId = customOAuth2UserDetails.getMember().getId();
+        Trainer loginedTrainer = trainerService.findOne(userId);
+
+        if (!loginedTrainer.getId().equals(id)) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("잘못된 접근입니다."));
+        }
+
+        List<PtMembershipViewDto> ptMembershipList = ptMembershipService.findByTrainer(loginedTrainer).stream()
+                .map(pms -> PtMembershipViewDto.builder()
+                        .memberName(pms.getNorMember().getName())
+                        .trainerId(pms.getTrainer().getId())
+                        .trainerName(loginedTrainer.getName())
+                        .initCount(pms.getInitCount())
+                        .remainCount(pms.getRemainPtCount())
+                        .build())
+                .toList();
+
+        return ResponseEntity.ok().body(ApiResponse.success(ptMembershipList));
     }
 
     private TrainerViewDto createTrainerViewDto(Trainer loginedTrainer) {

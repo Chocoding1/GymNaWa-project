@@ -10,7 +10,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
-import project.gymnawa.domain.etcfield.Address;
 import project.gymnawa.domain.entity.Trainer;
 import project.gymnawa.domain.dto.trainer.TrainerEditDto;
 import project.gymnawa.domain.dto.trainer.TrainerSaveDto;
@@ -122,9 +121,8 @@ public class TrainerController {
             log.info("errors = " + bindingResult);
             return "/trainer/editTrainerForm";
         }
-        Address address = new Address(trainerEditDto.getZoneCode(), trainerEditDto.getAddress(), trainerEditDto.getDetailAddress(), trainerEditDto.getBuildingName());
 
-        trainerService.updateTrainer(id, trainerEditDto.getPassword(), trainerEditDto.getName(), address);
+        trainerService.updateTrainer(id, trainerEditDto);
 
         return "redirect:/member/t/{id}/mypage";
     }
