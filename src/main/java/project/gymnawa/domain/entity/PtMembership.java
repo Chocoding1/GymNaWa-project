@@ -1,15 +1,15 @@
 package project.gymnawa.domain.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import project.gymnawa.domain.dto.ptmembership.PtMembershipViewDto;
 import project.gymnawa.domain.etcfield.BaseTime;
 
 @Entity(name = "pt_membership")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Builder
 public class PtMembership extends BaseTime {
 
     @Id
@@ -28,13 +28,13 @@ public class PtMembership extends BaseTime {
     private int remainPtCount;
     private int price;
 
-    @Builder
-    public PtMembership(Long id, NorMember norMember, Trainer trainer,int initCount, int remainPtCount, int price) {
-        this.id = id;
-        this.norMember = norMember;
-        this.trainer = trainer;
-        this.initCount = initCount;
-        this.remainPtCount = remainPtCount;
-        this.price = price;
+    public PtMembershipViewDto of() {
+        return PtMembershipViewDto.builder()
+                .memberName(norMember.getName())
+                .trainerId(trainer.getId())
+                .trainerName(trainer.getName())
+                .initCount(initCount)
+                .remainCount(remainPtCount)
+                .build();
     }
 }

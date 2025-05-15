@@ -2,7 +2,6 @@ package project.gymnawa.controller.api;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -20,12 +19,10 @@ import project.gymnawa.domain.dto.normember.MemberSaveDto;
 import project.gymnawa.domain.dto.trainer.TrainerSaveDto;
 import project.gymnawa.domain.entity.Member;
 import project.gymnawa.domain.api.ApiResponse;
-import project.gymnawa.domain.dto.member.MemberLoginDto;
 import project.gymnawa.domain.entity.NorMember;
 import project.gymnawa.service.MemberService;
 import project.gymnawa.service.NorMemberService;
 import project.gymnawa.service.TrainerService;
-import project.gymnawa.web.SessionConst;
 
 import java.util.HashMap;
 import java.util.Map;

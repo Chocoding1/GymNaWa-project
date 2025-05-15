@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
 import project.gymnawa.domain.dto.ptmembership.PtMembershipViewDto;
 import project.gymnawa.domain.dto.review.ReviewViewDto;
+import project.gymnawa.domain.entity.PtMembership;
+import project.gymnawa.domain.entity.Review;
 import project.gymnawa.domain.entity.Trainer;
 import project.gymnawa.domain.api.ApiResponse;
 import project.gymnawa.domain.dto.trainer.TrainerEditDto;
@@ -130,8 +132,7 @@ public class TrainerApiController {
         }
 
         List<ReviewViewDto> reviewList = reviewService.findByTrainer(loginedTrainer).stream()
-                .map(r -> new ReviewViewDto(r.getId(), r.getNorMember().getName(), r.getTrainer().getName(),
-                        r.getContent(), r.getCreatedDateTime(), r.getModifiedDateTime()))
+                .map(Review::of)
                 .toList();
 
         return ResponseEntity.ok().body(ApiResponse.success(reviewList));
@@ -152,13 +153,7 @@ public class TrainerApiController {
         }
 
         List<PtMembershipViewDto> ptMembershipList = ptMembershipService.findByTrainer(loginedTrainer).stream()
-                .map(pms -> PtMembershipViewDto.builder()
-                        .memberName(pms.getNorMember().getName())
-                        .trainerId(pms.getTrainer().getId())
-                        .trainerName(loginedTrainer.getName())
-                        .initCount(pms.getInitCount())
-                        .remainCount(pms.getRemainPtCount())
-                        .build())
+                .map(PtMembership::of)
                 .toList();
 
         return ResponseEntity.ok().body(ApiResponse.success(ptMembershipList));
@@ -171,17 +166,6 @@ public class TrainerApiController {
                 .email(loginedTrainer.getEmail())
                 .gender(loginedTrainer.getGender().getExp())
                 .address(loginedTrainer.getAddress())
-                .build();
-    }
-
-    private TrainerEditDto createTrainerEditDto(Trainer loginedTrainer) {
-        return TrainerEditDto.builder()
-                .password(loginedTrainer.getPassword())
-                .name(loginedTrainer.getName())
-                .zoneCode(loginedTrainer.getAddress().getZoneCode())
-                .address(loginedTrainer.getAddress().getAddress())
-                .detailAddress(loginedTrainer.getAddress().getDetailAddress())
-                .buildingName(loginedTrainer.getAddress().getBuildingName())
                 .build();
     }
 }

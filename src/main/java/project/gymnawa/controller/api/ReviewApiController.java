@@ -17,7 +17,6 @@ import project.gymnawa.domain.dto.review.ReviewSaveDto;
 import project.gymnawa.domain.dto.review.ReviewViewDto;
 import project.gymnawa.service.NorMemberService;
 import project.gymnawa.service.ReviewService;
-import project.gymnawa.service.TrainerService;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,7 +29,6 @@ public class ReviewApiController {
 
     private final ReviewService reviewService;
     private final NorMemberService norMemberService;
-    private final TrainerService trainerService;
 
     /**
      * 리뷰 추가

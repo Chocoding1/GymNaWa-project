@@ -17,6 +17,7 @@ import project.gymnawa.domain.api.ApiResponse;
 import project.gymnawa.domain.dto.normember.MemberEditDto;
 import project.gymnawa.domain.dto.normember.MemberSaveDto;
 import project.gymnawa.domain.dto.normember.MemberViewDto;
+import project.gymnawa.domain.entity.PtMembership;
 import project.gymnawa.domain.entity.Review;
 import project.gymnawa.service.EmailService;
 import project.gymnawa.service.NorMemberService;
@@ -152,13 +153,7 @@ public class NorMemberApiController {
         }
 
         List<PtMembershipViewDto> ptMembershipList = ptMembershipService.findByMember(loginedMember).stream()
-                .map(pms -> PtMembershipViewDto.builder()
-                        .memberName(loginedMember.getName())
-                        .trainerId(pms.getTrainer().getId())
-                        .trainerName(pms.getTrainer().getName())
-                        .initCount(pms.getInitCount())
-                        .remainCount(pms.getRemainPtCount())
-                        .build())
+                .map(PtMembership::of)
                 .toList();
 
         return ResponseEntity.ok().body(ApiResponse.success(ptMembershipList));
