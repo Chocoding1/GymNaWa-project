@@ -8,6 +8,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import project.gymnawa.domain.dto.normember.MemberEditDto;
+import project.gymnawa.domain.dto.normember.MemberSaveDto;
+import project.gymnawa.domain.dto.trainer.TrainerSaveDto;
 import project.gymnawa.domain.etcfield.Address;
 import project.gymnawa.domain.etcfield.Gender;
 import project.gymnawa.domain.entity.NorMember;
@@ -46,11 +48,18 @@ class NorMemberServiceTest {
                 .gender(Gender.MALE)
                 .build();
 
+        MemberSaveDto memberSaveDto = MemberSaveDto.builder()
+                .email("galmeagi2@naver.com")
+                .password("1234")
+                .name("조성진")
+                .gender(Gender.MALE)
+                .build();
+
         when(norMemberRepository.save(norMember)).thenReturn(norMember);
         when(memberRepository.findByEmail("galmeagi2@naver.com")).thenReturn(Optional.empty());
 
         //when
-        Long joinId = norMemberService.join(norMember);
+        Long joinId = norMemberService.join(memberSaveDto);
 
         //then
         assertThat(joinId).isEqualTo(norMember.getId());
@@ -67,13 +76,17 @@ class NorMemberServiceTest {
     void joinFail() {
         //given
         NorMember norMember = createNorMember("galmeagi2@naver.com", "aadfad", "조성진");
-        NorMember dupliMember = createNorMember("galmeagi2@naver.com", "aadfad", "조성진");
+        MemberSaveDto memberSaveDto = MemberSaveDto.builder()
+                .email("galmeagi2@naver.com")
+                .password("aadfad")
+                .name("조성진")
+                .build();
 
         when(memberRepository.findByEmail("galmeagi2@naver.com")).thenReturn(Optional.of(norMember));
 
         //when & then
         assertThrows(IllegalStateException.class,
-                () -> norMemberService.join(dupliMember));
+                () -> norMemberService.join(memberSaveDto));
         verify(memberRepository, times(1)).findByEmail("galmeagi2@naver.com");
     }
 

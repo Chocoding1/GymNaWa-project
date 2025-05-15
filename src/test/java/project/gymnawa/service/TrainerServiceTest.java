@@ -7,6 +7,9 @@ import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import project.gymnawa.domain.dto.normember.MemberEditDto;
+import project.gymnawa.domain.dto.trainer.TrainerEditDto;
+import project.gymnawa.domain.dto.trainer.TrainerSaveDto;
 import project.gymnawa.domain.entity.Trainer;
 import project.gymnawa.domain.etcfield.Address;
 import project.gymnawa.domain.etcfield.Gender;
@@ -39,12 +42,17 @@ class TrainerServiceTest {
     void joinSuccess() {
         //given
         Trainer trainer = createTrainer("galmeagi2@naver.com", "1234", "조성진");
+        TrainerSaveDto trainerSaveDto = TrainerSaveDto.builder()
+                .email("galmeagi2@naver.com")
+                .password("1234")
+                .name("조성진")
+                .build();
 
         when(trainerRepository.save(trainer)).thenReturn(trainer);
         when(memberRepository.findByEmail("galmeagi2@naver.com")).thenReturn(Optional.empty());
 
         //when
-        Long joinId = trainerService.join(trainer);
+        Long joinId = trainerService.join(trainerSaveDto);
 
         //then
         assertThat(joinId).isEqualTo(trainer.getId());
@@ -60,13 +68,17 @@ class TrainerServiceTest {
     void joinFail() {
         //given
         Trainer trainer = createTrainer("galmeagi2@naver.com", "aadfad", "조성진");
-        Trainer dupliTrainer = createTrainer("galmeagi2@naver.com", "aadfad", "조성진");
+        TrainerSaveDto trainerSaveDto = TrainerSaveDto.builder()
+                .email("galmeagi2@naver.com")
+                .password("aadfad")
+                .name("조성진")
+                .build();
 
         when(memberRepository.findByEmail("galmeagi2@naver.com")).thenReturn(Optional.of(trainer));
 
         //when & then
         assertThrows(IllegalStateException.class,
-                () -> trainerService.join(dupliTrainer));
+                () -> trainerService.join(trainerSaveDto));
         verify(memberRepository, times(1)).findByEmail("galmeagi2@naver.com");
     }
 
@@ -163,10 +175,19 @@ class TrainerServiceTest {
                 .gender(Gender.MALE)
                 .build();
 
+        TrainerEditDto trainerEditDto = TrainerEditDto.builder()
+                .password("newPw")
+                .name("newName")
+                .zoneCode("newZone")
+                .address("newAddress")
+                .detailAddress("newDetail")
+                .buildingName("newBuilding")
+                .build();
+
         when(trainerRepository.findById(1L)).thenReturn(Optional.of(trainer));
 
         //when
-        trainerService.updateTrainer(1L, "newPw", "newName", new Address("newZone", "newAddress", "newDetail", "newBuilding"));
+        trainerService.updateTrainer(1L, trainerEditDto);
 
         //then
         assertThat(trainer.getPassword()).isEqualTo("newPw");
@@ -182,9 +203,18 @@ class TrainerServiceTest {
         //given
         when(trainerRepository.findById(1L)).thenReturn(Optional.empty());
 
+        TrainerEditDto trainerEditDto = TrainerEditDto.builder()
+                .password("newPw")
+                .name("newName")
+                .zoneCode("newZone")
+                .address("newAddress")
+                .detailAddress("newDetail")
+                .buildingName("newBuilding")
+                .build();
+
         //when & then
         assertThrows(NoSuchElementException.class,
-                () -> trainerService.updateTrainer(1L, "newPw", "newName", new Address("newZone", "newAddress", "newDetail", "newBuilding")));
+                () -> trainerService.updateTrainer(1L, trainerEditDto));
 
         verify(trainerRepository, times(1)).findById(1L);
     }

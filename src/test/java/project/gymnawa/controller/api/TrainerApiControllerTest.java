@@ -73,7 +73,7 @@ class TrainerApiControllerTest {
                 "name", "email", Gender.MALE, "zoneCode", "address", "detailAddress", "buildingName");
 
         when(emailService.isEmailVerified(anyString(), anyString())).thenReturn(true);
-        when(trainerService.join(any(Trainer.class))).thenReturn(id);
+        when(trainerService.join(any(TrainerSaveDto.class))).thenReturn(id);
 
         //when
         ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/api/member/t/add")
@@ -89,7 +89,7 @@ class TrainerApiControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.email").value("email"));
 
         verify(emailService, times(1)).isEmailVerified(anyString(), anyString());
-        verify(trainerService, times(1)).join(any(Trainer.class));
+        verify(trainerService, times(1)).join(any(TrainerSaveDto.class));
     }
 
     @Test
@@ -215,7 +215,7 @@ class TrainerApiControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data").value("edit successful"));
 
-        verify(trainerService, times(1)).updateTrainer(eq(1L), eq(trainerEditDto.getPassword()), eq(trainerEditDto.getName()), any(Address.class));
+        verify(trainerService, times(1)).updateTrainer(eq(1L), eq(trainerEditDto));
     }
 
     @Test
@@ -242,7 +242,7 @@ class TrainerApiControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("입력값이 올바르지 않습니다."));
 
-        verify(trainerService, never()).updateTrainer(eq(1L), eq(trainerEditDto.getPassword()), eq(trainerEditDto.getName()), any(Address.class));
+        verify(trainerService, never()).updateTrainer(eq(1L), eq(trainerEditDto));
     }
 
     private TrainerSaveDto createTrainerSaveDto(String password, String name,
