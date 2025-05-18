@@ -1,8 +1,8 @@
 # GymNaWa-project
-Spring MVC , JPA 복습하며 만들어보는 사이드 프로젝트
 
 
 ## 헬스 트레이너 리뷰 서비스 - "짐나와"
+#### https://spectacular-taurus-e63.notion.site/Gymnawa-19530a2dedab802cacbbe1e4431007cd (노션 링크)
 ### 프로젝트 개요
 **<문제점>**
 - 트레이너별로 가르치는 실력의 편차가 심해 어떤 트레이너에게 PT를 받아야할 지 고민이고, 혹시라도 나와 맞지 않는 트레이너라면 곤란
@@ -39,6 +39,7 @@ Spring MVC , JPA 복습하며 만들어보는 사이드 프로젝트
 ---
 ### ERD
 <img width="90%" src="https://github.com/user-attachments/assets/ffa71708-a75e-4ea8-94fc-99c88930abff">
+
 
 ---
 ### 개발 진행 현황
@@ -294,7 +295,6 @@ Spring MVC , JPA 복습하며 만들어보는 사이드 프로젝트
 - 그리고 너무 다양한 기능들을 생각하다 보니 뭐부터 해야할 지 갈피를 못 잡는 상황도 생겼다.
 - 내가 처음에 생각한 문제점을 해결할 수 있는 최소한의 기능들을 정하고, 그것들을 먼저 구현해야겠다고 생각했다.
 - 그래서 우선 요구사항 정의와 상세 기술 구현 사항을 노션에 정리했다.
-  - https://spectacular-taurus-e63.notion.site/Gymnawa-19530a2dedab802cacbbe1e4431007cd
 - 이를 바탕으로 일단 최소 기능만 돌아가는 초기 버전을 완성해야겠다. (우선 공부가 목적이기 때문에 너무 완벽하게 하려고 하지 말자..!)
 ---
 ### To-Do-List
