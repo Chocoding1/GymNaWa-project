@@ -1,6 +1,7 @@
 package project.gymnawa.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.gymnawa.domain.entity.Member;
@@ -15,6 +16,7 @@ import java.util.NoSuchElementException;
 public class MemberService {
 
     private final MemberRepository memberRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     /**
      * 로그인
@@ -55,5 +57,12 @@ public class MemberService {
      */
     public void deleteOne(Long id) {
         memberRepository.deleteById(id);
+    }
+
+    /**
+     * 비밀번호 검증
+     */
+    public boolean verifyPassword(String rawPw, String encodedPw) {
+        return bCryptPasswordEncoder.matches(rawPw, encodedPw);
     }
 }
