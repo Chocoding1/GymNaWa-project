@@ -15,6 +15,7 @@ import project.gymnawa.auth.jwt.util.JwtUtil;
 import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
 import project.gymnawa.domain.dto.member.MemberHomeInfoDto;
 import project.gymnawa.domain.dto.member.MemberOauthInfoDto;
+import project.gymnawa.domain.dto.member.PasswordDto;
 import project.gymnawa.domain.dto.normember.MemberSaveDto;
 import project.gymnawa.domain.dto.trainer.TrainerSaveDto;
 import project.gymnawa.domain.entity.Member;
@@ -136,14 +137,20 @@ public class MemberApiController {
     /**
      * 회원 정보 수정 시, 비밀번호 확인
      */
-    @PostMapping("/verify-password")
-    public ResponseEntity<ApiResponse<?>> verifyPassword(@AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails,
-                                                         @RequestBody String password) {
+    @PostMapping("/{id}/verify-password")
+    public ResponseEntity<ApiResponse<String>> verifyPassword(@PathVariable Long id,
+                                                         @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails,
+                                                         @RequestBody PasswordDto passwordDto) {
 
         Long userId = customOAuth2UserDetails.getMember().getId();
         Member loginedMember = memberService.findOne(userId);
 
-        if (loginedMember.getPassword().equals(password)) {
+        // url 조작으로 다른 사용자 정보 접근 방지
+        if (!loginedMember.getId().equals(id)) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("잘못된 접근입니다."));
+        }
+
+        if (memberService.verifyPassword(passwordDto.getPassword(), loginedMember.getPassword())) {
             return ResponseEntity.ok().body(ApiResponse.success(null));
         } else {
             return ResponseEntity.ok().body(ApiResponse.error("비밀번호가 일치하지 않습니다."));
