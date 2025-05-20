@@ -30,7 +30,7 @@ public class KakaoService {
 
     private final RestTemplate restTemplate;
 
-    @Value("${rest.api.key}")
+    @Value("${kakao.rest.api.key}")
     private String restApiKey;
 
     private String baseUrl = "https://dapi.kakao.com/v2/local/search/keyword.json";

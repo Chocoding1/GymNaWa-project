@@ -19,7 +19,7 @@ import project.gymnawa.domain.entity.NorMember;
 import project.gymnawa.domain.entity.Trainer;
 import project.gymnawa.web.SessionConst;
 
-@WebMvcTest(HomeApiController.class)
+//@WebMvcTest(HomeApiController.class)
 @ExtendWith(MockitoExtension.class)
 class HomeApiControllerTest {
 
@@ -29,7 +29,7 @@ class HomeApiControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Value("${api.key}")
+    @Value("${kakao.api.key}")
     private String apiKey;
 
     private MockHttpSession session;

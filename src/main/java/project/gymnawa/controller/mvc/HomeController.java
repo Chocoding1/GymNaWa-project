@@ -19,7 +19,7 @@ public class HomeController {
 
     private final MemberService memberService;
 
-    @Value("${api.key}")
+    @Value("${kakao.api.key}")
     private String apiKey;
 
     @GetMapping("/")
