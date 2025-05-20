@@ -85,7 +85,7 @@ public class GymTrainerApiController {
      */
     @GetMapping("/{gymId}/trainers")
     public ResponseEntity<ApiResponse<List<GymTrainerViewDto>>> trainersByGym(@PathVariable String gymId) {
-        
+
         List<GymTrainer> trainers = gymTrainerService.findByGymAndContractStatus(gymId, ContractStatus.ACTIVE);
 
         List<GymTrainerViewDto> trainerViewDtos = trainers.stream()
