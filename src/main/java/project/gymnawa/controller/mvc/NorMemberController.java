@@ -137,7 +137,6 @@ public class NorMemberController {
 
     private MemberEditDto createMemberEditDto(NorMember norMember) {
         return MemberEditDto.builder()
-                .password(norMember.getPassword())
                 .name(norMember.getName())
                 .zoneCode(norMember.getAddress().getZoneCode())
                 .address(norMember.getAddress().getAddress())

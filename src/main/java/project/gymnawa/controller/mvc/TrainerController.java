@@ -93,7 +93,7 @@ public class TrainerController {
 
         Trainer trainer = trainerService.findOne(id);
 
-        TrainerEditDto trainerEditDto = new TrainerEditDto(trainer.getPassword(), trainer.getName(),
+        TrainerEditDto trainerEditDto = new TrainerEditDto(trainer.getName(),
                 trainer.getAddress().getZoneCode(), trainer.getAddress().getAddress(), trainer.getAddress().getDetailAddress(),
                 trainer.getAddress().getBuildingName());
 
