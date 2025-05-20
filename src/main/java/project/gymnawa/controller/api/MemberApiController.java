@@ -132,4 +132,21 @@ public class MemberApiController {
 
         return reissue;
     }
+
+    /**
+     * 회원 정보 수정 시, 비밀번호 확인
+     */
+    @PostMapping("/verify-password")
+    public ResponseEntity<ApiResponse<?>> verifyPassword(@AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails,
+                                                         @RequestBody String password) {
+
+        Long userId = customOAuth2UserDetails.getMember().getId();
+        Member loginedMember = memberService.findOne(userId);
+
+        if (loginedMember.getPassword().equals(password)) {
+            return ResponseEntity.ok().body(ApiResponse.success(null));
+        } else {
+            return ResponseEntity.ok().body(ApiResponse.error("비밀번호가 일치하지 않습니다."));
+        }
+    }
 }
