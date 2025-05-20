@@ -9,7 +9,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
-import project.gymnawa.domain.entity.NorMember;
 import project.gymnawa.domain.etcfield.ContractStatus;
 import project.gymnawa.domain.entity.GymTrainer;
 import project.gymnawa.domain.entity.Trainer;
@@ -19,7 +18,6 @@ import project.gymnawa.domain.dto.gymtrainer.GymTrainerResponseDto;
 import project.gymnawa.domain.dto.gymtrainer.GymTrainerViewDto;
 import project.gymnawa.service.GymTrainerService;
 import project.gymnawa.service.TrainerService;
-import project.gymnawa.web.SessionConst;
 
 import java.util.List;
 
@@ -86,8 +84,8 @@ public class GymTrainerApiController {
      * 헬스장 별 소속 트레이너 조회
      */
     @GetMapping("/{gymId}/trainers")
-    public ResponseEntity<ApiResponse<List<GymTrainerViewDto>>> trainersByGym(@PathVariable String gymId,
-                                                                              @RequestParam("placeName") String placeName) { // 응답으로 헬스장 이름도 전달할 예정
+    public ResponseEntity<ApiResponse<List<GymTrainerViewDto>>> trainersByGym(@PathVariable String gymId) {
+        
         List<GymTrainer> trainers = gymTrainerService.findByGymAndContractStatus(gymId, ContractStatus.ACTIVE);
 
         List<GymTrainerViewDto> trainerViewDtos = trainers.stream()
