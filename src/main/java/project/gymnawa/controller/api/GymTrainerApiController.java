@@ -4,9 +4,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
+import project.gymnawa.domain.entity.NorMember;
 import project.gymnawa.domain.etcfield.ContractStatus;
 import project.gymnawa.domain.entity.GymTrainer;
 import project.gymnawa.domain.entity.Trainer;
@@ -15,6 +18,7 @@ import project.gymnawa.domain.dto.gymtrainer.GymTrainerRequestDto;
 import project.gymnawa.domain.dto.gymtrainer.GymTrainerResponseDto;
 import project.gymnawa.domain.dto.gymtrainer.GymTrainerViewDto;
 import project.gymnawa.service.GymTrainerService;
+import project.gymnawa.service.TrainerService;
 import project.gymnawa.web.SessionConst;
 
 import java.util.List;
@@ -22,19 +26,22 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@RequestMapping("/api/gymtrainer")
+@RequestMapping("/api/gymtrainers")
 public class GymTrainerApiController {
 
     private final GymTrainerService gymTrainerService;
+    private final TrainerService trainerService;
 
     /**
      * 계약 정보 등록 (헬스장에 트레이너 등록)
      */
-    @PostMapping("/add")
+    @PostMapping
     public ResponseEntity<ApiResponse<GymTrainerResponseDto>> addGymTrainer(@Validated @RequestBody GymTrainerRequestDto gymTrainerRequestDto,
                                                                             BindingResult bindingResult,
-                                                                            // @SessionAttribute : 세션에 해당 키를 자기는 쌍이 없을 때, required가 true이면 오류 발생, false이면 null 반환
-                                                                            @SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) Trainer loginedTrainer) {
+                                                                            @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
+
+        Long userId = customOAuth2UserDetails.getMember().getId();
+        Trainer loginedTrainer = trainerService.findOne(userId);
 
         if (bindingResult.hasErrors()) {
             log.info("errors = " + bindingResult);
@@ -59,8 +66,12 @@ public class GymTrainerApiController {
      * 계약 정보 만료 (트레이너 계약 만료)
      */
     @PostMapping("/expire")
-    public ResponseEntity<ApiResponse<GymTrainerResponseDto>> expireGymTrainer(@SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) Trainer loginedTrainer,
+    public ResponseEntity<ApiResponse<GymTrainerResponseDto>> expireGymTrainer(@AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails,
                                                                                @RequestParam("gymId") String gymId) {
+
+        Long userId = customOAuth2UserDetails.getMember().getId();
+        Trainer loginedTrainer = trainerService.findOne(userId);
+
         List<GymTrainer> gymTrainers = gymTrainerService.findByGymIdAndTrainerAndContractStatus(gymId, loginedTrainer, ContractStatus.ACTIVE);
         // gymtrainer 안에 들어있는 trainer 객체는 프록시
 
