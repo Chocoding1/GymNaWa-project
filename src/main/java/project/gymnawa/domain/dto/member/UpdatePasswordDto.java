@@ -1,4 +1,4 @@
-package project.gymnawa.domain.dto.normember;
+package project.gymnawa.domain.dto.member;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
