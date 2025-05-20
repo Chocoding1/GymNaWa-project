@@ -25,7 +25,9 @@ public class GymTrainerController {
      */
 /*
     @GetMapping("/add")
-    public String contractAddForm(@SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) Trainer loginedTrainer) {
+    public String contractAddForm(
+    // @SessionAttribute : 세션에 해당 키를 자기는 쌍이 없을 때, required가 true이면 오류 발생, false이면 null 반환
+    @SessionAttribute(value = SessionConst.LOGIN_MEMBER, required = false) Trainer loginedTrainer) {
 
         if (loginedTrainer == null) {
             log.info("로그인 필요");
