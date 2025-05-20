@@ -10,8 +10,10 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
+import project.gymnawa.domain.dto.member.UpdatePasswordDto;
 import project.gymnawa.domain.dto.ptmembership.PtMembershipViewDto;
 import project.gymnawa.domain.dto.review.ReviewViewDto;
+import project.gymnawa.domain.entity.NorMember;
 import project.gymnawa.domain.entity.PtMembership;
 import project.gymnawa.domain.entity.Review;
 import project.gymnawa.domain.entity.Trainer;
@@ -114,6 +116,30 @@ public class TrainerApiController {
         trainerService.updateTrainer(userId, trainerEditDto);
 
         return ResponseEntity.ok().body(ApiResponse.success("edit successful"));
+    }
+
+    /**
+     * 비밀번호 변경
+     */
+    @PostMapping("/{id}/password")
+    public ResponseEntity<ApiResponse<?>> updatePassword(@PathVariable Long id,
+                                                         @RequestBody UpdatePasswordDto updatePasswordDto,
+                                                         @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
+
+        Long userId = customOAuth2UserDetails.getMember().getId();
+        Trainer loginedTrainer = trainerService.findOne(userId);
+
+        if (!loginedTrainer.getId().equals(id)) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("잘못된 접근입니다."));
+        }
+
+        log.info("curPw :" + updatePasswordDto.getCurrentPassword());
+        log.info("newPw :" + updatePasswordDto.getNewPassword());
+        log.info("confPw :" + updatePasswordDto.getConfirmPassword());
+
+        trainerService.changePassword(id, updatePasswordDto);
+
+        return ResponseEntity.ok().body(ApiResponse.success("change successful"));
     }
 
     /**
