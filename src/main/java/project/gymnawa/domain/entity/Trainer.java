@@ -27,7 +27,7 @@ public class Trainer extends Member {
      * 트레이너 정보 수정
      */
     @Override
-    public void updateInfo(String password, String name, Address address) {
-        super.updateInfo(password, name, address);
+    public void updateInfo( String name, Address address) {
+        super.updateInfo(name, address);
     }
 }

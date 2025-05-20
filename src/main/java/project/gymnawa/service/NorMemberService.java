@@ -1,24 +1,25 @@
 package project.gymnawa.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.gymnawa.domain.dto.normember.MemberEditDto;
 import project.gymnawa.domain.dto.normember.MemberSaveDto;
+import project.gymnawa.domain.dto.member.UpdatePasswordDto;
 import project.gymnawa.domain.etcfield.Address;
-import project.gymnawa.domain.entity.Member;
 import project.gymnawa.domain.entity.NorMember;
 import project.gymnawa.domain.etcfield.Role;
 import project.gymnawa.repository.MemberRepository;
 import project.gymnawa.repository.NorMemberRepository;
 
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j
 public class NorMemberService {
 
     private final NorMemberRepository norMemberRepository;
@@ -67,13 +68,32 @@ public class NorMemberService {
         NorMember norMember = norMemberRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
 
-        memberEditDto.setPassword(bCryptPasswordEncoder.encode(memberEditDto.getPassword()));
-
-        String password = memberEditDto.getPassword();
         String name = memberEditDto.getName();
         Address address = new Address(memberEditDto.getZoneCode(), memberEditDto.getAddress(), memberEditDto.getDetailAddress(), memberEditDto.getBuildingName());
 
-        norMember.updateInfo(password, name, address);
+        norMember.updateInfo(name, address);
+    }
+
+    /**
+     * 비밀번호 수정
+     */
+    @Transactional
+    public void changePassword(Long id, UpdatePasswordDto updatePasswordDto) {
+        NorMember norMember = norMemberRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
+
+        // 현재 비밀번호 일치 확인
+        if (!bCryptPasswordEncoder.matches(updatePasswordDto.getCurrentPassword(), norMember.getPassword())) {
+            throw new IllegalArgumentException("현재 비밀번호가 일치하지 않습니다.");
+        }
+
+        // 새 비밀번호 일치 확인
+        if (!updatePasswordDto.getNewPassword().equals(updatePasswordDto.getConfirmPassword())) {
+            throw new IllegalArgumentException("새 비밀번호가 서로 일치하지 않습니다.");
+        }
+
+        String newPassword = bCryptPasswordEncoder.encode(updatePasswordDto.getNewPassword());
+        norMember.changePassword(newPassword);
     }
 
     /**

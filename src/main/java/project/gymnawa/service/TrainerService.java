@@ -4,9 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import project.gymnawa.domain.dto.member.UpdatePasswordDto;
 import project.gymnawa.domain.dto.trainer.TrainerEditDto;
 import project.gymnawa.domain.dto.trainer.TrainerSaveDto;
 import project.gymnawa.domain.entity.Member;
+import project.gymnawa.domain.entity.NorMember;
 import project.gymnawa.domain.entity.Trainer;
 import project.gymnawa.domain.etcfield.Address;
 import project.gymnawa.domain.etcfield.Role;
@@ -86,12 +88,32 @@ public class TrainerService {
         Trainer trainer = trainerRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 트레이너입니다."));
 
-        trainerEditDto.setPassword(bCryptPasswordEncoder.encode(trainerEditDto.getPassword()));
-        String password = trainerEditDto.getPassword();
         String name = trainerEditDto.getName();
         Address address = new Address(trainerEditDto.getZoneCode(), trainerEditDto.getAddress(), trainerEditDto.getDetailAddress(), trainerEditDto.getBuildingName());
 
-        trainer.updateInfo(password, name, address);
+        trainer.updateInfo(name, address);
+    }
+
+    /**
+     * 비밀번호 수정
+     */
+    @Transactional
+    public void changePassword(Long id, UpdatePasswordDto updatePasswordDto) {
+        Trainer trainer = trainerRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
+
+        // 현재 비밀번호 일치 확인
+        if (!bCryptPasswordEncoder.matches(updatePasswordDto.getCurrentPassword(), trainer.getPassword())) {
+            throw new IllegalArgumentException("현재 비밀번호가 일치하지 않습니다.");
+        }
+
+        // 새 비밀번호 일치 확인
+        if (!updatePasswordDto.getNewPassword().equals(updatePasswordDto.getConfirmPassword())) {
+            throw new IllegalArgumentException("새 비밀번호가 서로 일치하지 않습니다.");
+        }
+
+        String newPassword = bCryptPasswordEncoder.encode(updatePasswordDto.getNewPassword());
+        trainer.changePassword(newPassword);
     }
 
     /**
