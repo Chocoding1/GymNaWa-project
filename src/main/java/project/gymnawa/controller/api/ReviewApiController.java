@@ -53,7 +53,7 @@ public class ReviewApiController {
 
         Long savedId = reviewService.save(reviewSaveDto, loginedMember);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(savedId));
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.of("리뷰 등록 성공", savedId));
     }
 
     /**
@@ -83,7 +83,7 @@ public class ReviewApiController {
 
         ReviewViewDto reviewViewDto = createReviewViewDto(review);
 
-        return ResponseEntity.ok().body(ApiResponse.success(reviewViewDto));
+        return ResponseEntity.ok().body(ApiResponse.of("리뷰 수정 성공", reviewViewDto));
     }
 
     /**
@@ -98,7 +98,7 @@ public class ReviewApiController {
 
         reviewService.deleteReview(id, loginedMember);
 
-        return ResponseEntity.ok().body(ApiResponse.success("delete successful"));
+        return ResponseEntity.ok().body(ApiResponse.of("리뷰 삭제 성공"));
     }
 
     private ReviewViewDto createReviewViewDto(Review review) {

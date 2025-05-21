@@ -13,7 +13,6 @@ import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
 import project.gymnawa.domain.dto.member.UpdatePasswordDto;
 import project.gymnawa.domain.dto.ptmembership.PtMembershipViewDto;
 import project.gymnawa.domain.dto.review.ReviewViewDto;
-import project.gymnawa.domain.entity.NorMember;
 import project.gymnawa.domain.entity.PtMembership;
 import project.gymnawa.domain.entity.Review;
 import project.gymnawa.domain.entity.Trainer;
@@ -66,7 +65,7 @@ public class TrainerApiController {
 
         Long joinId = trainerService.join(trainerSaveDto);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(joinId));
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.of("회원가입 성공", joinId));
     }
 
     /**
@@ -85,7 +84,7 @@ public class TrainerApiController {
 
         TrainerViewDto trainerViewDto = createTrainerViewDto(loginedTrainer);
 
-        return ResponseEntity.ok().body(ApiResponse.success(trainerViewDto));
+        return ResponseEntity.ok().body(ApiResponse.of("회원 정보 조회 성공", trainerViewDto));
     }
 
     /**
@@ -115,7 +114,7 @@ public class TrainerApiController {
 
         trainerService.updateTrainer(userId, trainerEditDto);
 
-        return ResponseEntity.ok().body(ApiResponse.success("edit successful"));
+        return ResponseEntity.ok().body(ApiResponse.of("회원 정보 수정 성공"));
     }
 
     /**
@@ -139,7 +138,7 @@ public class TrainerApiController {
 
         trainerService.changePassword(id, updatePasswordDto);
 
-        return ResponseEntity.ok().body(ApiResponse.success("change successful"));
+        return ResponseEntity.ok().body(ApiResponse.of("비밀번호 변경 성공"));
     }
 
     /**
@@ -161,7 +160,7 @@ public class TrainerApiController {
                 .map(Review::of)
                 .toList();
 
-        return ResponseEntity.ok().body(ApiResponse.success(reviewList));
+        return ResponseEntity.ok().body(ApiResponse.of("리뷰 조회 성공", reviewList));
     }
 
     /**
@@ -182,7 +181,7 @@ public class TrainerApiController {
                 .map(PtMembership::of)
                 .toList();
 
-        return ResponseEntity.ok().body(ApiResponse.success(ptMembershipList));
+        return ResponseEntity.ok().body(ApiResponse.of("PT 조회 성공", ptMembershipList));
     }
 
     private TrainerViewDto createTrainerViewDto(Trainer loginedTrainer) {

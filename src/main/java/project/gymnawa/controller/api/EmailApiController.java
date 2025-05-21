@@ -29,7 +29,7 @@ public class EmailApiController {
         emailService.sendMail(emailDto.getEmail());
         response.put("success", true);
 
-        return ResponseEntity.ok().body(ApiResponse.success(response));
+        return ResponseEntity.ok().body(ApiResponse.of("이메일 전송 성공", response));
     }
 
     @PostMapping("verify-code")
@@ -43,6 +43,6 @@ public class EmailApiController {
             response.put("message", "인증코드가 올바르지 않습니다.");
         }
 
-        return ResponseEntity.ok().body(ApiResponse.success(response));
+        return ResponseEntity.ok().body(ApiResponse.of("이메일 인증 성공", response));
     }
 }

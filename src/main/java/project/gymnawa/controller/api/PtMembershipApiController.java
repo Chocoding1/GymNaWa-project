@@ -51,6 +51,6 @@ public class PtMembershipApiController {
 
         Long ptMembershipId = ptMembershipService.save(ptMembership);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(ptMembershipId));
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.of("PT 등록 성공", ptMembershipId));
     }
 }

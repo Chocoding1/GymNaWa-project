@@ -57,7 +57,7 @@ public class GymTrainerApiController {
 
         GymTrainerResponseDto gymTrainerResponseDto = createGymTrainerResponseDto(gymTrainer);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(gymTrainerResponseDto));
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.of("트레이너 등록 성공", gymTrainerResponseDto));
     }
 
     /**
@@ -77,7 +77,7 @@ public class GymTrainerApiController {
 
         GymTrainerResponseDto gymTrainerResponseDto = createGymTrainerResponseDto(gymTrainers.get(0));
 
-        return ResponseEntity.ok().body(ApiResponse.success(gymTrainerResponseDto));
+        return ResponseEntity.ok().body(ApiResponse.of("계약 만료 처리 성공", gymTrainerResponseDto));
     }
 
     /**
@@ -97,7 +97,7 @@ public class GymTrainerApiController {
                                 .build())
                 .toList();
 
-        return ResponseEntity.ok().body(ApiResponse.success(trainerViewDtos));
+        return ResponseEntity.ok().body(ApiResponse.of("트레이너 조회 성공", trainerViewDtos));
     }
 
     private static GymTrainer createGymTrainer(GymTrainerRequestDto gymTrainerRequestDto, Trainer trainer) {

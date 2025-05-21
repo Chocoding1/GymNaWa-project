@@ -65,7 +65,7 @@ public class NorMemberApiController {
 
         Long joinId = norMemberService.join(memberSaveDto);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(joinId));
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.of("회원가입 성공", joinId));
     }
 
     /**
@@ -85,7 +85,7 @@ public class NorMemberApiController {
 
         MemberViewDto memberViewDto = createMemberViewDto(loginedMember);
 
-        return ResponseEntity.ok().body(ApiResponse.success(memberViewDto));
+        return ResponseEntity.ok().body(ApiResponse.of("회원 조회 성공", memberViewDto));
     }
 
     /**
@@ -115,7 +115,7 @@ public class NorMemberApiController {
 
         norMemberService.updateMember(userId, memberEditDto);
 
-        return ResponseEntity.ok().body(ApiResponse.success("edit successful"));
+        return ResponseEntity.ok().body(ApiResponse.of("회원 정보 수정 성공"));
     }
 
     /**
@@ -139,7 +139,7 @@ public class NorMemberApiController {
 
         norMemberService.changePassword(id, updatePasswordDto);
 
-        return ResponseEntity.ok().body(ApiResponse.success("change successful"));
+        return ResponseEntity.ok().body(ApiResponse.of("비밀번호 변경 성공"));
     }
 
     /**
@@ -160,7 +160,7 @@ public class NorMemberApiController {
                 .map(Review::of)
                 .toList();
 
-        return ResponseEntity.ok().body(ApiResponse.success(reviewList));
+        return ResponseEntity.ok().body(ApiResponse.of("리뷰 조회 성공", reviewList));
     }
 
     /**
@@ -181,7 +181,7 @@ public class NorMemberApiController {
                 .map(PtMembership::of)
                 .toList();
 
-        return ResponseEntity.ok().body(ApiResponse.success(ptMembershipList));
+        return ResponseEntity.ok().body(ApiResponse.of("진행 중인 PT 조회 성공", ptMembershipList));
     }
 
     private MemberViewDto createMemberViewDto(NorMember loginedMember) {

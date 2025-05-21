@@ -65,7 +65,7 @@ public class MemberApiController {
                 .trainer(isTrainer)
                 .build();
 
-        return ResponseEntity.ok().body(ApiResponse.success(memberHomeInfoDto));
+        return ResponseEntity.ok().body(ApiResponse.of("회원 조회 성공", memberHomeInfoDto));
     }
 
     /**
@@ -151,7 +151,7 @@ public class MemberApiController {
         }
 
         if (memberService.verifyPassword(passwordDto.getPassword(), loginedMember.getPassword())) {
-            return ResponseEntity.ok().body(ApiResponse.success(null));
+            return ResponseEntity.ok().body(ApiResponse.of("비밀번호 검증 성공"));
         } else {
             return ResponseEntity.ok().body(ApiResponse.error("비밀번호가 일치하지 않습니다."));
         }

@@ -38,6 +38,6 @@ public class GymApiController {
             return ResponseEntity.badRequest().body(ApiResponse.error("검색 결과가 없습니다."));
         }
 
-        return ResponseEntity.ok().body(ApiResponse.success(result));
+        return ResponseEntity.ok().body(ApiResponse.of("헬스장 조회 성공", result));
     }
 }
