@@ -1,4 +1,4 @@
-package project.gymnawa.except.handler;
+package project.gymnawa.errors.handler;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
