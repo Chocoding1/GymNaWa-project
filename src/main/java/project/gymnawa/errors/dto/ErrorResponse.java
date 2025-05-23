@@ -1,19 +1,25 @@
-package project.gymnawa.except.dto;
+package project.gymnawa.errors.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import org.springframework.http.ResponseEntity;
+
+import java.util.Map;
 
 @Data
 @Builder
 @AllArgsConstructor
 public class ErrorResponse {
 
-    private String code;
-    private String message;
+    private String errorCode;
+    private String errorMessage;
+    private Map<String, String> errors;
 
-    public static ErrorResponse of(String code, String message) {
-        return new ErrorResponse(code, message);
+    public static ErrorResponse of(String errorCode, String errorMessage) {
+        return new ErrorResponse(errorCode, errorMessage, null);
+    }
+
+    public static ErrorResponse of(String errorCode, String errorMessage, Map<String, String> errors) {
+        return new ErrorResponse(errorCode, errorMessage, errors);
     }
 }
