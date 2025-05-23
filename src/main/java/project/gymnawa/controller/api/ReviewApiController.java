@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
@@ -15,11 +14,12 @@ import project.gymnawa.domain.api.ApiResponse;
 import project.gymnawa.domain.dto.review.ReviewEditDto;
 import project.gymnawa.domain.dto.review.ReviewSaveDto;
 import project.gymnawa.domain.dto.review.ReviewViewDto;
+import project.gymnawa.domain.entity.Trainer;
 import project.gymnawa.service.NorMemberService;
 import project.gymnawa.service.ReviewService;
+import project.gymnawa.service.TrainerService;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 @RestController
 @Slf4j
@@ -29,27 +29,17 @@ public class ReviewApiController {
 
     private final ReviewService reviewService;
     private final NorMemberService norMemberService;
+    private final TrainerService trainerService;
 
     /**
      * 리뷰 추가
      */
     @PostMapping
     public ResponseEntity<ApiResponse<?>> addReview(@Validated @RequestBody ReviewSaveDto reviewSaveDto,
-                                                        BindingResult bindingResult,
                                                         @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
         Long userId = customOAuth2UserDetails.getMember().getId();
         NorMember loginedMember = norMemberService.findOne(userId);
-
-        if (bindingResult.hasErrors()) {
-            log.info("errors = " + bindingResult);
-            Map<String, String> errorMap = new HashMap<>();
-            bindingResult.getFieldErrors().forEach(error ->
-                    errorMap.put(error.getField(), error.getDefaultMessage())
-            );
-            return ResponseEntity.badRequest().body(ApiResponse.error("입력값 오류", errorMap));
-        }
-
 
         Long savedId = reviewService.save(reviewSaveDto, loginedMember);
 
@@ -62,20 +52,10 @@ public class ReviewApiController {
     @PatchMapping("/{id}")
     public ResponseEntity<ApiResponse<?>> reviewEdit(@PathVariable Long id,
                                                                  @Validated @RequestBody ReviewEditDto reviewEditDto,
-                                                                 BindingResult bindingResult,
                                                                  @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
         Long userId = customOAuth2UserDetails.getMember().getId();
         NorMember loginedMember = norMemberService.findOne(userId);
-
-        if (bindingResult.hasErrors()) {
-            log.info("errors = " + bindingResult);
-            Map<String, String> errorMap = new HashMap<>();
-            bindingResult.getFieldErrors().forEach(error ->
-                    errorMap.put(error.getField(), error.getDefaultMessage())
-            );
-            return ResponseEntity.badRequest().body(ApiResponse.error("입력값 오류", errorMap));
-        }
 
         reviewService.updateReview(id, loginedMember, reviewEditDto.getContent());
 
@@ -99,6 +79,21 @@ public class ReviewApiController {
         reviewService.deleteReview(id, loginedMember);
 
         return ResponseEntity.ok().body(ApiResponse.of("리뷰 삭제 성공"));
+    }
+
+    /**
+     * 트레이너별 리뷰 조회
+     */
+    @GetMapping("/{trainerId}")
+    public ResponseEntity<ApiResponse<List<ReviewViewDto>>> getReviewList(@PathVariable Long trainerId) {
+
+        Trainer trainer = trainerService.findOne(trainerId);
+
+        List<ReviewViewDto> reviewList = reviewService.findByTrainer(trainer).stream()
+                .map(Review::of)
+                .toList();
+
+        return ResponseEntity.ok().body(ApiResponse.of("리뷰 조회 성공", reviewList));
     }
 
     private ReviewViewDto createReviewViewDto(Review review) {

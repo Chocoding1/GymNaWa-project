@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import project.gymnawa.auth.jwt.service.ReissueServiceImpl;
@@ -21,12 +20,12 @@ import project.gymnawa.domain.dto.trainer.TrainerSaveDto;
 import project.gymnawa.domain.entity.Member;
 import project.gymnawa.domain.api.ApiResponse;
 import project.gymnawa.domain.entity.NorMember;
+import project.gymnawa.errors.exception.CustomException;
 import project.gymnawa.service.MemberService;
 import project.gymnawa.service.NorMemberService;
 import project.gymnawa.service.TrainerService;
 
-import java.util.HashMap;
-import java.util.Map;
+import static project.gymnawa.errors.dto.ErrorCode.*;
 
 @Controller
 @RequiredArgsConstructor
@@ -72,7 +71,7 @@ public class MemberApiController {
      * 추가 정보 입력
      */
     @PostMapping("/add-info")
-    public ResponseEntity<?> addInfo(@RequestBody @Validated MemberOauthInfoDto memberOauthInfoDto, BindingResult bindingResult,
+    public ResponseEntity<?> addInfo(@RequestBody @Validated MemberOauthInfoDto memberOauthInfoDto,
                           HttpServletRequest request, HttpServletResponse response) {
 
         /**
@@ -82,16 +81,6 @@ public class MemberApiController {
         String refreshToken = request.getHeader("Authorization-Refresh");
         Long userId = jwtUtil.getId(refreshToken);
         Member guestMember = memberService.findOne(userId);
-
-
-        if (bindingResult.hasErrors()) {
-            log.info("errors = " + bindingResult);
-            Map<String, String> errorMap = new HashMap<>();
-            bindingResult.getFieldErrors().forEach(error ->
-                    errorMap.put(error.getField(), error.getDefaultMessage())
-            );
-            return ResponseEntity.badRequest().body(ApiResponse.error("입력값 오류", errorMap));
-        }
 
         // 기존 회원의 타입을 바꿀 수 없어서(@DiscriminatorColumn 사용했기 때문) 게스트 회원 지우고 새롭게 회원 객체 다시 생성
         Long newJoinId;
@@ -147,13 +136,13 @@ public class MemberApiController {
 
         // url 조작으로 다른 사용자 정보 접근 방지
         if (!loginedMember.getId().equals(id)) {
-            return ResponseEntity.badRequest().body(ApiResponse.error("잘못된 접근입니다."));
+            throw new CustomException(ACCESS_DENIED);
         }
 
         if (memberService.verifyPassword(passwordDto.getPassword(), loginedMember.getPassword())) {
             return ResponseEntity.ok().body(ApiResponse.of("비밀번호 검증 성공"));
         } else {
-            return ResponseEntity.ok().body(ApiResponse.error("비밀번호가 일치하지 않습니다."));
+            throw new CustomException(INVALID_PASSWORD);
         }
     }
 }

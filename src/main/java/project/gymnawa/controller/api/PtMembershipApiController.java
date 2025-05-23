@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
@@ -34,16 +33,10 @@ public class PtMembershipApiController {
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<Long>> registerPt(
             @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails,
-            @Validated @RequestBody PtMembershipSaveDto ptMembershipSaveDto,
-            BindingResult bindingResult) {
+            @Validated @RequestBody PtMembershipSaveDto ptMembershipSaveDto) {
 
         Long userId = customOAuth2UserDetails.getMember().getId();
         NorMember loginedMember = norMemberService.findOne(userId);
-
-        if (bindingResult.hasErrors()) {
-            log.info("errors = " + bindingResult);
-            return ResponseEntity.badRequest().body(ApiResponse.error("필수 입력사항을 모두 입력해주세요."));
-        }
 
         Trainer trainer = trainerService.findOne(ptMembershipSaveDto.getTrainerId());
 

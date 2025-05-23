@@ -12,12 +12,12 @@ import project.gymnawa.domain.etcfield.Gender;
 @Builder
 public class MemberOauthInfoDto {
 
-    @NotNull
+    @NotNull(message = "성별은 필수입니다.")
     private Gender gender;
 
-    @NotBlank
+    @NotBlank(message = "주소는 필수입니다.")
     private String zoneCode;
-    @NotBlank
+    @NotBlank(message = "주소는 필수입니다.")
     private String address;
     private String detailAddress;
     private String buildingName;

@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
@@ -16,10 +15,13 @@ import project.gymnawa.domain.api.ApiResponse;
 import project.gymnawa.domain.dto.gymtrainer.GymTrainerRequestDto;
 import project.gymnawa.domain.dto.gymtrainer.GymTrainerResponseDto;
 import project.gymnawa.domain.dto.gymtrainer.GymTrainerViewDto;
+import project.gymnawa.errors.exception.CustomException;
 import project.gymnawa.service.GymTrainerService;
 import project.gymnawa.service.TrainerService;
 
 import java.util.List;
+
+import static project.gymnawa.errors.dto.ErrorCode.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -35,20 +37,14 @@ public class GymTrainerApiController {
      */
     @PostMapping
     public ResponseEntity<ApiResponse<GymTrainerResponseDto>> addGymTrainer(@Validated @RequestBody GymTrainerRequestDto gymTrainerRequestDto,
-                                                                            BindingResult bindingResult,
                                                                             @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
         Long userId = customOAuth2UserDetails.getMember().getId();
         Trainer loginedTrainer = trainerService.findOne(userId);
 
-        if (bindingResult.hasErrors()) {
-            log.info("errors = " + bindingResult);
-            return ResponseEntity.badRequest().body(ApiResponse.error("입력값이 올바르지 않습니다."));
-        }
-
         //이미 해당 헬스장에 계약되어 있으면 에러
         if (!gymTrainerService.findByGymIdAndTrainerAndContractStatus(gymTrainerRequestDto.getGymId(), loginedTrainer, ContractStatus.ACTIVE).isEmpty()) {
-            return ResponseEntity.badRequest().body(ApiResponse.error("이미 계약되어 있습니다."));
+            throw new CustomException(DUPLICATE_CONTRACT);
         }
 
         GymTrainer gymTrainer = createGymTrainer(gymTrainerRequestDto, loginedTrainer); // 원본 트레이너 객체로 gymtrainer 객체 생성

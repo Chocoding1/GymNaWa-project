@@ -1,12 +1,10 @@
 package project.gymnawa.controller.api;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
@@ -20,14 +18,15 @@ import project.gymnawa.domain.dto.normember.MemberSaveDto;
 import project.gymnawa.domain.dto.normember.MemberViewDto;
 import project.gymnawa.domain.entity.PtMembership;
 import project.gymnawa.domain.entity.Review;
+import project.gymnawa.errors.exception.CustomException;
 import project.gymnawa.service.EmailService;
 import project.gymnawa.service.NorMemberService;
 import project.gymnawa.service.PtMembershipService;
 import project.gymnawa.service.ReviewService;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import static project.gymnawa.errors.dto.ErrorCode.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -44,23 +43,11 @@ public class NorMemberApiController {
      * 회원가입
      */
     @PostMapping
-    public ResponseEntity<ApiResponse<?>> addMember(@Validated @RequestBody MemberSaveDto memberSaveDto,
-                                                            BindingResult bindingResult, HttpServletRequest request) {
-
-        if (bindingResult.hasErrors()) {
-            log.info("errors = " + bindingResult);
-            Map<String, String> errorMap = new HashMap<>();
-            bindingResult.getFieldErrors().forEach(error ->
-                    errorMap.put(error.getField(), error.getDefaultMessage())
-            );
-            return ResponseEntity.badRequest().body(ApiResponse.error("입력값 오류", errorMap));
-        }
+    public ResponseEntity<ApiResponse<?>> addMember(@Validated @RequestBody MemberSaveDto memberSaveDto) {
 
         if (!emailService.isEmailVerified(memberSaveDto.getEmail(), memberSaveDto.getEmailCode())) {
             log.info("code : " + memberSaveDto.getEmailCode());
-            Map<String, String> errorMap = new HashMap<>();
-            errorMap.put("email", "이메일 인증이 필요합니다.");
-            return ResponseEntity.badRequest().body(ApiResponse.error("이메일 인증 오류", errorMap));
+            throw new CustomException(INVALID_EMAIL_CODE);
         }
 
         Long joinId = norMemberService.join(memberSaveDto);
@@ -80,7 +67,7 @@ public class NorMemberApiController {
 
         // url 조작으로 다른 사용자 마이페이지 접속 방지
         if (!loginedMember.getId().equals(id)) {
-            return ResponseEntity.badRequest().body(ApiResponse.error("잘못된 접근입니다."));
+            throw new CustomException(ACCESS_DENIED);
         }
 
         MemberViewDto memberViewDto = createMemberViewDto(loginedMember);
@@ -94,23 +81,13 @@ public class NorMemberApiController {
     @PatchMapping("/{id}")
     public ResponseEntity<ApiResponse<?>> editMember(@PathVariable Long id,
                                                           @Validated @RequestBody MemberEditDto memberEditDto,
-                                                          BindingResult bindingResult,
                                                           @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
         Long userId = customOAuth2UserDetails.getMember().getId();
         NorMember loginedMember = norMemberService.findOne(userId);
 
         if (!loginedMember.getId().equals(id)) {
-            return ResponseEntity.badRequest().body(ApiResponse.error("잘못된 접근입니다."));
-        }
-
-        if (bindingResult.hasErrors()) {
-            log.info("errors = " + bindingResult);
-            Map<String, String> errorMap = new HashMap<>();
-            bindingResult.getFieldErrors().forEach(error ->
-                    errorMap.put(error.getField(), error.getDefaultMessage())
-            );
-            return ResponseEntity.badRequest().body(ApiResponse.error("입력값 오류", errorMap));
+            throw new CustomException(ACCESS_DENIED);
         }
 
         norMemberService.updateMember(userId, memberEditDto);
@@ -123,14 +100,14 @@ public class NorMemberApiController {
      */
     @PostMapping("/{id}/password")
     public ResponseEntity<ApiResponse<?>> updatePassword(@PathVariable Long id,
-                                                         @RequestBody UpdatePasswordDto updatePasswordDto,
+                                                         @Validated @RequestBody UpdatePasswordDto updatePasswordDto,
                                                          @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
         Long userId = customOAuth2UserDetails.getMember().getId();
         NorMember loginedMember = norMemberService.findOne(userId);
 
         if (!loginedMember.getId().equals(id)) {
-            return ResponseEntity.badRequest().body(ApiResponse.error("잘못된 접근입니다."));
+            throw new CustomException(ACCESS_DENIED);
         }
 
         log.info("curPw :" + updatePasswordDto.getCurrentPassword());
@@ -153,7 +130,7 @@ public class NorMemberApiController {
         NorMember loginedMember = norMemberService.findOne(userId);
 
         if (!loginedMember.getId().equals(id)) {
-            return ResponseEntity.badRequest().body(ApiResponse.error("잘못된 접근입니다."));
+            throw new CustomException(ACCESS_DENIED);
         }
 
         List<ReviewViewDto> reviewList = reviewService.findByMember(loginedMember).stream()
@@ -174,7 +151,7 @@ public class NorMemberApiController {
         NorMember loginedMember = norMemberService.findOne(userId);
 
         if (!loginedMember.getId().equals(id)) {
-            return ResponseEntity.badRequest().body(ApiResponse.error("잘못된 접근입니다."));
+            throw new CustomException(ACCESS_DENIED);
         }
 
         List<PtMembershipViewDto> ptMembershipList = ptMembershipService.findByMember(loginedMember).stream()
@@ -186,7 +163,6 @@ public class NorMemberApiController {
 
     private MemberViewDto createMemberViewDto(NorMember loginedMember) {
         return MemberViewDto.builder()
-                .password(loginedMember.getPassword())
                 .name(loginedMember.getName())
                 .email(loginedMember.getEmail())
                 .gender(loginedMember.getGender().getExp())

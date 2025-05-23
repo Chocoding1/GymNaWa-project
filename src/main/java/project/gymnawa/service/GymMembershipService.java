@@ -46,7 +46,7 @@ public class GymMembershipService {
      */
     public void deleteMembership(Long id) {
         GymMembership gymMembership = gymMembershipRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("존재하지 등록 정보입니다."));
+                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 등록 정보입니다."));
 
         gymMembershipRepository.delete(gymMembership);
     }

@@ -6,11 +6,13 @@ import org.springframework.transaction.annotation.Transactional;
 import project.gymnawa.domain.etcfield.ContractStatus;
 import project.gymnawa.domain.entity.GymTrainer;
 import project.gymnawa.domain.entity.Trainer;
+import project.gymnawa.errors.exception.CustomException;
 import project.gymnawa.repository.GymTrainerRepository;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.NoSuchElementException;
+
+import static project.gymnawa.errors.dto.ErrorCode.*;
 
 @Service
 @Transactional(readOnly = true)
@@ -56,7 +58,7 @@ public class GymTrainerService {
     @Transactional
     public void expireContract(Long gymTrainerId) {
         GymTrainer gymTrainer = gymTrainerRepository.findById(gymTrainerId)
-                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 계약입니다."));
+                .orElseThrow(() -> new CustomException(CONTRACT_NOT_FOUND));
 
         gymTrainer.expireContract(LocalDate.now());
     }

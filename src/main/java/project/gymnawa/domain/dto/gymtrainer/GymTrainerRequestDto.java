@@ -14,10 +14,8 @@ import java.time.LocalDate;
 @Builder
 public class GymTrainerRequestDto {
 
-    @NotBlank
     private String gymId;
 
-    @NotNull
     private LocalDate hireDate;
 
     @Enumerated(value = EnumType.STRING)

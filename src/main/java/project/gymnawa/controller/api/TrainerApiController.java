@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
@@ -20,14 +19,15 @@ import project.gymnawa.domain.api.ApiResponse;
 import project.gymnawa.domain.dto.trainer.TrainerEditDto;
 import project.gymnawa.domain.dto.trainer.TrainerSaveDto;
 import project.gymnawa.domain.dto.trainer.TrainerViewDto;
+import project.gymnawa.errors.exception.CustomException;
 import project.gymnawa.service.EmailService;
 import project.gymnawa.service.PtMembershipService;
 import project.gymnawa.service.ReviewService;
 import project.gymnawa.service.TrainerService;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import static project.gymnawa.errors.dto.ErrorCode.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -45,22 +45,11 @@ public class TrainerApiController {
      */
     @PostMapping
     public ResponseEntity<ApiResponse<?>> addTrainer(@Validated @RequestBody TrainerSaveDto trainerSaveDto,
-                                                          BindingResult bindingResult, HttpServletRequest request) {
-
-        if (bindingResult.hasErrors()) {
-            log.info("errors = " + bindingResult);
-            Map<String, String> errorMap = new HashMap<>();
-            bindingResult.getFieldErrors().forEach(error ->
-                    errorMap.put(error.getField(), error.getDefaultMessage())
-            );
-            return ResponseEntity.badRequest().body(ApiResponse.error("입력값 오류", errorMap));
-        }
+                                                          HttpServletRequest request) {
 
         if (!emailService.isEmailVerified(trainerSaveDto.getEmail(), trainerSaveDto.getEmailCode())) {
             log.info("code : " + request.getParameter("code"));
-            Map<String, String> errorMap = new HashMap<>();
-            errorMap.put("email", "이메일 인증이 필요합니다.");
-            return ResponseEntity.badRequest().body(ApiResponse.error("이메일 인증 오류", errorMap));
+            throw new CustomException(INVALID_EMAIL_CODE);
         }
 
         Long joinId = trainerService.join(trainerSaveDto);
@@ -79,7 +68,7 @@ public class TrainerApiController {
         Trainer loginedTrainer = trainerService.findOne(userId);
 
         if (!loginedTrainer.getId().equals(id)) {
-            return ResponseEntity.badRequest().body(ApiResponse.error("잘못된 접근입니다."));
+            throw new CustomException(ACCESS_DENIED);
         }
 
         TrainerViewDto trainerViewDto = createTrainerViewDto(loginedTrainer);
@@ -93,23 +82,13 @@ public class TrainerApiController {
     @PatchMapping("/{id}")
     public ResponseEntity<ApiResponse<?>> editTrainer(@PathVariable Long id,
                                                            @Validated @RequestBody TrainerEditDto trainerEditDto,
-                                                           BindingResult bindingResult,
                                                            @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
         Long userId = customOAuth2UserDetails.getMember().getId();
         Trainer loginedTrainer = trainerService.findOne(userId);
 
         if (!loginedTrainer.getId().equals(id)) {
-            return ResponseEntity.badRequest().body(ApiResponse.error("잘못된 접근입니다."));
-        }
-
-        if (bindingResult.hasErrors()) {
-            log.info("errors = " + bindingResult);
-            Map<String, String> errorMap = new HashMap<>();
-            bindingResult.getFieldErrors().forEach(error ->
-                    errorMap.put(error.getField(), error.getDefaultMessage())
-            );
-            return ResponseEntity.badRequest().body(ApiResponse.error("입력값 오류", errorMap));
+            throw new CustomException(ACCESS_DENIED);
         }
 
         trainerService.updateTrainer(userId, trainerEditDto);
@@ -122,14 +101,14 @@ public class TrainerApiController {
      */
     @PostMapping("/{id}/password")
     public ResponseEntity<ApiResponse<?>> updatePassword(@PathVariable Long id,
-                                                         @RequestBody UpdatePasswordDto updatePasswordDto,
+                                                         @Validated @RequestBody UpdatePasswordDto updatePasswordDto,
                                                          @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
         Long userId = customOAuth2UserDetails.getMember().getId();
         Trainer loginedTrainer = trainerService.findOne(userId);
 
         if (!loginedTrainer.getId().equals(id)) {
-            return ResponseEntity.badRequest().body(ApiResponse.error("잘못된 접근입니다."));
+            throw new CustomException(ACCESS_DENIED);
         }
 
         log.info("curPw :" + updatePasswordDto.getCurrentPassword());
@@ -153,7 +132,7 @@ public class TrainerApiController {
 
 
         if (!loginedTrainer.getId().equals(id)) {
-            return ResponseEntity.badRequest().body(ApiResponse.error("잘못된 접근입니다."));
+            throw new CustomException(ACCESS_DENIED);
         }
 
         List<ReviewViewDto> reviewList = reviewService.findByTrainer(loginedTrainer).stream()
@@ -174,7 +153,7 @@ public class TrainerApiController {
         Trainer loginedTrainer = trainerService.findOne(userId);
 
         if (!loginedTrainer.getId().equals(id)) {
-            return ResponseEntity.badRequest().body(ApiResponse.error("잘못된 접근입니다."));
+            throw new CustomException(ACCESS_DENIED);
         }
 
         List<PtMembershipViewDto> ptMembershipList = ptMembershipService.findByTrainer(loginedTrainer).stream()

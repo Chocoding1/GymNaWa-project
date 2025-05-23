@@ -4,10 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.gymnawa.domain.entity.Gym;
+import project.gymnawa.errors.exception.CustomException;
 import project.gymnawa.repository.GymRepository;
 
 import java.util.List;
-import java.util.NoSuchElementException;
+
+import static project.gymnawa.errors.dto.ErrorCode.*;
 
 @Service
 @Transactional(readOnly = true)
@@ -33,7 +35,7 @@ public class GymService {
      */
     public Gym findGym(Long id) {
         return gymRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 헬스장입니다."));
+                .orElseThrow(() -> new CustomException(GYM_NOT_FOUND));
     }
 
     /**

@@ -5,10 +5,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.gymnawa.domain.entity.Member;
+import project.gymnawa.errors.exception.CustomException;
 import project.gymnawa.repository.MemberRepository;
 
 import java.util.List;
-import java.util.NoSuchElementException;
+
+import static project.gymnawa.errors.dto.ErrorCode.*;
 
 @Service
 @Transactional(readOnly = true)
@@ -34,7 +36,7 @@ public class MemberService {
      */
     public Member findOne(Long id) {
         return memberRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
+                .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
     }
 
     /**
@@ -49,7 +51,7 @@ public class MemberService {
      */
     public Member findByEmail(String email) {
         return memberRepository.findByEmail(email)
-                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
+                .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
     }
 
     /**

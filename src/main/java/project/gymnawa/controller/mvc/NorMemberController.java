@@ -128,7 +128,6 @@ public class NorMemberController {
                 .id(norMember.getId())
                 .name(norMember.getName())
                 .gender(norMember.getGender().getExp())
-                .password(norMember.getPassword())
                 .email(norMember.getEmail())
                 .address(norMember.getAddress())
                 .build();

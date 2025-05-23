@@ -11,10 +11,12 @@ import project.gymnawa.domain.dto.member.UpdatePasswordDto;
 import project.gymnawa.domain.etcfield.Address;
 import project.gymnawa.domain.entity.NorMember;
 import project.gymnawa.domain.etcfield.Role;
+import project.gymnawa.errors.exception.CustomException;
 import project.gymnawa.repository.MemberRepository;
 import project.gymnawa.repository.NorMemberRepository;
 
-import java.util.NoSuchElementException;
+
+import static project.gymnawa.errors.dto.ErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -56,7 +58,7 @@ public class NorMemberService {
      */
     private void validateDuplicateMember(MemberSaveDto memberSaveDto) {
         if (memberRepository.existsByEmail(memberSaveDto.getEmail())) {
-            throw new IllegalStateException("이미 가입된 이메일입니다.");
+            throw new CustomException(DUPLICATE_EMAIL);
         }
     }
 
@@ -66,7 +68,7 @@ public class NorMemberService {
     @Transactional
     public void updateMember(long id, MemberEditDto memberEditDto) {
         NorMember norMember = norMemberRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
+                .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
 
         String name = memberEditDto.getName();
         Address address = new Address(memberEditDto.getZoneCode(), memberEditDto.getAddress(), memberEditDto.getDetailAddress(), memberEditDto.getBuildingName());
@@ -80,16 +82,16 @@ public class NorMemberService {
     @Transactional
     public void changePassword(Long id, UpdatePasswordDto updatePasswordDto) {
         NorMember norMember = norMemberRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
+                .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
 
         // 현재 비밀번호 일치 확인
         if (!bCryptPasswordEncoder.matches(updatePasswordDto.getCurrentPassword(), norMember.getPassword())) {
-            throw new IllegalArgumentException("현재 비밀번호가 일치하지 않습니다.");
+            throw new CustomException(INVALID_PASSWORD);
         }
 
         // 새 비밀번호 일치 확인
         if (!updatePasswordDto.getNewPassword().equals(updatePasswordDto.getConfirmPassword())) {
-            throw new IllegalArgumentException("새 비밀번호가 서로 일치하지 않습니다.");
+            throw new CustomException(INVALID_NEW_PASSWORD);
         }
 
         String newPassword = bCryptPasswordEncoder.encode(updatePasswordDto.getNewPassword());
@@ -101,7 +103,7 @@ public class NorMemberService {
      */
     public NorMember findOne(Long id) {
         return norMemberRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
+                .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
     }
 
     /**
@@ -110,7 +112,7 @@ public class NorMemberService {
     @Transactional
     public void deleteOne(Long id) {
         NorMember norMember = norMemberRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
+                .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
 
         norMemberRepository.delete(norMember);
     }

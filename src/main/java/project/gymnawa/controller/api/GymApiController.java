@@ -10,7 +10,10 @@ import org.springframework.web.bind.annotation.RestController;
 import project.gymnawa.domain.api.ApiResponse;
 import project.gymnawa.domain.dto.gym.GymDto;
 import project.gymnawa.domain.kakao.KakaoApiResponse;
+import project.gymnawa.errors.exception.CustomException;
 import project.gymnawa.service.KakaoService;
+
+import static project.gymnawa.errors.dto.ErrorCode.*;
 
 @RestController
 @Slf4j
@@ -35,7 +38,7 @@ public class GymApiController {
         }
 
         if (result == null) {
-            return ResponseEntity.badRequest().body(ApiResponse.error("검색 결과가 없습니다."));
+            throw new CustomException(GYMS_NOT_FOUND);
         }
 
         return ResponseEntity.ok().body(ApiResponse.of("헬스장 조회 성공", result));

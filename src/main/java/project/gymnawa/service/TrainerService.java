@@ -7,17 +7,16 @@ import org.springframework.transaction.annotation.Transactional;
 import project.gymnawa.domain.dto.member.UpdatePasswordDto;
 import project.gymnawa.domain.dto.trainer.TrainerEditDto;
 import project.gymnawa.domain.dto.trainer.TrainerSaveDto;
-import project.gymnawa.domain.entity.Member;
-import project.gymnawa.domain.entity.NorMember;
 import project.gymnawa.domain.entity.Trainer;
 import project.gymnawa.domain.etcfield.Address;
 import project.gymnawa.domain.etcfield.Role;
+import project.gymnawa.errors.exception.CustomException;
 import project.gymnawa.repository.MemberRepository;
 import project.gymnawa.repository.TrainerRepository;
 
 import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+
+import static project.gymnawa.errors.dto.ErrorCode.*;
 
 @Service
 // 서비스에서 DB에 여러 번 접근할 수 있기 때문에 서비스 단에서 한 번에 쿼리를 처리하기 위해 서비스 단에 트랜잭션을 달아준다.
@@ -54,7 +53,7 @@ public class TrainerService {
      */
     private void validateDuplicateTrainer(TrainerSaveDto trainerSaveDto) {
         if (memberRepository.existsByEmail(trainerSaveDto.getEmail())) {
-            throw new IllegalStateException("이미 가입된 이메일입니다.");
+            throw new CustomException(DUPLICATE_EMAIL);
         }
     }
 
@@ -63,7 +62,7 @@ public class TrainerService {
      */
     public Trainer findOne(Long id) {
         return trainerRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 트레이너입니다."));
+                .orElseThrow(() -> new CustomException(TRAINER_NOT_FOUND));
     }
 
     /**
@@ -86,7 +85,7 @@ public class TrainerService {
     @Transactional
     public void updateTrainer(Long id, TrainerEditDto trainerEditDto) {
         Trainer trainer = trainerRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 트레이너입니다."));
+                .orElseThrow(() -> new CustomException(TRAINER_NOT_FOUND));
 
         String name = trainerEditDto.getName();
         Address address = new Address(trainerEditDto.getZoneCode(), trainerEditDto.getAddress(), trainerEditDto.getDetailAddress(), trainerEditDto.getBuildingName());
@@ -100,16 +99,16 @@ public class TrainerService {
     @Transactional
     public void changePassword(Long id, UpdatePasswordDto updatePasswordDto) {
         Trainer trainer = trainerRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
+                .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
 
         // 현재 비밀번호 일치 확인
         if (!bCryptPasswordEncoder.matches(updatePasswordDto.getCurrentPassword(), trainer.getPassword())) {
-            throw new IllegalArgumentException("현재 비밀번호가 일치하지 않습니다.");
+            throw new CustomException(INVALID_PASSWORD);
         }
 
         // 새 비밀번호 일치 확인
         if (!updatePasswordDto.getNewPassword().equals(updatePasswordDto.getConfirmPassword())) {
-            throw new IllegalArgumentException("새 비밀번호가 서로 일치하지 않습니다.");
+            throw new CustomException(INVALID_NEW_PASSWORD);
         }
 
         String newPassword = bCryptPasswordEncoder.encode(updatePasswordDto.getNewPassword());
@@ -122,7 +121,7 @@ public class TrainerService {
     @Transactional
     public void deleteOne(Long id) {
         Trainer trainer = trainerRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 트레이너입니다."));
+                .orElseThrow(() -> new CustomException(TRAINER_NOT_FOUND));
 
         trainerRepository.delete(trainer);
     }

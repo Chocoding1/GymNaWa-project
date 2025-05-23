@@ -8,9 +8,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
 import project.gymnawa.domain.entity.Member;
+import project.gymnawa.errors.exception.CustomException;
 import project.gymnawa.repository.MemberRepository;
 
-import java.util.NoSuchElementException;
+import static project.gymnawa.errors.dto.ErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -26,7 +27,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         log.info("loadUserByUsername 실행");
 
         Member member = memberRepository.findByEmail(email)
-                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 회원입니다."));
+                .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
 
         return new CustomOAuth2UserDetails(member);
     }
