@@ -12,7 +12,6 @@ import org.springframework.mock.web.MockHttpSession;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import project.gymnawa.domain.etcfield.Address;
@@ -25,6 +24,7 @@ import project.gymnawa.service.NorMemberService;
 import project.gymnawa.web.SessionConst;
 
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 @WebMvcTest(NorMemberApiController.class)
 @ExtendWith(MockitoExtension.class)
@@ -53,7 +53,7 @@ class NorMemberApiControllerTest {
         Gender gender = Gender.MALE;
 
         //when
-        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.get("/api/member/n/add"));
+        ResultActions resultActions = mockMvc.perform(get("/api/member/n/add"));
 
         //then
         resultActions
@@ -71,10 +71,10 @@ class NorMemberApiControllerTest {
                 "name", "email", Gender.MALE, "zoneCode", "address", "detailAddress", "buildingName");
 
         when(emailService.isEmailVerified(anyString(), anyString())).thenReturn(true);
-        when(norMemberService.join(any(NorMember.class))).thenReturn(id);
+        when(norMemberService.join(any(MemberSaveDto.class))).thenReturn(id);
 
         //when
-        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/api/member/n/add")
+        ResultActions resultActions = mockMvc.perform(post("/api/member/n/add")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(memberSaveDto))
                 .param("code", "correctCode"));
@@ -87,7 +87,7 @@ class NorMemberApiControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.data.email").value("email"));
 
         verify(emailService, times(1)).isEmailVerified(anyString(), anyString());
-        verify(norMemberService, times(1)).join(any(NorMember.class));
+        verify(norMemberService, times(1)).join(any(MemberSaveDto.class));
     }
 
     @Test
@@ -97,7 +97,7 @@ class NorMemberApiControllerTest {
         MemberSaveDto memberSaveDto = createMemberSaveDto("", "", "", Gender.MALE, "", "", "", "");
 
         //when
-        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/api/member/n/add")
+        ResultActions resultActions = mockMvc.perform(post("/api/member/n/add")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(memberSaveDto)));
 
@@ -118,7 +118,7 @@ class NorMemberApiControllerTest {
         when(emailService.isEmailVerified(anyString(), anyString())).thenReturn(false);
 
         //when
-        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/api/member/n/add")
+        ResultActions resultActions = mockMvc.perform(post("/api/member/n/add")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(memberSaveDto))
                 .param("code", "wrongCode"));
@@ -151,7 +151,7 @@ class NorMemberApiControllerTest {
         session.setAttribute(SessionConst.LOGIN_MEMBER, norMember);
 
         //when
-        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.get("/api/member/n/1/mypage")
+        ResultActions resultActions = mockMvc.perform(get("/api/member/n/1/mypage")
                 .session(session)); // 세션 주입
 
         //then
@@ -182,7 +182,7 @@ class NorMemberApiControllerTest {
         session.setAttribute(SessionConst.LOGIN_MEMBER, norMember);
 
         //when
-        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.get("/api/member/n/1/edit")
+        ResultActions resultActions = mockMvc.perform(get("/api/member/n/1/edit")
                 .session(session));
 
         //then
@@ -207,7 +207,6 @@ class NorMemberApiControllerTest {
                 .build();
 
         MemberEditDto memberEditDto = MemberEditDto.builder()
-                .password("newPassword")
                 .name("newName")
                 .zoneCode("zoneCode")
                 .address("address")
@@ -227,7 +226,7 @@ class NorMemberApiControllerTest {
         session.setAttribute(SessionConst.LOGIN_MEMBER, norMember);
 
         //when
-        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/api/member/n/1/edit")
+        ResultActions resultActions = mockMvc.perform(post("/api/member/n/1/edit")
                 .session(session)
                 .content(objectMapper.writeValueAsString(memberEditDto))
                 .contentType(MediaType.APPLICATION_JSON));
@@ -254,7 +253,6 @@ class NorMemberApiControllerTest {
                 .build();
 
         MemberEditDto memberEditDto = MemberEditDto.builder()
-                .password("")
                 .name("newName")
                 .zoneCode("zoneCode")
                 .address("address")
@@ -267,7 +265,7 @@ class NorMemberApiControllerTest {
         session.setAttribute(SessionConst.LOGIN_MEMBER, norMember);
 
         //when
-        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/api/member/n/1/edit")
+        ResultActions resultActions = mockMvc.perform(post("/api/member/n/1/edit")
                 .session(session)
                 .content(objectMapper.writeValueAsString(memberEditDto))
                 .contentType(MediaType.APPLICATION_JSON));
