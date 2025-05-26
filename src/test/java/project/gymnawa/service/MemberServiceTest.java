@@ -95,6 +95,42 @@ public class MemberServiceTest {
         assertThat(errorCode.getErrorMessage()).isEqualTo("존재하지 않는 회원입니다.");
     }
 
+    @Test
+    @DisplayName("회원 탈퇴 처리 성공")
+    void deactivateMemberSuccess() {
+        //given
+        Member member = Member.builder()
+                .deleted(false)
+                .build();
+
+        when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
+
+        //when
+        memberService.deactivateMember(anyLong());
+
+        //then
+        verify(memberRepository, times(1)).findById(anyLong());
+
+        assertThat(member.isDeleted()).isEqualTo(true);
+    }
+
+    @Test
+    @DisplayName("회원 탈퇴 처리 실패 - 존재하지 않는 회원일 경우 에러 발생")
+    void deactivateMemberFail_notFoundMember() {
+        //given
+        when(memberRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        //when & then
+        CustomException customException = assertThrows(CustomException.class, () -> memberService.deactivateMember(anyLong()));
+        ErrorCode errorCode = customException.getErrorCode();
+
+        verify(memberRepository, times(1)).findById(anyLong());
+
+        assertThat(errorCode.getCode()).isEqualTo("MEMBER_NOT_FOUND");
+        assertThat(errorCode.getStatus()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(errorCode.getErrorMessage()).isEqualTo("존재하지 않는 회원입니다.");
+    }
+
     /**
      * 로그인 기능 주석 처리 (spring security 사용)
      */
