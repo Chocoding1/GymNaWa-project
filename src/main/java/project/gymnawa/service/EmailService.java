@@ -8,10 +8,14 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.gymnawa.domain.entity.Member;
+import project.gymnawa.errors.dto.ErrorCode;
+import project.gymnawa.errors.exception.CustomException;
 import project.gymnawa.repository.MemberRepository;
 
 import java.util.Optional;
 import java.util.Random;
+
+import static project.gymnawa.errors.dto.ErrorCode.*;
 
 @Service
 @RequiredArgsConstructor
@@ -40,7 +44,7 @@ public class EmailService {
 
     private void validateDuplicateEmail(String email) {
         if (memberRepository.existsByEmail(email)) {
-            throw new IllegalStateException("해당 이메일로 가입한 이력이 있습니다.");
+            throw new CustomException(DUPLICATE_EMAIL);
         }
     }
 
