@@ -145,4 +145,21 @@ public class MemberApiController {
             throw new CustomException(INVALID_PASSWORD);
         }
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<String>> deactivateMember(@PathVariable Long id,
+                                                                @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
+
+        Long userId = customOAuth2UserDetails.getMember().getId();
+        Member loginedMember = memberService.findOne(userId);
+
+        // url 조작으로 다른 사용자 정보 접근 방지
+        if (!loginedMember.getId().equals(id)) {
+            throw new CustomException(ACCESS_DENIED);
+        }
+
+        memberService.deactivateMember(userId);
+
+        return ResponseEntity.ok().body(ApiResponse.of("회원 탈퇴 성공"));
+    }
 }
