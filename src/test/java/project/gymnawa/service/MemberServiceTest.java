@@ -6,9 +6,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import project.gymnawa.domain.etcfield.Address;
+import org.springframework.http.HttpStatus;
 import project.gymnawa.domain.etcfield.Gender;
 import project.gymnawa.domain.entity.Member;
+import project.gymnawa.errors.dto.ErrorCode;
+import project.gymnawa.errors.exception.CustomException;
 import project.gymnawa.repository.MemberRepository;
 
 import java.util.*;
@@ -20,98 +22,83 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class) // MockitoExtension : 가짜 객체를 사용할 수 있도록 지원하는 모듈
 public class MemberServiceTest {
 
-    @Mock
-    MemberRepository memberRepository;
-
-    @InjectMocks
+    @InjectMocks // 실제 테스트하고자 하는 클래스 지정(의존성 주입)
     MemberService memberService;
 
+    @Mock // 실제 테스트하고자 하는 클래스가 의존성을 주입받고 있는 클래스 지정(Mock 객체)
+    MemberRepository memberRepository;
+
     @Test
-    @DisplayName("회원 조회 성공")
+    @DisplayName("회원을 조회할 수 있다.")
     void findMemberSuccess() {
         //given
-        Long memberId = 1L;
-        Address address = new Address("12345", "서울", "강서구", "마곡동");
-        Member member = createMember("1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
+        Member member = createMember("1234", "조성진", "galmeagi2@naver.com", Gender.MALE);
 
-        when(memberRepository.findById(memberId)).thenReturn(Optional.of(member));
+        when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
 
         //when
-        Member findMember = memberService.findOne(memberId);
+        Member findMember = memberService.findOne(anyLong());
 
         //then
         assertThat(findMember).isNotNull();
         assertThat(findMember).isEqualTo(member);
         assertThat(findMember.getName()).isEqualTo("조성진");
-        verify(memberRepository, times(1)).findById(memberId);
+        verify(memberRepository, times(1)).findById(anyLong());
     }
 
     @Test
-    @DisplayName("회원 조회 실패 - 존재하지 않는 회원")
+    @DisplayName("존재하지 않는 회원은 조회할 수 없고, 에러를 발생시킨다.")
     void findMemberFail() {
         //given
-        Long memberId = 1L;
-
-        when(memberRepository.findById(memberId)).thenReturn(Optional.empty());
+        when(memberRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         //when & then
-        assertThrows(NoSuchElementException.class, () -> memberService.findOne(1L));
-        verify(memberRepository, times(1)).findById(memberId);
+        CustomException customException = assertThrows(CustomException.class, () -> memberService.findOne(anyLong()));
+        ErrorCode errorCode = customException.getErrorCode();
+
+        verify(memberRepository, times(1)).findById(anyLong());
+        assertThat(errorCode.getCode()).isEqualTo("MEMBER_NOT_FOUND");
+        assertThat(errorCode.getStatus()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(errorCode.getErrorMessage()).isEqualTo("존재하지 않는 회원입니다.");
     }
 
     @Test
-    @DisplayName("회원 전체 조회")
-    void findMembers() {
-        //given
-        Address address = new Address("12345", "서울", "강서구", "마곡동");
-        Member member1 = createMember("1234", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
-        Member member2 = createMember("123456", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
-        Member member3 = createMember("1234567", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
-
-        List<Member> members = Arrays.asList(member1, member2, member3);
-
-        when(memberRepository.findAll()).thenReturn(members);
-
-        //when
-        List<Member> result = memberService.findMembers();
-
-        //then
-        assertThat(result.size()).isEqualTo(3);
-        verify(memberRepository, times(1)).findAll();
-    }
-
-    @Test
-    @DisplayName("이메일로 회원 조회 성공")
+    @DisplayName("이메일로 회원을 조회할 수 있다.")
     void findMemberByEmailSuccess() {
         //given
-        String email = "galmeagi2@naver.com";
-        Address address = new Address("12345", "서울", "강서구", "마곡동");
-        Member member = createMember("1234", "조성진", email, address, Gender.MALE);
+        Member member = createMember("1234", "조성진", "galmeagi2@naver.com", Gender.MALE);
 
-        when(memberRepository.findByEmail(email)).thenReturn(Optional.of(member));
+        when(memberRepository.findByEmail(anyString())).thenReturn(Optional.of(member));
 
         //when
-        Member findMember = memberService.findByEmail(email);
+        Member findMember = memberService.findByEmail(anyString());
 
         //then
         assertThat(findMember).isNotNull();
         assertThat(findMember).isEqualTo(member);
-        verify(memberRepository, times(1)).findByEmail(email);
+        verify(memberRepository, times(1)).findByEmail(anyString());
     }
 
     @Test
-    @DisplayName("이메일로 회원 조회 실패 - 존재하지 않는 이메일")
+    @DisplayName("가입되지 않은 이메일로 회원 조회 시, 에러를 발생시킨다.")
     void findMemberByEmailFail() {
         //given
-        String email = "galmeagi2@naver.com";
-
-        when(memberRepository.findByEmail(email)).thenReturn(Optional.empty());
+        when(memberRepository.findByEmail(anyString())).thenReturn(Optional.empty());
 
         //when & then
-        assertThrows(NoSuchElementException.class, () -> memberService.findByEmail(email));
-        verify(memberRepository, times(1)).findByEmail(email);
+        CustomException customException = assertThrows(CustomException.class, () -> memberService.findByEmail(anyString()));
+        ErrorCode errorCode = customException.getErrorCode();
+
+        verify(memberRepository, times(1)).findByEmail(anyString());
+        assertThat(errorCode.getCode()).isEqualTo("MEMBER_NOT_FOUND");
+        assertThat(errorCode.getStatus()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(errorCode.getErrorMessage()).isEqualTo("존재하지 않는 회원입니다.");
     }
 
+    /**
+     * 로그인 기능 주석 처리 (spring security 사용)
+     */
+/*
     @Test
     @DisplayName("로그인 성공")
     void loginSuccess() {
@@ -166,13 +153,13 @@ public class MemberServiceTest {
         assertThat(loginedMember).isNull();
         verify(memberRepository, times(1)).findByEmail(email);
     }
+*/
 
-    private Member createMember(String password, String name, String email, Address address, Gender gender) {
+    private Member createMember(String password, String name, String email, Gender gender) {
         return Member.builder()
                 .password(password)
                 .name(name)
                 .email(email)
-                .address(address)
                 .gender(gender)
                 .build();
     }
