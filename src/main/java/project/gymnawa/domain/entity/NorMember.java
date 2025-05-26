@@ -19,8 +19,8 @@ public class NorMember extends Member {
     /**
      * 회원 객체 생성
      */
-    public NorMember(Long id, String password, String name, String email, Gender gender, Address address, String provider, String providerId, String loginType, Role role) {
-        super(id, password, name, email, gender, address, provider, providerId, loginType, role);
+    public NorMember(Long id, String password, String name, String email, Gender gender, Address address, String provider, String providerId, String loginType, Role role, boolean deleted) {
+        super(id, password, name, email, gender, address, provider, providerId, loginType, role, deleted);
     }
 
     /**
@@ -31,6 +31,9 @@ public class NorMember extends Member {
         super.updateInfo(name, address);
     }
 
+    /**
+     * 비밀번호 변경
+     */
     @Override
     public void changePassword(String newPassword) {
         super.changePassword(newPassword);

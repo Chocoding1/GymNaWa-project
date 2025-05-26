@@ -41,12 +41,27 @@ public class Member extends BaseTime {
     @Enumerated(value = EnumType.STRING)
     private Role role;
 
+    private boolean deleted;
+
+    /**
+     * 회원 정보 변경
+     */
     public void updateInfo(String name, Address address) {
         this.name = name;
         this.address = address;
     }
 
+    /**
+     * 비밀번호 변경
+     */
     public void changePassword(String newPassword) {
         this.password = newPassword;
+    }
+
+    /**
+     * 회원 탈퇴 처리
+     */
+    public void deactivate() {
+        this.deleted = true;
     }
 }

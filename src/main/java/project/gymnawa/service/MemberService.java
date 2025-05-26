@@ -56,7 +56,11 @@ public class MemberService {
 
     /**
      * 임시 회원 정보 삭제
+     * @Transactional 어노테이션이 붙지 않아도 삭제가 되었던 이유
+     * deleteById()는 Spring Data JPA의 메서드를 사용하는 건데, 해당 메서드를 가보면 @Transactional 어노테이션이 붙어있다.
+     * 그치만 명시적으로 붙여주자.
      */
+    @Transactional
     public void deleteOne(Long id) {
         memberRepository.deleteById(id);
     }
@@ -66,5 +70,16 @@ public class MemberService {
      */
     public boolean verifyPassword(String rawPw, String encodedPw) {
         return bCryptPasswordEncoder.matches(rawPw, encodedPw);
+    }
+
+    /**
+     * 회원 탈퇴 처리
+     */
+    @Transactional
+    public void deactivateMember(Long id) {
+        Member member = memberRepository.findById(id)
+                .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
+
+        member.deactivate();
     }
 }
