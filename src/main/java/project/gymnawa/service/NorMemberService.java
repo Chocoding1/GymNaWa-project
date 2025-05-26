@@ -39,7 +39,7 @@ public class NorMemberService {
         // 중복 회원 검증 필요
         validateDuplicateMember(memberSaveDto);
 
-        // 일반 로그인 사용자일 경우에만 비밀번호 암호화 진행
+        // 일반 회원가입일 경우에만 비밀번호 암호화 진행
         if (memberSaveDto.getLoginType() == null) {
             // 비밀번호 암호화
             memberSaveDto.setPassword(bCryptPasswordEncoder.encode(memberSaveDto.getPassword()));
@@ -104,16 +104,5 @@ public class NorMemberService {
     public NorMember findOne(Long id) {
         return norMemberRepository.findById(id)
                 .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
-    }
-
-    /**
-     * 일반 회원 탈퇴
-     */
-    @Transactional
-    public void deleteOne(Long id) {
-        NorMember norMember = norMemberRepository.findById(id)
-                .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
-
-        norMemberRepository.delete(norMember);
     }
 }

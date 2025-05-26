@@ -114,15 +114,4 @@ public class TrainerService {
         String newPassword = bCryptPasswordEncoder.encode(updatePasswordDto.getNewPassword());
         trainer.changePassword(newPassword);
     }
-
-    /**
-     * 트레이너 탈퇴
-     */
-    @Transactional
-    public void deleteOne(Long id) {
-        Trainer trainer = trainerRepository.findById(id)
-                .orElseThrow(() -> new CustomException(TRAINER_NOT_FOUND));
-
-        trainerRepository.delete(trainer);
-    }
 }
