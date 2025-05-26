@@ -274,7 +274,6 @@ class TrainerApiControllerTest {
     private TrainerEditDto createTrainerEditDto(String password, String name, String zoneCode,
                                                 String address, String detailAddress, String buildingName) {
         return TrainerEditDto.builder()
-                .password(password)
                 .name(name)
                 .zoneCode(zoneCode)
                 .address(address)
