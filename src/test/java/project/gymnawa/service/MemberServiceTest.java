@@ -32,12 +32,13 @@ public class MemberServiceTest {
     @DisplayName("회원을 조회할 수 있다.")
     void findMemberSuccess() {
         //given
+        Long memberId = 1L;
         Member member = createMember("1234", "조성진", "galmeagi2@naver.com", Gender.MALE);
 
         when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
 
         //when
-        Member findMember = memberService.findOne(anyLong());
+        Member findMember = memberService.findOne(memberId);
 
         //then
         assertThat(findMember).isNotNull();
@@ -50,10 +51,11 @@ public class MemberServiceTest {
     @DisplayName("존재하지 않는 회원은 조회할 수 없고, 에러를 발생시킨다.")
     void findMemberFail_notFound() {
         //given
+        Long memberId = 1L;
         when(memberRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         //when & then
-        CustomException customException = assertThrows(CustomException.class, () -> memberService.findOne(anyLong()));
+        CustomException customException = assertThrows(CustomException.class, () -> memberService.findOne(memberId));
         ErrorCode errorCode = customException.getErrorCode();
 
         verify(memberRepository, times(1)).findById(anyLong());
@@ -66,6 +68,7 @@ public class MemberServiceTest {
     @DisplayName("탈퇴한 회원은 조회할 수 없고, 에러를 발생시킨다.")
     void findMemberFail_deleted() {
         //given
+        Long memberId = 1L;
         Member member = Member.builder()
                 .deleted(true)
                 .build();
@@ -73,7 +76,7 @@ public class MemberServiceTest {
         when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
 
         //when & then
-        CustomException customException = assertThrows(CustomException.class, () -> memberService.findOne(anyLong()));
+        CustomException customException = assertThrows(CustomException.class, () -> memberService.findOne(memberId));
         ErrorCode errorCode = customException.getErrorCode();
 
         verify(memberRepository, times(1)).findById(anyLong());
@@ -86,12 +89,13 @@ public class MemberServiceTest {
     @DisplayName("이메일로 회원을 조회할 수 있다.")
     void findMemberByEmailSuccess() {
         //given
+        String email = "galmeagi2@naver.com";
         Member member = createMember("1234", "조성진", "galmeagi2@naver.com", Gender.MALE);
 
         when(memberRepository.findByEmail(anyString())).thenReturn(Optional.of(member));
 
         //when
-        Member findMember = memberService.findByEmail(anyString());
+        Member findMember = memberService.findByEmail(email);
 
         //then
         assertThat(findMember).isNotNull();
@@ -103,10 +107,11 @@ public class MemberServiceTest {
     @DisplayName("가입되지 않은 이메일로 회원 조회 시, 에러를 발생시킨다.")
     void findMemberByEmailFail_notFound() {
         //given
+        String email = "galmeagi2@naver.com";
         when(memberRepository.findByEmail(anyString())).thenReturn(Optional.empty());
 
         //when & then
-        CustomException customException = assertThrows(CustomException.class, () -> memberService.findByEmail(anyString()));
+        CustomException customException = assertThrows(CustomException.class, () -> memberService.findByEmail(email));
         ErrorCode errorCode = customException.getErrorCode();
 
         verify(memberRepository, times(1)).findByEmail(anyString());
@@ -119,6 +124,7 @@ public class MemberServiceTest {
     @DisplayName("탈퇴한 이메일로 회원 조회 시, 에러를 발생시킨다.")
     void findMemberByEmailFail_deleted() {
         //given
+        String email = "galmeagi2@naver.com";
         Member member = Member.builder()
                 .email("galmeagi2@naver.com")
                 .deleted(true)
@@ -127,7 +133,7 @@ public class MemberServiceTest {
         when(memberRepository.findByEmail(anyString())).thenReturn(Optional.of(member));
 
         //when & then
-        CustomException customException = assertThrows(CustomException.class, () -> memberService.findByEmail(anyString()));
+        CustomException customException = assertThrows(CustomException.class, () -> memberService.findByEmail(email));
         ErrorCode errorCode = customException.getErrorCode();
 
         verify(memberRepository, times(1)).findByEmail(anyString());
@@ -140,6 +146,7 @@ public class MemberServiceTest {
     @DisplayName("회원 탈퇴 처리 성공")
     void deactivateMemberSuccess() {
         //given
+        Long memberId = 1L;
         Member member = Member.builder()
                 .deleted(false)
                 .build();
@@ -147,7 +154,7 @@ public class MemberServiceTest {
         when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
 
         //when
-        memberService.deactivateMember(anyLong());
+        memberService.deactivateMember(memberId);
 
         //then
         verify(memberRepository, times(1)).findById(anyLong());
@@ -159,10 +166,11 @@ public class MemberServiceTest {
     @DisplayName("회원 탈퇴 처리 실패 - 존재하지 않는 회원일 경우 에러 발생")
     void deactivateMemberFail_notFound() {
         //given
+        Long memberId = 1L;
         when(memberRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         //when & then
-        CustomException customException = assertThrows(CustomException.class, () -> memberService.deactivateMember(anyLong()));
+        CustomException customException = assertThrows(CustomException.class, () -> memberService.deactivateMember(memberId));
         ErrorCode errorCode = customException.getErrorCode();
 
         verify(memberRepository, times(1)).findById(anyLong());
@@ -176,6 +184,7 @@ public class MemberServiceTest {
     @DisplayName("회원 탈퇴 처리 실패 - 이미 탈퇴한 회원일 경우 에러 발생")
     void deactivateMemberFail_deleted() {
         //given
+        Long memberId = 1L;
         Member member = Member.builder()
                 .deleted(true)
                 .build();
@@ -183,7 +192,7 @@ public class MemberServiceTest {
         when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
 
         //when & then
-        CustomException customException = assertThrows(CustomException.class, () -> memberService.deactivateMember(anyLong()));
+        CustomException customException = assertThrows(CustomException.class, () -> memberService.deactivateMember(memberId));
         ErrorCode errorCode = customException.getErrorCode();
 
         verify(memberRepository, times(1)).findById(anyLong());
