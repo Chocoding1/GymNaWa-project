@@ -43,7 +43,7 @@ public class EmailService {
     }
 
     private void validateDuplicateEmail(String email) {
-        if (memberRepository.existsByEmail(email)) {
+        if (memberRepository.existsByEmailAndDeletedFalse(email)) {
             throw new CustomException(DUPLICATE_EMAIL);
         }
     }
