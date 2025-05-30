@@ -159,11 +159,7 @@ public class MemberServiceTest {
     @DisplayName("회원 탈퇴 처리 실패 - 존재하지 않는 회원일 경우 에러 발생")
     void deactivateMemberFail_notFound() {
         //given
-        Member member = Member.builder()
-                .deleted(true)
-                .build();
-
-        when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
+        when(memberRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         //when & then
         CustomException customException = assertThrows(CustomException.class, () -> memberService.deactivateMember(anyLong()));
@@ -180,7 +176,11 @@ public class MemberServiceTest {
     @DisplayName("회원 탈퇴 처리 실패 - 이미 탈퇴한 회원일 경우 에러 발생")
     void deactivateMemberFail_deleted() {
         //given
-        when(memberRepository.findById(anyLong())).thenReturn(Optional.empty());
+        Member member = Member.builder()
+                .deleted(true)
+                .build();
+
+        when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
 
         //when & then
         CustomException customException = assertThrows(CustomException.class, () -> memberService.deactivateMember(anyLong()));
