@@ -57,7 +57,7 @@ public class NorMemberService {
      * 중복 이메일 검증 함수
      */
     private void validateDuplicateMember(MemberSaveDto memberSaveDto) {
-        if (memberRepository.existsByEmail(memberSaveDto.getEmail())) {
+        if (memberRepository.existsByEmailAndDeletedFalse(memberSaveDto.getEmail())) {
             throw new CustomException(DUPLICATE_EMAIL);
         }
     }
@@ -69,6 +69,10 @@ public class NorMemberService {
     public void updateMember(long id, MemberEditDto memberEditDto) {
         NorMember norMember = norMemberRepository.findById(id)
                 .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
+
+        if (norMember.isDeleted()) {
+            throw new CustomException(DEACTIVATE_MEMBER);
+        }
 
         String name = memberEditDto.getName();
         Address address = new Address(memberEditDto.getZoneCode(), memberEditDto.getAddress(), memberEditDto.getDetailAddress(), memberEditDto.getBuildingName());
@@ -83,6 +87,10 @@ public class NorMemberService {
     public void changePassword(Long id, UpdatePasswordDto updatePasswordDto) {
         NorMember norMember = norMemberRepository.findById(id)
                 .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
+
+        if (norMember.isDeleted()) {
+            throw new CustomException(DEACTIVATE_MEMBER);
+        }
 
         // 현재 비밀번호 일치 확인
         if (!bCryptPasswordEncoder.matches(updatePasswordDto.getCurrentPassword(), norMember.getPassword())) {
@@ -102,7 +110,13 @@ public class NorMemberService {
      * 일반 회원 단건 조회
      */
     public NorMember findOne(Long id) {
-        return norMemberRepository.findById(id)
+        NorMember norMember = norMemberRepository.findById(id)
                 .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
+
+        if (norMember.isDeleted()) {
+            throw new CustomException(DEACTIVATE_MEMBER);
+        }
+
+        return norMember;
     }
 }

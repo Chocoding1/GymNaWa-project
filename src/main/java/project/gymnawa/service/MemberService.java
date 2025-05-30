@@ -8,7 +8,6 @@ import project.gymnawa.domain.entity.Member;
 import project.gymnawa.errors.exception.CustomException;
 import project.gymnawa.repository.MemberRepository;
 
-import java.util.List;
 
 import static project.gymnawa.errors.dto.ErrorCode.*;
 
@@ -35,23 +34,28 @@ public class MemberService {
      * 회원 조회
      */
     public Member findOne(Long id) {
-        return memberRepository.findById(id)
+        Member member = memberRepository.findById(id)
                 .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
-    }
 
-    /**
-     * 회원 전체 조회
-     */
-    public List<Member> findMembers() {
-        return memberRepository.findAll();
+        if (member.isDeleted()) {
+            throw new CustomException(DEACTIVATE_MEMBER);
+        }
+
+        return member;
     }
 
     /**
      * 이메일로 회원 조회
      */
     public Member findByEmail(String email) {
-        return memberRepository.findByEmail(email)
+        Member member = memberRepository.findByEmail(email)
                 .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
+
+        if (member.isDeleted()) {
+            throw new CustomException(DEACTIVATE_MEMBER);
+        }
+
+        return member;
     }
 
     /**
@@ -79,6 +83,10 @@ public class MemberService {
     public void deactivateMember(Long id) {
         Member member = memberRepository.findById(id)
                 .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
+
+        if (member.isDeleted()) {
+            throw new CustomException(DEACTIVATE_MEMBER);
+        }
 
         member.deactivate();
     }

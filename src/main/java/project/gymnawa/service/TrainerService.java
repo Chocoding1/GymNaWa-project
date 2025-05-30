@@ -52,7 +52,7 @@ public class TrainerService {
      * 이메일 중복 체크
      */
     private void validateDuplicateTrainer(TrainerSaveDto trainerSaveDto) {
-        if (memberRepository.existsByEmail(trainerSaveDto.getEmail())) {
+        if (memberRepository.existsByEmailAndDeletedFalse(trainerSaveDto.getEmail())) {
             throw new CustomException(DUPLICATE_EMAIL);
         }
     }
@@ -61,8 +61,14 @@ public class TrainerService {
      * 트레이너 단건 조회
      */
     public Trainer findOne(Long id) {
-        return trainerRepository.findById(id)
+        Trainer trainer = trainerRepository.findById(id)
                 .orElseThrow(() -> new CustomException(TRAINER_NOT_FOUND));
+
+        if (trainer.isDeleted()) {
+            throw new CustomException(DEACTIVATE_MEMBER);
+        }
+
+        return trainer;
     }
 
     /**
@@ -76,7 +82,7 @@ public class TrainerService {
      * 트레이너 목록
      */
     public List<Trainer> findTrainers() {
-        return trainerRepository.findAll();
+        return trainerRepository.findALl();
     }
 
     /**
@@ -86,6 +92,10 @@ public class TrainerService {
     public void updateTrainer(Long id, TrainerEditDto trainerEditDto) {
         Trainer trainer = trainerRepository.findById(id)
                 .orElseThrow(() -> new CustomException(TRAINER_NOT_FOUND));
+
+        if (trainer.isDeleted()) {
+            throw new CustomException(DEACTIVATE_MEMBER);
+        }
 
         String name = trainerEditDto.getName();
         Address address = new Address(trainerEditDto.getZoneCode(), trainerEditDto.getAddress(), trainerEditDto.getDetailAddress(), trainerEditDto.getBuildingName());
@@ -100,6 +110,10 @@ public class TrainerService {
     public void changePassword(Long id, UpdatePasswordDto updatePasswordDto) {
         Trainer trainer = trainerRepository.findById(id)
                 .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
+
+        if (trainer.isDeleted()) {
+            throw new CustomException(DEACTIVATE_MEMBER);
+        }
 
         // 현재 비밀번호 일치 확인
         if (!bCryptPasswordEncoder.matches(updatePasswordDto.getCurrentPassword(), trainer.getPassword())) {
