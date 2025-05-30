@@ -1,6 +1,8 @@
 package project.gymnawa.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import project.gymnawa.domain.entity.Trainer;
 
 import java.util.List;
@@ -18,20 +20,12 @@ public interface TrainerRepository extends JpaRepository<Trainer, Long> {
     /**
      * 트레이너 이름으로 조회
      */
-    List<Trainer> findByName(String name);
+    @Query("select t from Trainer t where t.deleted = false and t.name = :name")
+    List<Trainer> findByName(@Param("name") String name);
 
     /**
      * 트레이너 전체 조회
      */
-
-    // 이건 이제 트레이너 고용 저장소에서 해야할 기능
-//    /**
-//     * 특정 헬스장에 있는 트레이너 목록
-//     */
-//    @Query("select t from Trainer t where t.gym = :gym")
-//    List<Trainer> findByGym(@Param("gym") Gym gym);
-
-    /**
-     * 트레이너 삭제
-     */
+    @Query("select t from Trainer t where t.deleted = false")
+    List<Trainer> findALl();
 }
