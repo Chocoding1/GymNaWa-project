@@ -7,18 +7,20 @@ import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import project.gymnawa.domain.dto.normember.MemberEditDto;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import project.gymnawa.domain.dto.member.UpdatePasswordDto;
 import project.gymnawa.domain.dto.trainer.TrainerEditDto;
 import project.gymnawa.domain.dto.trainer.TrainerSaveDto;
 import project.gymnawa.domain.entity.Trainer;
 import project.gymnawa.domain.etcfield.Address;
 import project.gymnawa.domain.etcfield.Gender;
+import project.gymnawa.domain.etcfield.Role;
+import project.gymnawa.errors.dto.ErrorCode;
+import project.gymnawa.errors.exception.CustomException;
 import project.gymnawa.repository.MemberRepository;
 import project.gymnawa.repository.TrainerRepository;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -36,147 +38,167 @@ class TrainerServiceTest {
     TrainerRepository trainerRepository;
     @Mock
     MemberRepository memberRepository;
+    @Mock
+    BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Test
-    @DisplayName("회원가입 성공")
-    void joinSuccess() {
+    @DisplayName("회원가입 성공 - 일반 회원가입(loginType == null)")
+    void joinSuccessWithNormal() {
         //given
-        Trainer trainer = createTrainer("galmeagi2@naver.com", "1234", "조성진");
         TrainerSaveDto trainerSaveDto = TrainerSaveDto.builder()
                 .email("galmeagi2@naver.com")
                 .password("1234")
                 .name("조성진")
+                .gender(Gender.MALE)
                 .build();
 
-        when(trainerRepository.save(trainer)).thenReturn(trainer);
-        when(memberRepository.findByEmail("galmeagi2@naver.com")).thenReturn(Optional.empty());
+        when(memberRepository.existsByEmailAndDeletedFalse(anyString())).thenReturn(false);
+        when(trainerRepository.save(any(Trainer.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         //when
-        Long joinId = trainerService.join(trainerSaveDto);
+        trainerService.join(trainerSaveDto);
 
         //then
-        assertThat(joinId).isEqualTo(trainer.getId());
-        verify(trainerRepository, times(1)).save(trainer);
+        verify(memberRepository, times(1)).existsByEmailAndDeletedFalse(anyString());
+        verify(bCryptPasswordEncoder, times(1)).encode(anyString());
+        verify(trainerRepository, times(1)).save(any(Trainer.class));
 
-        InOrder inOrder = inOrder(memberRepository, trainerRepository);
-        inOrder.verify(memberRepository).findByEmail("galmeagi2@naver.com");
-        inOrder.verify(trainerRepository).save(trainer);
+        assertThat(trainerSaveDto.getLoginType()).isEqualTo("normal");
+        assertThat(trainerSaveDto.getRole()).isEqualTo(Role.USER);
+
+        InOrder inOrder = inOrder(memberRepository, trainerRepository, bCryptPasswordEncoder);
+        inOrder.verify(memberRepository).existsByEmailAndDeletedFalse(anyString());
+        inOrder.verify(bCryptPasswordEncoder).encode(anyString());
+        inOrder.verify(trainerRepository).save(any(Trainer.class));
     }
 
     @Test
-    @DisplayName("회원가입 실패 - 중복 이메일은 입력 불가")
-    void joinFail() {
+    @DisplayName("회원가입 성공 - 소셜 로그인 회원가입(loginType == social)")
+    void joinSuccessWithSocial() {
         //given
-        Trainer trainer = createTrainer("galmeagi2@naver.com", "aadfad", "조성진");
+        TrainerSaveDto trainerSaveDto = TrainerSaveDto.builder()
+                .email("galmeagi2@naver.com")
+                .password("1234")
+                .name("조성진")
+                .gender(Gender.MALE)
+                .loginType("social")
+                .build();
+
+        when(memberRepository.existsByEmailAndDeletedFalse(anyString())).thenReturn(false);
+        when(trainerRepository.save(any(Trainer.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        //when
+        trainerService.join(trainerSaveDto);
+
+        //then
+        verify(memberRepository, times(1)).existsByEmailAndDeletedFalse(anyString());
+        verify(bCryptPasswordEncoder, times(0)).encode(anyString());
+        verify(trainerRepository, times(1)).save(any(Trainer.class));
+
+        assertThat(trainerSaveDto.getRole()).isEqualTo(Role.USER);
+
+        InOrder inOrder = inOrder(memberRepository, trainerRepository);
+        inOrder.verify(memberRepository).existsByEmailAndDeletedFalse(anyString());
+        inOrder.verify(trainerRepository).save(any(Trainer.class));
+    }
+
+    @Test
+    @DisplayName("회원가입 실패 - 이미 가입된 이메일 입력 시 오류 발생")
+    void joinFail_duplicateEmail() {
+        //given
         TrainerSaveDto trainerSaveDto = TrainerSaveDto.builder()
                 .email("galmeagi2@naver.com")
                 .password("aadfad")
                 .name("조성진")
                 .build();
 
-        when(memberRepository.findByEmail("galmeagi2@naver.com")).thenReturn(Optional.of(trainer));
+        when(memberRepository.existsByEmailAndDeletedFalse(anyString())).thenReturn(true);
 
         //when & then
-        assertThrows(IllegalStateException.class,
+        CustomException customException = assertThrows(CustomException.class,
                 () -> trainerService.join(trainerSaveDto));
-        verify(memberRepository, times(1)).findByEmail("galmeagi2@naver.com");
+        ErrorCode errorCode = customException.getErrorCode();
+
+        verify(memberRepository, times(1)).existsByEmailAndDeletedFalse(anyString());
+
+        assertThat(errorCode.getCode()).isEqualTo("DUPLICATE_EMAIL");
+        assertThat(errorCode.getStatus()).isEqualTo(HttpStatus.CONFLICT);
+        assertThat(errorCode.getErrorMessage()).isEqualTo("이미 가입된 이메일입니다.");
     }
 
     @Test
-    @DisplayName("트레이너 조회 성공")
-    void findTrainerSuccess() {
+    @DisplayName("회원 조회 성공")
+    void findNorMemberSuccess() {
         //given
+        Long memberId = 1L;
         Trainer trainer = Trainer.builder()
-                .id(1L)
                 .password("1234")
-                .name("조성진")
                 .email("galmeagi2@naver.com")
-                .gender(Gender.MALE)
                 .build();
 
-        when(trainerRepository.findById(1L)).thenReturn(Optional.of(trainer));
+        when(trainerRepository.findById(anyLong())).thenReturn(Optional.of(trainer));
 
         //when
-        Trainer findTrainer = trainerService.findOne(1L);
+        trainerService.findOne(memberId);
 
         //then
-        assertThat(findTrainer.getEmail()).isEqualTo(trainer.getEmail());
-        verify(trainerRepository, times(1)).findById(1L);
+        verify(trainerRepository, times(1)).findById(anyLong());
     }
 
     @Test
-    @DisplayName("회원 조회 실패 - 존재하지 않는 회원")
-    void findTrainerFail() {
+    @DisplayName("회원 조회 실패 - 존재하지 않는 회원일 경우 에러 발생")
+    void findNorMemberFail_notFound() {
         //given
-        Long id = 1L;
-        when(trainerRepository.findById(id)).thenReturn(Optional.empty());
+        Long memberId = 1L;
+        when(trainerRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         //when & then
-        assertThrows(NoSuchElementException.class,
-                () -> trainerService.findOne(id));
+        CustomException customException = assertThrows(CustomException.class,
+                () -> trainerService.findOne(memberId));
+        ErrorCode errorCode = customException.getErrorCode();
 
-        verify(trainerRepository, times(1)).findById(id);
+        assertThat(errorCode.getCode()).isEqualTo("MEMBER_NOT_FOUND");
+        assertThat(errorCode.getStatus()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(errorCode.getErrorMessage()).isEqualTo("존재하지 않는 회원입니다.");
+
+        verify(trainerRepository, times(1)).findById(anyLong());
     }
 
     @Test
-    @DisplayName("트레이너 이름으로 조회")
-    void findByName() {
+    @DisplayName("회원 조회 실패 - 탈퇴한 회원일 경우 에러 발생")
+    void findNorMemberFail_deleted() {
         //given
-        Trainer trainer1 = createTrainer("galmeagi2@naver.com", "aadfad", "조성진");
-        Trainer trainer2 = createTrainer("galmeagi2@naver.com", "aadfad", "조성진");
-        Trainer trainer3 = createTrainer("galmeagi2@naver.com", "aadfad", "조성진");
+        Long memberId = 1L;
+        Trainer trainer = Trainer.builder()
+                .deleted(true)
+                .build();
 
-        List<Trainer> trainers = Arrays.asList(trainer1, trainer2, trainer3);
+        when(trainerRepository.findById(anyLong())).thenReturn(Optional.of(trainer));
 
-        when(trainerRepository.findByName("조성진")).thenReturn(trainers);
+        //when & then
+        CustomException customException = assertThrows(CustomException.class,
+                () -> trainerService.findOne(memberId));
+        ErrorCode errorCode = customException.getErrorCode();
 
-        //when
-        List<Trainer> result = trainerService.findByName("조성진");
+        assertThat(errorCode.getCode()).isEqualTo("DEACTIVATE_MEMBER");
+        assertThat(errorCode.getStatus()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(errorCode.getErrorMessage()).isEqualTo("탈퇴한 회원입니다.");
 
-        //then
-        assertThat(result.size()).isEqualTo(3);
-        assertThat(result).contains(trainer1, trainer2, trainer3);
-
-        verify(trainerRepository, times(1)).findByName("조성진");
+        verify(trainerRepository, times(1)).findById(anyLong());
     }
 
     @Test
-    @DisplayName("트레이너 목록")
-    void findTrainers() {
-        //given
-        Trainer trainer1 = createTrainer("galmeagi2@naver.com", "aadfad", "조성진");
-        Trainer trainer2 = createTrainer("galmeagi2@naver.com", "aadfad", "조성진");
-        Trainer trainer3 = createTrainer("galmeagi2@naver.com", "aadfad", "조성진");
-
-        List<Trainer> trainers = Arrays.asList(trainer1, trainer2, trainer3);
-
-        when(trainerRepository.findAll()).thenReturn(trainers);
-
-        //when
-        List<Trainer> result = trainerService.findTrainers();
-
-        //then
-        assertThat(result.size()).isEqualTo(3);
-        assertThat(result).contains(trainer1, trainer2, trainer3);
-
-        verify(trainerRepository, times(1)).findAll();
-    }
-
-    @Test
-    @DisplayName("트레이너 정보 수정 성공")
-    void updateTrainerSuccess() {
+    @DisplayName("회원 정보 수정 성공")
+    void updateMemberSuccess() {
         //given
         Trainer trainer = Trainer.builder()
                 .id(1L)
-                .password("oldPw")
                 .name("oldName")
-                .email("oldMail")
                 .address(new Address("oldZone", "oldAddress", "oldDetail", "oldBuilding"))
                 .gender(Gender.MALE)
                 .build();
 
         TrainerEditDto trainerEditDto = TrainerEditDto.builder()
-                .password("newPw")
                 .name("newName")
                 .zoneCode("newZone")
                 .address("newAddress")
@@ -190,63 +212,221 @@ class TrainerServiceTest {
         trainerService.updateTrainer(1L, trainerEditDto);
 
         //then
-        assertThat(trainer.getPassword()).isEqualTo("newPw");
         assertThat(trainer.getName()).isEqualTo("newName");
         assertThat(trainer.getAddress().getZoneCode()).isEqualTo("newZone");
+        assertThat(trainer.getGender()).isEqualTo(Gender.MALE);
 
         verify(trainerRepository, times(1)).findById(1L);
     }
 
     @Test
-    @DisplayName("회원 정보 수정 실패 - 존재하지 않는 회원")
-    void updateTrainerFail_EmptyMember() {
+    @DisplayName("회원 정보 수정 실패 - 존재하지 않는 회원일 경우 에러 발생")
+    void updateMemberFail_notFound() {
         //given
-        when(trainerRepository.findById(1L)).thenReturn(Optional.empty());
-
+        Long memberId = 1L;
         TrainerEditDto trainerEditDto = TrainerEditDto.builder()
-                .password("newPw")
-                .name("newName")
-                .zoneCode("newZone")
-                .address("newAddress")
-                .detailAddress("newDetail")
-                .buildingName("newBuilding")
                 .build();
+
+        when(trainerRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         //when & then
-        assertThrows(NoSuchElementException.class,
-                () -> trainerService.updateTrainer(1L, trainerEditDto));
+        CustomException customException = assertThrows(CustomException.class,
+                () -> trainerService.updateTrainer(memberId, trainerEditDto));
+        ErrorCode errorCode = customException.getErrorCode();
 
-        verify(trainerRepository, times(1)).findById(1L);
+        verify(trainerRepository, times(1)).findById(anyLong());
+
+        assertThat(errorCode.getCode()).isEqualTo("MEMBER_NOT_FOUND");
+        assertThat(errorCode.getStatus()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(errorCode.getErrorMessage()).isEqualTo("존재하지 않는 회원입니다.");
     }
 
     @Test
-    @DisplayName("트레이너 탈퇴")
-    void deleteTrainer() {
+    @DisplayName("회원 정보 수정 실패 - 탈퇴한 회원일 경우 에러 발생")
+    void updateMemberFail_deleted() {
         //given
+        Long memberId = 1L;
         Trainer trainer = Trainer.builder()
-                .id(1L)
-                .password("1234")
-                .email("galmeagi2@naver.com")
+                .deleted(true)
                 .build();
 
-        when(trainerRepository.findById(1L)).thenReturn(Optional.of(trainer));
+        TrainerEditDto trainerEditDto = TrainerEditDto.builder()
+                .build();
 
-        //when
-        trainerService.deleteOne(1L);
+        when(trainerRepository.findById(anyLong())).thenReturn(Optional.of(trainer));
 
-        verify(trainerRepository, times(1)).findById(1L);
-        verify(trainerRepository, times(1)).delete(trainer);
+        //when & then
+        CustomException customException = assertThrows(CustomException.class,
+                () -> trainerService.updateTrainer(memberId, trainerEditDto));
+        ErrorCode errorCode = customException.getErrorCode();
 
-        InOrder inOrder = inOrder(trainerRepository);
-        inOrder.verify(trainerRepository).findById(1L);
-        inOrder.verify(trainerRepository).delete(trainer);
+        verify(trainerRepository, times(1)).findById(anyLong());
+
+        assertThat(errorCode.getCode()).isEqualTo("DEACTIVATE_MEMBER");
+        assertThat(errorCode.getStatus()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(errorCode.getErrorMessage()).isEqualTo("탈퇴한 회원입니다.");
     }
 
-    private Trainer createTrainer(String email, String password, String name) {
+    @Test
+    @DisplayName("비밀번호 변경 성공")
+    public void updatePasswordSuccess() {
+        //given
+        Long memberId = 1L;
+        Trainer trainer = Trainer.builder()
+                .password("oldPwd")
+                .build();
+
+        UpdatePasswordDto updatePasswordDto = UpdatePasswordDto.builder()
+                .currentPassword("oldPwd")
+                .newPassword("newPwd")
+                .confirmPassword("newPwd")
+                .build();
+
+        when(trainerRepository.findById(anyLong())).thenReturn(Optional.of(trainer));
+        when(bCryptPasswordEncoder.matches(anyString(), anyString())).thenReturn(true);
+
+        //when
+        trainerService.changePassword(memberId, updatePasswordDto);
+
+        //then
+        assertThat(trainer.getPassword()).isNotEqualTo("oldPwd");
+
+        verify(trainerRepository, times(1)).findById(anyLong());
+        verify(bCryptPasswordEncoder, times(1)).matches(anyString(), anyString());
+        verify(bCryptPasswordEncoder, times(1)).encode(anyString());
+
+        InOrder inOrder = inOrder(trainerRepository, bCryptPasswordEncoder);
+        inOrder.verify(trainerRepository).findById(anyLong());
+        inOrder.verify(bCryptPasswordEncoder).matches(anyString(), anyString());
+        inOrder.verify(bCryptPasswordEncoder).encode(anyString());
+    }
+
+    @Test
+    @DisplayName("비밀번호 변경 실패 - 존재하지 않는 회원일 경우 에러 발생")
+    public void updatePasswordFail_notFound() {
+        //given
+        Long memberId = 1L;
+        UpdatePasswordDto updatePasswordDto = UpdatePasswordDto.builder()
+                .build();
+
+        when(trainerRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        //when & then
+        CustomException customException = assertThrows(CustomException.class,
+                () -> trainerService.changePassword(memberId, updatePasswordDto));
+        ErrorCode errorCode = customException.getErrorCode();
+
+        assertThat(errorCode.getCode()).isEqualTo("MEMBER_NOT_FOUND");
+        assertThat(errorCode.getStatus()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(errorCode.getErrorMessage()).isEqualTo("존재하지 않는 회원입니다.");
+
+        verify(trainerRepository, times(1)).findById(anyLong());
+        verify(bCryptPasswordEncoder, never()).matches(anyString(), anyString());
+        verify(bCryptPasswordEncoder, never()).encode(anyString());
+    }
+
+    @Test
+    @DisplayName("비밀번호 변경 실패 - 탈퇴한 회원일 경우 에러 발생")
+    public void updatePasswordFail_deleted() {
+        //given
+        Long memberId = 1L;
+        Trainer trainer = Trainer.builder()
+                .deleted(true)
+                .build();
+
+        UpdatePasswordDto updatePasswordDto = UpdatePasswordDto.builder()
+                .build();
+
+        when(trainerRepository.findById(anyLong())).thenReturn(Optional.of(trainer));
+
+        //when & then
+        CustomException customException = assertThrows(CustomException.class,
+                () -> trainerService.changePassword(memberId, updatePasswordDto));
+        ErrorCode errorCode = customException.getErrorCode();
+
+        assertThat(errorCode.getCode()).isEqualTo("DEACTIVATE_MEMBER");
+        assertThat(errorCode.getStatus()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(errorCode.getErrorMessage()).isEqualTo("탈퇴한 회원입니다.");
+
+        verify(trainerRepository, times(1)).findById(anyLong());
+        verify(bCryptPasswordEncoder, never()).matches(anyString(), anyString());
+        verify(bCryptPasswordEncoder, never()).encode(anyString());
+    }
+
+    @Test
+    @DisplayName("비밀번호 변경 실패 - 현재 비밀번호가 일치하지 않을 경우 에러 발생")
+    public void updatePasswordFail_invalidCurrentPassword() {
+        //given
+        Long memberId = 1L;
+        Trainer trainer = Trainer.builder()
+                .password("oldPwd")
+                .build();
+
+        UpdatePasswordDto updatePasswordDto = UpdatePasswordDto.builder()
+                .currentPassword("invalidPwd")
+                .newPassword("newPwd")
+                .confirmPassword("newPwd")
+                .build();
+
+        when(trainerRepository.findById(anyLong())).thenReturn(Optional.of(trainer));
+        when(bCryptPasswordEncoder.matches(anyString(), anyString())).thenReturn(false);
+
+        //when & then
+        CustomException customException = assertThrows(CustomException.class,
+                () -> trainerService.changePassword(memberId, updatePasswordDto));
+        ErrorCode errorCode = customException.getErrorCode();
+
+        assertThat(trainer.getPassword()).isEqualTo("oldPwd");
+
+        assertThat(errorCode.getCode()).isEqualTo("INVALID_PASSWORD");
+        assertThat(errorCode.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(errorCode.getErrorMessage()).isEqualTo("비밀번호가 일치하지 않습니다.");
+
+        verify(trainerRepository, times(1)).findById(anyLong());
+        verify(bCryptPasswordEncoder, times(1)).matches(anyString(), anyString());
+        verify(bCryptPasswordEncoder, never()).encode(anyString());
+    }
+
+    @Test
+    @DisplayName("비밀번호 변경 실패 - 재입력한 새 비밀번호가 일치하지 않을 경우 에러 발생")
+    public void updatePasswordFail_invalidConfirmPassword() {
+        //given
+        Long memberId = 1L;
+        Trainer trainer = Trainer.builder()
+                .password("oldPwd")
+                .build();
+
+        UpdatePasswordDto updatePasswordDto = UpdatePasswordDto.builder()
+                .currentPassword("oldPwd")
+                .newPassword("newPwd")
+                .confirmPassword("invalidNewPwd")
+                .build();
+
+        when(trainerRepository.findById(anyLong())).thenReturn(Optional.of(trainer));
+        when(bCryptPasswordEncoder.matches(anyString(), anyString())).thenReturn(true);
+
+        //when & then
+        CustomException customException = assertThrows(CustomException.class,
+                () -> trainerService.changePassword(memberId, updatePasswordDto));
+        ErrorCode errorCode = customException.getErrorCode();
+
+        assertThat(trainer.getPassword()).isEqualTo("oldPwd");
+
+        assertThat(errorCode.getCode()).isEqualTo("INVALID_NEW_PASSWORD");
+        assertThat(errorCode.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(errorCode.getErrorMessage()).isEqualTo("새 비밀번호가 서로 일치하지 않습니다.");
+
+        verify(trainerRepository, times(1)).findById(anyLong());
+        verify(bCryptPasswordEncoder, times(1)).matches(anyString(), anyString());
+        verify(bCryptPasswordEncoder, never()).encode(anyString());
+    }
+
+    private Trainer createTrainer(String email, String password, String name, boolean deleted) {
         return Trainer.builder()
                 .email(email)
                 .password(password)
                 .name(name)
+                .deleted(deleted)
                 .build();
     }
 }
