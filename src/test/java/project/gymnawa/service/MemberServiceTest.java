@@ -48,7 +48,7 @@ public class MemberServiceTest {
 
     @Test
     @DisplayName("존재하지 않는 회원은 조회할 수 없고, 에러를 발생시킨다.")
-    void findMemberFail() {
+    void findMemberFail_notFound() {
         //given
         when(memberRepository.findById(anyLong())).thenReturn(Optional.empty());
 
@@ -60,6 +60,26 @@ public class MemberServiceTest {
         assertThat(errorCode.getCode()).isEqualTo("MEMBER_NOT_FOUND");
         assertThat(errorCode.getStatus()).isEqualTo(HttpStatus.NOT_FOUND);
         assertThat(errorCode.getErrorMessage()).isEqualTo("존재하지 않는 회원입니다.");
+    }
+
+    @Test
+    @DisplayName("탈퇴한 회원은 조회할 수 없고, 에러를 발생시킨다.")
+    void findMemberFail_deleted() {
+        //given
+        Member member = Member.builder()
+                .deleted(true)
+                .build();
+
+        when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
+
+        //when & then
+        CustomException customException = assertThrows(CustomException.class, () -> memberService.findOne(anyLong()));
+        ErrorCode errorCode = customException.getErrorCode();
+
+        verify(memberRepository, times(1)).findById(anyLong());
+        assertThat(errorCode.getCode()).isEqualTo("DEACTIVATE_MEMBER");
+        assertThat(errorCode.getStatus()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(errorCode.getErrorMessage()).isEqualTo("탈퇴한 회원입니다.");
     }
 
     @Test
@@ -81,7 +101,7 @@ public class MemberServiceTest {
 
     @Test
     @DisplayName("가입되지 않은 이메일로 회원 조회 시, 에러를 발생시킨다.")
-    void findMemberByEmailFail() {
+    void findMemberByEmailFail_notFound() {
         //given
         when(memberRepository.findByEmail(anyString())).thenReturn(Optional.empty());
 
@@ -93,6 +113,27 @@ public class MemberServiceTest {
         assertThat(errorCode.getCode()).isEqualTo("MEMBER_NOT_FOUND");
         assertThat(errorCode.getStatus()).isEqualTo(HttpStatus.NOT_FOUND);
         assertThat(errorCode.getErrorMessage()).isEqualTo("존재하지 않는 회원입니다.");
+    }
+
+    @Test
+    @DisplayName("탈퇴한 이메일로 회원 조회 시, 에러를 발생시킨다.")
+    void findMemberByEmailFail_deleted() {
+        //given
+        Member member = Member.builder()
+                .email("galmeagi2@naver.com")
+                .deleted(true)
+                .build();
+
+        when(memberRepository.findByEmail(anyString())).thenReturn(Optional.of(member));
+
+        //when & then
+        CustomException customException = assertThrows(CustomException.class, () -> memberService.findByEmail(anyString()));
+        ErrorCode errorCode = customException.getErrorCode();
+
+        verify(memberRepository, times(1)).findByEmail(anyString());
+        assertThat(errorCode.getCode()).isEqualTo("DEACTIVATE_MEMBER");
+        assertThat(errorCode.getStatus()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(errorCode.getErrorMessage()).isEqualTo("탈퇴한 회원입니다.");
     }
 
     @Test
@@ -116,9 +157,13 @@ public class MemberServiceTest {
 
     @Test
     @DisplayName("회원 탈퇴 처리 실패 - 존재하지 않는 회원일 경우 에러 발생")
-    void deactivateMemberFail_notFoundMember() {
+    void deactivateMemberFail_notFound() {
         //given
-        when(memberRepository.findById(anyLong())).thenReturn(Optional.empty());
+        Member member = Member.builder()
+                .deleted(true)
+                .build();
+
+        when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
 
         //when & then
         CustomException customException = assertThrows(CustomException.class, () -> memberService.deactivateMember(anyLong()));
@@ -129,6 +174,23 @@ public class MemberServiceTest {
         assertThat(errorCode.getCode()).isEqualTo("MEMBER_NOT_FOUND");
         assertThat(errorCode.getStatus()).isEqualTo(HttpStatus.NOT_FOUND);
         assertThat(errorCode.getErrorMessage()).isEqualTo("존재하지 않는 회원입니다.");
+    }
+
+    @Test
+    @DisplayName("회원 탈퇴 처리 실패 - 이미 탈퇴한 회원일 경우 에러 발생")
+    void deactivateMemberFail_deleted() {
+        //given
+        when(memberRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        //when & then
+        CustomException customException = assertThrows(CustomException.class, () -> memberService.deactivateMember(anyLong()));
+        ErrorCode errorCode = customException.getErrorCode();
+
+        verify(memberRepository, times(1)).findById(anyLong());
+
+        assertThat(errorCode.getCode()).isEqualTo("DEACTIVATE_MEMBER");
+        assertThat(errorCode.getStatus()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(errorCode.getErrorMessage()).isEqualTo("탈퇴한 회원입니다.");
     }
 
     /**
