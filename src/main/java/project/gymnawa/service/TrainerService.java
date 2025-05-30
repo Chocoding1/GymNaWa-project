@@ -62,7 +62,7 @@ public class TrainerService {
      */
     public Trainer findOne(Long id) {
         Trainer trainer = trainerRepository.findById(id)
-                .orElseThrow(() -> new CustomException(TRAINER_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
 
         if (trainer.isDeleted()) {
             throw new CustomException(DEACTIVATE_MEMBER);
@@ -91,7 +91,7 @@ public class TrainerService {
     @Transactional
     public void updateTrainer(Long id, TrainerEditDto trainerEditDto) {
         Trainer trainer = trainerRepository.findById(id)
-                .orElseThrow(() -> new CustomException(TRAINER_NOT_FOUND));
+                .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
 
         if (trainer.isDeleted()) {
             throw new CustomException(DEACTIVATE_MEMBER);
