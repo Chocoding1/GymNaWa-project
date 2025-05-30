@@ -12,6 +12,7 @@ public enum ErrorCode {
     INVALID_PASSWORD("INVALID_PASSWORD", HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다."),
     INVALID_NEW_PASSWORD("INVALID_NEW_PASSWORD", HttpStatus.BAD_REQUEST, "새 비밀번호가 서로 일치하지 않습니다."),
     ACCESS_DENIED("ACCESS_DENIED", HttpStatus.BAD_REQUEST, "잘못된 접근입니다."),
+    DEACTIVATE_MEMBER("DEACTIVATE_MEMBER", HttpStatus.NOT_FOUND, "탈퇴한 회원입니다."),
 
     // 일반 회원
     MEMBER_NOT_FOUND("MEMBER_NOT_FOUND", HttpStatus.NOT_FOUND, "존재하지 않는 회원입니다."),
