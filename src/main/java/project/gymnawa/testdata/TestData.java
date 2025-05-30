@@ -10,7 +10,6 @@ import project.gymnawa.domain.entity.NorMember;
 import project.gymnawa.domain.entity.PtMembership;
 import project.gymnawa.domain.entity.Review;
 import project.gymnawa.domain.entity.Trainer;
-import project.gymnawa.domain.etcfield.Address;
 import project.gymnawa.domain.etcfield.Gender;
 import project.gymnawa.service.*;
 
