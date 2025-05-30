@@ -7,16 +7,20 @@ import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import project.gymnawa.domain.dto.member.UpdatePasswordDto;
 import project.gymnawa.domain.dto.normember.MemberEditDto;
 import project.gymnawa.domain.dto.normember.MemberSaveDto;
-import project.gymnawa.domain.dto.trainer.TrainerSaveDto;
 import project.gymnawa.domain.etcfield.Address;
 import project.gymnawa.domain.etcfield.Gender;
 import project.gymnawa.domain.entity.NorMember;
+import project.gymnawa.domain.etcfield.Role;
+import project.gymnawa.errors.dto.ErrorCode;
+import project.gymnawa.errors.exception.CustomException;
 import project.gymnawa.repository.MemberRepository;
 import project.gymnawa.repository.NorMemberRepository;
 
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
@@ -33,21 +37,13 @@ class NorMemberServiceTest {
     NorMemberRepository norMemberRepository;
     @Mock
     MemberRepository memberRepository;
+    @Mock
+    BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Test
-    @DisplayName("회원가입 성공")
-    void joinSuccess() {
+    @DisplayName("회원가입 성공 - 일반 회원가입(loginType == null)")
+    void joinSuccessWithNormal() {
         //given
-        Address address = new Address("12345", "서울", "강서구", "마곡동");
-        NorMember norMember = NorMember.builder()
-                .id(1L)
-                .password("1234")
-                .name("조성진")
-                .email("galmeagi2@naver.com")
-                .address(address)
-                .gender(Gender.MALE)
-                .build();
-
         MemberSaveDto memberSaveDto = MemberSaveDto.builder()
                 .email("galmeagi2@naver.com")
                 .password("1234")
@@ -55,39 +51,78 @@ class NorMemberServiceTest {
                 .gender(Gender.MALE)
                 .build();
 
-        when(norMemberRepository.save(norMember)).thenReturn(norMember);
-        when(memberRepository.findByEmail("galmeagi2@naver.com")).thenReturn(Optional.empty());
+        when(memberRepository.existsByEmailAndDeletedFalse(anyString())).thenReturn(false);
+        when(norMemberRepository.save(any(NorMember.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         //when
-        Long joinId = norMemberService.join(memberSaveDto);
+        norMemberService.join(memberSaveDto);
 
         //then
-        assertThat(joinId).isEqualTo(norMember.getId());
-        verify(memberRepository, times(1)).findByEmail("galmeagi2@naver.com");
-        verify(norMemberRepository, times(1)).save(norMember);
+        verify(memberRepository, times(1)).existsByEmailAndDeletedFalse(anyString());
+        verify(bCryptPasswordEncoder, times(1)).encode(anyString());
+        verify(norMemberRepository, times(1)).save(any(NorMember.class));
 
-        InOrder inOrder = inOrder(memberRepository, norMemberRepository);
-        inOrder.verify(memberRepository).findByEmail("galmeagi2@naver.com");
-        inOrder.verify(norMemberRepository).save(norMember);
+        assertThat(memberSaveDto.getLoginType()).isEqualTo("normal");
+        assertThat(memberSaveDto.getRole()).isEqualTo(Role.USER);
+
+        InOrder inOrder = inOrder(memberRepository, norMemberRepository, bCryptPasswordEncoder);
+        inOrder.verify(memberRepository).existsByEmailAndDeletedFalse(anyString());
+        inOrder.verify(bCryptPasswordEncoder).encode(anyString());
+        inOrder.verify(norMemberRepository).save(any(NorMember.class));
     }
 
     @Test
-    @DisplayName("회원가입 실패 - 중복 이메일은 입력 불가")
-    void joinFail() {
+    @DisplayName("회원가입 성공 - 소셜 로그인 회원가입(loginType == social)")
+    void joinSuccessWithSocial() {
         //given
-        NorMember norMember = createNorMember("galmeagi2@naver.com", "aadfad", "조성진");
+        MemberSaveDto memberSaveDto = MemberSaveDto.builder()
+                .email("galmeagi2@naver.com")
+                .password("1234")
+                .name("조성진")
+                .gender(Gender.MALE)
+                .loginType("social")
+                .build();
+
+        when(memberRepository.existsByEmailAndDeletedFalse(anyString())).thenReturn(false);
+        when(norMemberRepository.save(any(NorMember.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        //when
+        norMemberService.join(memberSaveDto);
+
+        //then
+        verify(memberRepository, times(1)).existsByEmailAndDeletedFalse(anyString());
+        verify(bCryptPasswordEncoder, times(0)).encode(anyString());
+        verify(norMemberRepository, times(1)).save(any(NorMember.class));
+
+        assertThat(memberSaveDto.getRole()).isEqualTo(Role.USER);
+
+        InOrder inOrder = inOrder(memberRepository, norMemberRepository);
+        inOrder.verify(memberRepository).existsByEmailAndDeletedFalse(anyString());
+        inOrder.verify(norMemberRepository).save(any(NorMember.class));
+    }
+
+    @Test
+    @DisplayName("회원가입 실패 - 이미 가입된 이메일 입력 시 오류 발생")
+    void joinFail_duplicateEmail() {
+        //given
         MemberSaveDto memberSaveDto = MemberSaveDto.builder()
                 .email("galmeagi2@naver.com")
                 .password("aadfad")
                 .name("조성진")
                 .build();
 
-        when(memberRepository.findByEmail("galmeagi2@naver.com")).thenReturn(Optional.of(norMember));
+        when(memberRepository.existsByEmailAndDeletedFalse(anyString())).thenReturn(true);
 
         //when & then
-        assertThrows(IllegalStateException.class,
+        CustomException customException = assertThrows(CustomException.class,
                 () -> norMemberService.join(memberSaveDto));
-        verify(memberRepository, times(1)).findByEmail("galmeagi2@naver.com");
+        ErrorCode errorCode = customException.getErrorCode();
+
+        verify(memberRepository, times(1)).existsByEmailAndDeletedFalse(anyString());
+
+        assertThat(errorCode.getCode()).isEqualTo("DUPLICATE_EMAIL");
+        assertThat(errorCode.getStatus()).isEqualTo(HttpStatus.CONFLICT);
+        assertThat(errorCode.getErrorMessage()).isEqualTo("이미 가입된 이메일입니다.");
     }
 
     @Test
@@ -96,15 +131,12 @@ class NorMemberServiceTest {
         //given
         NorMember norMember = NorMember.builder()
                 .id(1L)
-                .password("oldPw")
                 .name("oldName")
-                .email("oldMail")
                 .address(new Address("oldZone", "oldAddress", "oldDetail", "oldBuilding"))
                 .gender(Gender.MALE)
                 .build();
 
         MemberEditDto memberEditDto = MemberEditDto.builder()
-                .password("newPw")
                 .name("newName")
                 .zoneCode("newZone")
                 .address("newAddress")
@@ -118,7 +150,6 @@ class NorMemberServiceTest {
         norMemberService.updateMember(1L, memberEditDto);
 
         //then
-        assertThat(norMember.getPassword()).isEqualTo("newPw");
         assertThat(norMember.getName()).isEqualTo("newName");
         assertThat(norMember.getAddress().getZoneCode()).isEqualTo("newZone");
         assertThat(norMember.getGender()).isEqualTo(Gender.MALE);
@@ -127,89 +158,265 @@ class NorMemberServiceTest {
     }
 
     @Test
-    @DisplayName("회원 정보 수정 실패 - 존재하지 않는 회원")
-    void updateMemberFail_EmptyMember() {
+    @DisplayName("회원 정보 수정 실패 - 존재하지 않는 회원일 경우 에러 발생")
+    void updateMemberFail_notFound() {
         //given
-        when(norMemberRepository.findById(1L)).thenReturn(Optional.empty());
-
+        Long memberId = 1L;
         MemberEditDto memberEditDto = MemberEditDto.builder()
-                .password("newPw")
-                .name("newName")
-                .zoneCode("newZone")
-                .address("newAddress")
-                .detailAddress("newDetail")
-                .buildingName("newBuilding")
                 .build();
 
-        //when & then
-        assertThrows(NoSuchElementException.class,
-                () -> norMemberService.updateMember(1L, memberEditDto));
+        when(norMemberRepository.findById(anyLong())).thenReturn(Optional.empty());
 
-        verify(norMemberRepository, times(1)).findById(1L);
+        //when & then
+        CustomException customException = assertThrows(CustomException.class,
+                () -> norMemberService.updateMember(memberId, memberEditDto));
+        ErrorCode errorCode = customException.getErrorCode();
+
+        verify(norMemberRepository, times(1)).findById(anyLong());
+
+        assertThat(errorCode.getCode()).isEqualTo("MEMBER_NOT_FOUND");
+        assertThat(errorCode.getStatus()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(errorCode.getErrorMessage()).isEqualTo("존재하지 않는 회원입니다.");
+    }
+
+    @Test
+    @DisplayName("회원 정보 수정 실패 - 탈퇴한 회원일 경우 에러 발생")
+    void updateMemberFail_deleted() {
+        //given
+        Long memberId = 1L;
+        NorMember norMember = NorMember.builder()
+                .deleted(true)
+                .build();
+
+        MemberEditDto memberEditDto = MemberEditDto.builder()
+                .build();
+
+        when(norMemberRepository.findById(anyLong())).thenReturn(Optional.of(norMember));
+
+        //when & then
+        CustomException customException = assertThrows(CustomException.class,
+                () -> norMemberService.updateMember(memberId, memberEditDto));
+        ErrorCode errorCode = customException.getErrorCode();
+
+        verify(norMemberRepository, times(1)).findById(anyLong());
+
+        assertThat(errorCode.getCode()).isEqualTo("DEACTIVATE_MEMBER");
+        assertThat(errorCode.getStatus()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(errorCode.getErrorMessage()).isEqualTo("탈퇴한 회원입니다.");
+    }
+
+    @Test
+    @DisplayName("비밀번호 변경 성공")
+    public void updatePasswordSuccess() {
+        //given
+        Long memberId = 1L;
+        NorMember norMember = NorMember.builder()
+                .password("oldPwd")
+                .build();
+
+        UpdatePasswordDto updatePasswordDto = UpdatePasswordDto.builder()
+                .currentPassword("oldPwd")
+                .newPassword("newPwd")
+                .confirmPassword("newPwd")
+                .build();
+
+        when(norMemberRepository.findById(anyLong())).thenReturn(Optional.of(norMember));
+        when(bCryptPasswordEncoder.matches(anyString(), anyString())).thenReturn(true);
+
+        //when
+        norMemberService.changePassword(memberId, updatePasswordDto);
+
+        //then
+        assertThat(norMember.getPassword()).isNotEqualTo("oldPwd");
+
+        verify(norMemberRepository, times(1)).findById(anyLong());
+        verify(bCryptPasswordEncoder, times(1)).matches(anyString(), anyString());
+        verify(bCryptPasswordEncoder, times(1)).encode(anyString());
+
+        InOrder inOrder = inOrder(norMemberRepository, bCryptPasswordEncoder);
+        inOrder.verify(norMemberRepository).findById(anyLong());
+        inOrder.verify(bCryptPasswordEncoder).matches(anyString(), anyString());
+        inOrder.verify(bCryptPasswordEncoder).encode(anyString());
+    }
+
+    @Test
+    @DisplayName("비밀번호 변경 실패 - 존재하지 않는 회원일 경우 에러 발생")
+    public void updatePasswordFail_notFound() {
+        //given
+        Long memberId = 1L;
+        UpdatePasswordDto updatePasswordDto = UpdatePasswordDto.builder()
+                .build();
+
+        when(norMemberRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        //when & then
+        CustomException customException = assertThrows(CustomException.class,
+                () -> norMemberService.changePassword(memberId, updatePasswordDto));
+        ErrorCode errorCode = customException.getErrorCode();
+
+        assertThat(errorCode.getCode()).isEqualTo("MEMBER_NOT_FOUND");
+        assertThat(errorCode.getStatus()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(errorCode.getErrorMessage()).isEqualTo("존재하지 않는 회원입니다.");
+
+        verify(norMemberRepository, times(1)).findById(anyLong());
+        verify(bCryptPasswordEncoder, never()).matches(anyString(), anyString());
+        verify(bCryptPasswordEncoder, never()).encode(anyString());
+    }
+
+    @Test
+    @DisplayName("비밀번호 변경 실패 - 탈퇴한 회원일 경우 에러 발생")
+    public void updatePasswordFail_deleted() {
+        //given
+        Long memberId = 1L;
+        NorMember norMember = NorMember.builder()
+                .deleted(true)
+                .build();
+
+        UpdatePasswordDto updatePasswordDto = UpdatePasswordDto.builder()
+                .build();
+
+        when(norMemberRepository.findById(anyLong())).thenReturn(Optional.of(norMember));
+
+        //when & then
+        CustomException customException = assertThrows(CustomException.class,
+                () -> norMemberService.changePassword(memberId, updatePasswordDto));
+        ErrorCode errorCode = customException.getErrorCode();
+
+        assertThat(errorCode.getCode()).isEqualTo("DEACTIVATE_MEMBER");
+        assertThat(errorCode.getStatus()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(errorCode.getErrorMessage()).isEqualTo("탈퇴한 회원입니다.");
+
+        verify(norMemberRepository, times(1)).findById(anyLong());
+        verify(bCryptPasswordEncoder, never()).matches(anyString(), anyString());
+        verify(bCryptPasswordEncoder, never()).encode(anyString());
+    }
+
+    @Test
+    @DisplayName("비밀번호 변경 실패 - 현재 비밀번호가 일치하지 않을 경우 에러 발생")
+    public void updatePasswordFail_invalidCurrentPassword() {
+        //given
+        Long memberId = 1L;
+        NorMember norMember = NorMember.builder()
+                .password("oldPwd")
+                .build();
+
+        UpdatePasswordDto updatePasswordDto = UpdatePasswordDto.builder()
+                .currentPassword("invalidPwd")
+                .newPassword("newPwd")
+                .confirmPassword("newPwd")
+                .build();
+
+        when(norMemberRepository.findById(anyLong())).thenReturn(Optional.of(norMember));
+        when(bCryptPasswordEncoder.matches(anyString(), anyString())).thenReturn(false);
+
+        //when & then
+        CustomException customException = assertThrows(CustomException.class,
+                () -> norMemberService.changePassword(memberId, updatePasswordDto));
+        ErrorCode errorCode = customException.getErrorCode();
+
+        assertThat(norMember.getPassword()).isEqualTo("oldPwd");
+
+        assertThat(errorCode.getCode()).isEqualTo("INVALID_PASSWORD");
+        assertThat(errorCode.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(errorCode.getErrorMessage()).isEqualTo("비밀번호가 일치하지 않습니다.");
+
+        verify(norMemberRepository, times(1)).findById(anyLong());
+        verify(bCryptPasswordEncoder, times(1)).matches(anyString(), anyString());
+        verify(bCryptPasswordEncoder, never()).encode(anyString());
+    }
+
+    @Test
+    @DisplayName("비밀번호 변경 실패 - 재입력한 새 비밀번호가 일치하지 않을 경우 에러 발생")
+    public void updatePasswordFail_invalidConfirmPassword() {
+        //given
+        Long memberId = 1L;
+        NorMember norMember = NorMember.builder()
+                .password("oldPwd")
+                .build();
+
+        UpdatePasswordDto updatePasswordDto = UpdatePasswordDto.builder()
+                .currentPassword("oldPwd")
+                .newPassword("newPwd")
+                .confirmPassword("invalidNewPwd")
+                .build();
+
+        when(norMemberRepository.findById(anyLong())).thenReturn(Optional.of(norMember));
+        when(bCryptPasswordEncoder.matches(anyString(), anyString())).thenReturn(true);
+
+        //when & then
+        CustomException customException = assertThrows(CustomException.class,
+                () -> norMemberService.changePassword(memberId, updatePasswordDto));
+        ErrorCode errorCode = customException.getErrorCode();
+
+        assertThat(norMember.getPassword()).isEqualTo("oldPwd");
+
+        assertThat(errorCode.getCode()).isEqualTo("INVALID_NEW_PASSWORD");
+        assertThat(errorCode.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(errorCode.getErrorMessage()).isEqualTo("새 비밀번호가 서로 일치하지 않습니다.");
+
+        verify(norMemberRepository, times(1)).findById(anyLong());
+        verify(bCryptPasswordEncoder, times(1)).matches(anyString(), anyString());
+        verify(bCryptPasswordEncoder, never()).encode(anyString());
     }
 
     @Test
     @DisplayName("회원 조회 성공")
     void findNorMemberSuccess() {
         //given
+        Long memberId = 1L;
         NorMember norMember = NorMember.builder()
-                .id(1L)
                 .password("1234")
                 .email("galmeagi2@naver.com")
                 .build();
 
-        when(norMemberRepository.findById(1L)).thenReturn(Optional.of(norMember));
+        when(norMemberRepository.findById(anyLong())).thenReturn(Optional.of(norMember));
 
         //when
-        NorMember findNorMember = norMemberService.findOne(1L);
+        norMemberService.findOne(memberId);
 
         //then
-        assertThat(findNorMember.getEmail()).isEqualTo(norMember.getEmail());
-        verify(norMemberRepository, times(1)).findById(1L);
+        verify(norMemberRepository, times(1)).findById(anyLong());
     }
 
     @Test
-    @DisplayName("회원 조회 실패 - 존재하지 않는 회원")
-    void findNorMemberFail() {
+    @DisplayName("회원 조회 실패 - 존재하지 않는 회원일 경우 에러 발생")
+    void findNorMemberFail_notFound() {
         //given
-        Long id = 1L;
-        when(norMemberRepository.findById(id)).thenReturn(Optional.empty());
+        Long memberId = 1L;
+        when(norMemberRepository.findById(anyLong())).thenReturn(Optional.empty());
 
         //when & then
-        assertThrows(NoSuchElementException.class,
-                () -> norMemberService.findOne(id));
+        CustomException customException = assertThrows(CustomException.class,
+                () -> norMemberService.findOne(memberId));
+        ErrorCode errorCode = customException.getErrorCode();
 
-        verify(norMemberRepository, times(1)).findById(id);
+        assertThat(errorCode.getCode()).isEqualTo("MEMBER_NOT_FOUND");
+        assertThat(errorCode.getStatus()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(errorCode.getErrorMessage()).isEqualTo("존재하지 않는 회원입니다.");
+
+        verify(norMemberRepository, times(1)).findById(anyLong());
     }
 
     @Test
-    @DisplayName("회원 탈퇴")
-    void deleteNorMember() {
+    @DisplayName("회원 조회 실패 - 탈퇴한 회원일 경우 에러 발생")
+    void findNorMemberFail_deleted() {
         //given
+        Long memberId = 1L;
         NorMember norMember = NorMember.builder()
-                .id(1L)
-                .password("1234")
-                .email("galmeagi2@naver.com")
+                .deleted(true)
                 .build();
 
-        when(norMemberRepository.findById(1L)).thenReturn(Optional.of(norMember));
+        when(norMemberRepository.findById(anyLong())).thenReturn(Optional.of(norMember));
 
-        //when
-        norMemberService.deleteOne(1L);
+        //when & then
+        CustomException customException = assertThrows(CustomException.class,
+                () -> norMemberService.findOne(memberId));
+        ErrorCode errorCode = customException.getErrorCode();
 
-        verify(norMemberRepository, times(1)).findById(1L);
-        verify(norMemberRepository, times(1)).delete(norMember);
+        assertThat(errorCode.getCode()).isEqualTo("DEACTIVATE_MEMBER");
+        assertThat(errorCode.getStatus()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(errorCode.getErrorMessage()).isEqualTo("탈퇴한 회원입니다.");
 
-        InOrder inOrder = inOrder(norMemberRepository);
-        inOrder.verify(norMemberRepository).findById(1L);
-        inOrder.verify(norMemberRepository).delete(norMember);
-    }
-
-    private NorMember createNorMember(String email, String password, String name) {
-        return NorMember.builder()
-                .email(email)
-                .password(password)
-                .name(name)
-                .build();
+        verify(norMemberRepository, times(1)).findById(anyLong());
     }
 }
