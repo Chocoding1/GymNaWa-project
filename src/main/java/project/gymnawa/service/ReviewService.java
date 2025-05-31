@@ -7,10 +7,12 @@ import project.gymnawa.domain.dto.review.ReviewSaveDto;
 import project.gymnawa.domain.entity.NorMember;
 import project.gymnawa.domain.entity.Review;
 import project.gymnawa.domain.entity.Trainer;
+import project.gymnawa.errors.exception.CustomException;
 import project.gymnawa.repository.ReviewRepository;
 
 import java.util.List;
-import java.util.NoSuchElementException;
+
+import static project.gymnawa.errors.dto.ErrorCode.*;
 
 @Service
 @Transactional(readOnly = true)
@@ -35,7 +37,7 @@ public class ReviewService {
      */
     public Review findByIdAndNorMember(Long id, NorMember norMember) {
         return reviewRepository.findByIdAndNorMember(id, norMember)
-                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 리뷰입니다."));
+                .orElseThrow(() -> new CustomException(REVIEW_NOT_FOUND));
     }
 
     /**
@@ -58,7 +60,7 @@ public class ReviewService {
     @Transactional
     public void updateReview(Long id, NorMember norMember, String newContent) {
         Review review = reviewRepository.findByIdAndNorMember(id, norMember)
-                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 리뷰입니다."));
+                .orElseThrow(() -> new CustomException(REVIEW_NOT_FOUND));
 
         review.updateContent(newContent);
     }
@@ -69,7 +71,7 @@ public class ReviewService {
     @Transactional
     public void deleteReview(Long id, NorMember norMember) {
         Review review = reviewRepository.findByIdAndNorMember(id, norMember)
-                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 리뷰입니다."));
+                .orElseThrow(() -> new CustomException(REVIEW_NOT_FOUND));
 
         reviewRepository.delete(review);
     }
