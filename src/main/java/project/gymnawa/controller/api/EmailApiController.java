@@ -17,7 +17,7 @@ import java.util.HashMap;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-@RequestMapping("/api/email")
+@RequestMapping("/api/emails")
 public class EmailApiController {
 
     private final EmailService emailService;
@@ -34,15 +34,8 @@ public class EmailApiController {
 
     @PostMapping("verify-code")
     public ResponseEntity<ApiResponse<?>> verifyCode(@RequestBody EmailDto emailDto) {
-        HashMap<String, Object> response = new HashMap<>();
+        emailService.verifyCode(emailDto.getEmail(), emailDto.getCode());
 
-        if (emailService.verifyCode(emailDto.getEmail(), emailDto.getCode())) {
-            response.put("success", true);
-        } else {
-            response.put("success", false);
-            response.put("message", "인증코드가 올바르지 않습니다.");
-        }
-
-        return ResponseEntity.ok().body(ApiResponse.of("이메일 인증 성공", response));
+        return ResponseEntity.ok().body(ApiResponse.of("이메일 인증 성공"));
     }
 }
