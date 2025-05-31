@@ -7,9 +7,13 @@ import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
+import project.gymnawa.domain.dto.review.ReviewSaveDto;
 import project.gymnawa.domain.entity.NorMember;
 import project.gymnawa.domain.entity.Review;
 import project.gymnawa.domain.entity.Trainer;
+import project.gymnawa.errors.dto.ErrorCode;
+import project.gymnawa.errors.exception.CustomException;
 import project.gymnawa.repository.ReviewRepository;
 
 import java.util.Arrays;
@@ -29,20 +33,28 @@ class ReviewServiceTest {
 
     @Mock
     ReviewRepository reviewRepository;
+    @Mock
+    TrainerService trainerService;
 
     @Test
     @DisplayName("리뷰 저장")
     void save() {
         //given
         NorMember norMember = createNorMember("galmeagi2@naver.com", "1234", "조성진");
-        Trainer trainer = createTrainer("galmeagi2@naver.com", "123456", "조성민");
-        Review review = createReview("content", norMember, trainer);
+
+        ReviewSaveDto reviewSaveDto = ReviewSaveDto.builder()
+                .content("content")
+                .trainerId(1L)
+                .build();
+
+        when(reviewRepository.save(any(Review.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         //when
-        reviewService.save(review);
+        reviewService.save(reviewSaveDto, norMember);
 
         //then
-        verify(reviewRepository, times(1)).save(review);
+        verify(trainerService, times(1)).findOne(anyLong());
+        verify(reviewRepository, times(1)).save(any(Review.class));
     }
 
     @Test
@@ -50,21 +62,11 @@ class ReviewServiceTest {
     void findByMember() {
         //given
         NorMember norMember = createNorMember("galmeagi2@naver.com", "1234", "조성진");
-        Trainer trainer1 = createTrainer("galmeagi2@naver.com", "123456", "조성민");
-        Trainer trainer2 = createTrainer("galmeagi2@naver.com", "456", "조성모");
-        Review review1 = createReview("content1", norMember, trainer1);
-        Review review2 = createReview("content2", norMember, trainer2);
-
-        List<Review> reviews = Arrays.asList(review1, review2);
-
-        when(reviewRepository.findByNorMember(norMember)).thenReturn(reviews);
 
         //when
         List<Review> result = reviewService.findByMember(norMember);
 
         //then
-        assertThat(result.size()).isEqualTo(2);
-
         verify(reviewRepository, times(1)).findByNorMember(norMember);
     }
 
@@ -72,22 +74,12 @@ class ReviewServiceTest {
     @DisplayName("트레이너 별 리뷰 조회")
     void findByTrainer() {
         //given
-        NorMember norMember1 = createNorMember("galmeagi2@naver.com", "1234", "조성진");
-        NorMember norMember2 = createNorMember("galmeagi2@naver.com", "123456", "조성민");
         Trainer trainer = createTrainer("galmeagi2@naver.com", "456", "조성모");
-        Review review1 = createReview("content1", norMember1, trainer);
-        Review review2 = createReview("content2", norMember2, trainer);
-
-        List<Review> reviews = Arrays.asList(review1, review2);
-
-        when(reviewRepository.findByTrainer(trainer)).thenReturn(reviews);
 
         //when
-        List<Review> result = reviewService.findByTrainer(trainer);
+        reviewService.findByTrainer(trainer);
 
         //then
-        assertThat(result.size()).isEqualTo(2);
-
         verify(reviewRepository, times(1)).findByTrainer(trainer);
     }
 
@@ -96,24 +88,22 @@ class ReviewServiceTest {
     void updateReviewSuccess() {
         //given
         NorMember norMember = createNorMember("galmeagi2@naver.com", "1234", "조성진");
-        Trainer trainer = createTrainer("galmeagi2@naver.com", "123456", "조성민");
+        Long reviewId = 1L;
         Review review = Review.builder()
-                .id(1L)
                 .content("oldContent")
                 .norMember(norMember)
-                .trainer(trainer)
                 .build();
         String newContent = "newContent";
 
-        when(reviewRepository.findById(1L)).thenReturn(Optional.of(review));
+        when(reviewRepository.findByIdAndNorMember(anyLong(), any(NorMember.class))).thenReturn(Optional.of(review));
 
         //when
-        reviewService.updateReview(1L, norMember, newContent);
+        reviewService.updateReview(reviewId, norMember, newContent);
 
         //then
         assertThat(review.getContent()).isEqualTo(newContent);
 
-        verify(reviewRepository, times(1)).findById(1L);
+        verify(reviewRepository, times(1)).findByIdAndNorMember(anyLong(), any(NorMember.class));
     }
 
     @Test
@@ -122,13 +112,19 @@ class ReviewServiceTest {
         //given
         NorMember norMember = createNorMember("galmeagi2@naver.com", "1234", "조성진");
         String newContent = "newContent";
-        when(reviewRepository.findById(1L)).thenReturn(Optional.empty());
+        Long reviewId = 1L;
+        when(reviewRepository.findByIdAndNorMember(anyLong(), any(NorMember.class))).thenReturn(Optional.empty());
 
         //when & then
-        assertThrows(NoSuchElementException.class,
-                () -> reviewService.updateReview(1L, norMember, newContent));
+        CustomException customException = assertThrows(CustomException.class,
+                () -> reviewService.updateReview(reviewId, norMember, newContent));
+        ErrorCode errorCode = customException.getErrorCode();
 
-        verify(reviewRepository, times(1)).findById(1L);
+        verify(reviewRepository, times(1)).findByIdAndNorMember(anyLong(), any(NorMember.class));
+
+        assertThat(errorCode.getCode()).isEqualTo("REVIEW_NOT_FOUND");
+        assertThat(errorCode.getStatus()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(errorCode.getErrorMessage()).isEqualTo("존재하지 않는 리뷰입니다.");
     }
 
     @Test
@@ -136,45 +132,47 @@ class ReviewServiceTest {
     void ReviewDeleteSuccess() {
         //given
         NorMember norMember = createNorMember("galmeagi2@naver.com", "1234", "조성진");
-        Trainer trainer = createTrainer("galmeagi2@naver.com", "123456", "조성민");
+        Long reviewId = 1L;
         Review review = Review.builder()
-                .id(1L)
                 .content("oldContent")
                 .norMember(norMember)
-                .trainer(trainer)
                 .build();
 
-        when(reviewRepository.findById(1L)).thenReturn(Optional.of(review));
+        when(reviewRepository.findByIdAndNorMember(anyLong(), any(NorMember.class))).thenReturn(Optional.of(review));
 
         //when
-        reviewService.deleteReview(1L, norMember);
+        reviewService.deleteReview(reviewId, norMember);
 
         //then
-        verify(reviewRepository, times(1)).findById(1L);
-        verify(reviewRepository, times(1)).delete(review);
+        verify(reviewRepository, times(1)).findByIdAndNorMember(anyLong(), any(NorMember.class));
+        verify(reviewRepository, times(1)).delete(any(Review.class));
 
         InOrder inOrder = inOrder(reviewRepository);
-        inOrder.verify(reviewRepository).findById(1L);
+        inOrder.verify(reviewRepository).findByIdAndNorMember(anyLong(), any(NorMember.class));
         inOrder.verify(reviewRepository).delete(review);
     }
 
     @Test
-    @DisplayName("리뷰 삭제 실패")
+    @DisplayName("리뷰 삭제 실패 - 존재하지 않는 리뷰")
     void ReviewDeleteFail() {
         //given
+        Long reviewId = 1L;
         NorMember norMember = createNorMember("galmeagi2@naver.com", "1234", "조성진");
 
-        when(reviewRepository.findById(1L)).thenReturn(Optional.empty());
+        when(reviewRepository.findByIdAndNorMember(anyLong(), any(NorMember.class))).thenReturn(Optional.empty());
 
         //when & then
-        assertThrows(NoSuchElementException.class,
-                () -> reviewService.deleteReview(1L, norMember));
+        CustomException customException = assertThrows(CustomException.class,
+                () -> reviewService.deleteReview(reviewId, norMember));
+        ErrorCode errorCode = customException.getErrorCode();
 
         //then
-        verify(reviewRepository, times(1)).findById(1L);
+        verify(reviewRepository, times(1)).findByIdAndNorMember(anyLong(), any(NorMember.class));
+        verify(reviewRepository, never()).delete(any(Review.class));
 
-        InOrder inOrder = inOrder(reviewRepository);
-        inOrder.verify(reviewRepository).findById(1L);
+        assertThat(errorCode.getCode()).isEqualTo("REVIEW_NOT_FOUND");
+        assertThat(errorCode.getStatus()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(errorCode.getErrorMessage()).isEqualTo("존재하지 않는 리뷰입니다.");
     }
 
     private NorMember createNorMember(String email, String password, String name) {
@@ -190,14 +188,6 @@ class ReviewServiceTest {
                 .email(email)
                 .password(password)
                 .name(name)
-                .build();
-    }
-
-    private Review createReview(String content, NorMember norMember, Trainer trainer) {
-        return Review.builder()
-                .content(content)
-                .norMember(norMember)
-                .trainer(trainer)
                 .build();
     }
 }
