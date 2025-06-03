@@ -27,5 +27,5 @@ public interface TrainerRepository extends JpaRepository<Trainer, Long> {
      * 트레이너 전체 조회
      */
     @Query("select t from Trainer t where t.deleted = false")
-    List<Trainer> findALl();
+    List<Trainer> findAll();
 }
