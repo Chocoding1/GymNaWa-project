@@ -82,7 +82,7 @@ public class TrainerService {
      * 트레이너 목록
      */
     public List<Trainer> findTrainers() {
-        return trainerRepository.findALl();
+        return trainerRepository.findAll();
     }
 
     /**
