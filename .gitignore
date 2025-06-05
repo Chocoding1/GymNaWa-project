@@ -36,5 +36,5 @@ out/
 ### VS Code ###
 .vscode/
 
-### KAKAO API KEY ###
+### APPLICATION.YML ###
 src/main/resources/application.yml
