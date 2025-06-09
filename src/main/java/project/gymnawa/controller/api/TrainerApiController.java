@@ -64,7 +64,7 @@ public class TrainerApiController {
     public ResponseEntity<ApiResponse<TrainerViewDto>> myPage(@PathVariable Long id,
                                                               @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
-        Long userId = customOAuth2UserDetails.getMember().getId();
+        Long userId = customOAuth2UserDetails.getId();
         Trainer loginedTrainer = trainerService.findOne(userId);
 
         if (!loginedTrainer.getId().equals(id)) {
@@ -84,7 +84,7 @@ public class TrainerApiController {
                                                            @Validated @RequestBody TrainerEditDto trainerEditDto,
                                                            @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
-        Long userId = customOAuth2UserDetails.getMember().getId();
+        Long userId = customOAuth2UserDetails.getId();
         Trainer loginedTrainer = trainerService.findOne(userId);
 
         if (!loginedTrainer.getId().equals(id)) {
@@ -104,7 +104,7 @@ public class TrainerApiController {
                                                          @Validated @RequestBody UpdatePasswordDto updatePasswordDto,
                                                          @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
-        Long userId = customOAuth2UserDetails.getMember().getId();
+        Long userId = customOAuth2UserDetails.getId();
         Trainer loginedTrainer = trainerService.findOne(userId);
 
         if (!loginedTrainer.getId().equals(id)) {
@@ -127,7 +127,7 @@ public class TrainerApiController {
     public ResponseEntity<ApiResponse<List<ReviewViewDto>>> getReviewList(@PathVariable Long id,
                                                                           @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
-        Long userId = customOAuth2UserDetails.getMember().getId();
+        Long userId = customOAuth2UserDetails.getId();
         Trainer loginedTrainer = trainerService.findOne(userId);
 
 
@@ -149,7 +149,7 @@ public class TrainerApiController {
     public ResponseEntity<ApiResponse<List<PtMembershipViewDto>>> getPtMembershipList(@PathVariable Long id,
                                                                                       @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
-        Long userId = customOAuth2UserDetails.getMember().getId();
+        Long userId = customOAuth2UserDetails.getId();
         Trainer loginedTrainer = trainerService.findOne(userId);
 
         if (!loginedTrainer.getId().equals(id)) {

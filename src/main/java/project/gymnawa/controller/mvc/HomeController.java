@@ -31,7 +31,7 @@ public class HomeController {
 
         if (customOAuth2UserDetails != null) {
             log.info("oauthuserdetails 유저 존재");
-            Long id = customOAuth2UserDetails.getMember().getId();
+            Long id = customOAuth2UserDetails.getId();
 
             Member loginedMember = memberService.findOne(id);
             log.info("member.id : " + loginedMember.getId());

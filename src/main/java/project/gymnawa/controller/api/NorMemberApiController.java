@@ -62,7 +62,7 @@ public class NorMemberApiController {
     public ResponseEntity<ApiResponse<MemberViewDto>> myPage(@PathVariable Long id,
                                                              @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
-        Long userId = customOAuth2UserDetails.getMember().getId();
+        Long userId = customOAuth2UserDetails.getId();
         NorMember loginedMember = norMemberService.findOne(userId);
 
         // url 조작으로 다른 사용자 마이페이지 접속 방지
@@ -83,7 +83,7 @@ public class NorMemberApiController {
                                                           @Validated @RequestBody MemberEditDto memberEditDto,
                                                           @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
-        Long userId = customOAuth2UserDetails.getMember().getId();
+        Long userId = customOAuth2UserDetails.getId();
         NorMember loginedMember = norMemberService.findOne(userId);
 
         if (!loginedMember.getId().equals(id)) {
@@ -103,7 +103,7 @@ public class NorMemberApiController {
                                                          @Validated @RequestBody UpdatePasswordDto updatePasswordDto,
                                                          @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
-        Long userId = customOAuth2UserDetails.getMember().getId();
+        Long userId = customOAuth2UserDetails.getId();
         NorMember loginedMember = norMemberService.findOne(userId);
 
         if (!loginedMember.getId().equals(id)) {
@@ -126,7 +126,7 @@ public class NorMemberApiController {
     public ResponseEntity<ApiResponse<List<ReviewViewDto>>> getReviewList(@PathVariable Long id,
                                                                           @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
-        Long userId = customOAuth2UserDetails.getMember().getId();
+        Long userId = customOAuth2UserDetails.getId();
         NorMember loginedMember = norMemberService.findOne(userId);
 
         if (!loginedMember.getId().equals(id)) {
@@ -147,7 +147,7 @@ public class NorMemberApiController {
     public ResponseEntity<ApiResponse<List<PtMembershipViewDto>>> getPtMembershipList(@PathVariable Long id,
                                                                                       @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
-        Long userId = customOAuth2UserDetails.getMember().getId();
+        Long userId = customOAuth2UserDetails.getId();
         NorMember loginedMember = norMemberService.findOne(userId);
 
         if (!loginedMember.getId().equals(id)) {

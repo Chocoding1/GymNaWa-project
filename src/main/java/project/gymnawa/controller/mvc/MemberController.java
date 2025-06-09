@@ -100,7 +100,7 @@ public class MemberController {
                           Model model,
                           @ModelAttribute MemberOauthInfoDto memberOauthInfoDto) {
 
-        Long userId = customOAuth2UserDetails.getMember().getId();
+        Long userId = customOAuth2UserDetails.getId();
         Member loginedMember = memberService.findOne(userId);
 
         model.addAttribute("name", loginedMember.getName());
@@ -113,7 +113,7 @@ public class MemberController {
                           @Validated MemberOauthInfoDto memberOauthInfoDto, BindingResult bindingResult,
                           HttpServletRequest request, HttpServletResponse response) {
 
-        Long userId = customOAuth2UserDetails.getMember().getId();
+        Long userId = customOAuth2UserDetails.getId();
         Member loginedMember = memberService.findOne(userId);
 
         if (bindingResult.hasErrors()) {

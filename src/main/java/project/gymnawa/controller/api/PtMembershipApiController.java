@@ -35,7 +35,7 @@ public class PtMembershipApiController {
             @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails,
             @Validated @RequestBody PtMembershipSaveDto ptMembershipSaveDto) {
 
-        Long userId = customOAuth2UserDetails.getMember().getId();
+        Long userId = customOAuth2UserDetails.getId();
         NorMember loginedMember = norMemberService.findOne(userId);
 
         Trainer trainer = trainerService.findOne(ptMembershipSaveDto.getTrainerId());

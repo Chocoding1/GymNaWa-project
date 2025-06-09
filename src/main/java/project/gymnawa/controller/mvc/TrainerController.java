@@ -63,7 +63,7 @@ public class TrainerController {
     public String mypage(@PathVariable Long id, Model model,
                          @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
-        Long userId = customOAuth2UserDetails.getMember().getId();
+        Long userId = customOAuth2UserDetails.getId();
         Trainer loginedTrainer = trainerService.findOne(userId);
 
         if (!loginedTrainer.getId().equals(id)) {
@@ -84,7 +84,7 @@ public class TrainerController {
     public String editForm(@PathVariable Long id, Model model,
                            @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
-        Long userId = customOAuth2UserDetails.getMember().getId();
+        Long userId = customOAuth2UserDetails.getId();
         Trainer loginedTrainer = trainerService.findOne(userId);
 
         if (!loginedTrainer.getId().equals(id)) {
@@ -110,7 +110,7 @@ public class TrainerController {
                              @PathVariable Long id,
                              @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
-        Long userId = customOAuth2UserDetails.getMember().getId();
+        Long userId = customOAuth2UserDetails.getId();
         Trainer loginedTrainer = trainerService.findOne(userId);
 
         if (!loginedTrainer.getId().equals(id)) {

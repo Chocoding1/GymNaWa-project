@@ -39,7 +39,7 @@ public class GymTrainerApiController {
     public ResponseEntity<ApiResponse<GymTrainerResponseDto>> addGymTrainer(@Validated @RequestBody GymTrainerRequestDto gymTrainerRequestDto,
                                                                             @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
-        Long userId = customOAuth2UserDetails.getMember().getId();
+        Long userId = customOAuth2UserDetails.getId();
         Trainer loginedTrainer = trainerService.findOne(userId);
 
         //이미 해당 헬스장에 계약되어 있으면 에러
@@ -63,7 +63,7 @@ public class GymTrainerApiController {
     public ResponseEntity<ApiResponse<GymTrainerResponseDto>> expireGymTrainer(@AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails,
                                                                                @RequestParam("gymId") String gymId) {
 
-        Long userId = customOAuth2UserDetails.getMember().getId();
+        Long userId = customOAuth2UserDetails.getId();
         Trainer loginedTrainer = trainerService.findOne(userId);
 
         List<GymTrainer> gymTrainers = gymTrainerService.findByGymIdAndTrainerAndContractStatus(gymId, loginedTrainer, ContractStatus.ACTIVE);

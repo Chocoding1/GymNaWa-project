@@ -38,7 +38,7 @@ public class ReviewApiController {
     public ResponseEntity<ApiResponse<?>> addReview(@Validated @RequestBody ReviewSaveDto reviewSaveDto,
                                                         @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
-        Long userId = customOAuth2UserDetails.getMember().getId();
+        Long userId = customOAuth2UserDetails.getId();
         NorMember loginedMember = norMemberService.findOne(userId);
 
         Long savedId = reviewService.save(reviewSaveDto, loginedMember);
@@ -54,7 +54,7 @@ public class ReviewApiController {
                                                                  @Validated @RequestBody ReviewEditDto reviewEditDto,
                                                                  @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
-        Long userId = customOAuth2UserDetails.getMember().getId();
+        Long userId = customOAuth2UserDetails.getId();
         NorMember loginedMember = norMemberService.findOne(userId);
 
         reviewService.updateReview(id, loginedMember, reviewEditDto.getContent());
@@ -73,7 +73,7 @@ public class ReviewApiController {
     public ResponseEntity<ApiResponse<String>> reviewDelete(@PathVariable Long id,
                                                             @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
-        Long userId = customOAuth2UserDetails.getMember().getId();
+        Long userId = customOAuth2UserDetails.getId();
         NorMember loginedMember = norMemberService.findOne(userId);
 
         reviewService.deleteReview(id, loginedMember);

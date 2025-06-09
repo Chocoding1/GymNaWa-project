@@ -38,7 +38,7 @@ public class PtMembershipController {
                                  Model model,
                                  @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
-        Long userId = customOAuth2UserDetails.getMember().getId();
+        Long userId = customOAuth2UserDetails.getId();
 
         PtMembershipSaveDto ptMembershipSaveDto = PtMembershipSaveDto.builder()
                 .norMemberId(userId)
@@ -58,7 +58,7 @@ public class PtMembershipController {
                              @Validated PtMembershipSaveDto ptMembershipSaveDto, BindingResult bindingResult) {
 
 
-        Long userId = customOAuth2UserDetails.getMember().getId();
+        Long userId = customOAuth2UserDetails.getId();
         NorMember loginedMember = norMemberService.findOne(userId);
 
         if (bindingResult.hasErrors()) {
@@ -88,7 +88,7 @@ public class PtMembershipController {
     public String ptMembershipByMember(@AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails,
                                        Model model) {
 
-        Long userId = customOAuth2UserDetails.getMember().getId();
+        Long userId = customOAuth2UserDetails.getId();
         NorMember loginedMember = norMemberService.findOne(userId);
 
         List<PtMembershipViewDto> ptMembershipList = ptMembershipService.findByMember(loginedMember).stream()

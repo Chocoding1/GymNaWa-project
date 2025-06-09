@@ -63,7 +63,7 @@ public class NorMemberController {
     public String mypage(@PathVariable Long id, Model model,
                          @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
-        Long userId = customOAuth2UserDetails.getMember().getId();
+        Long userId = customOAuth2UserDetails.getId();
         NorMember loginedMember = norMemberService.findOne(userId);
 
         if (!loginedMember.getId().equals(id)) { // url 조작으로 다른 id를 기입할 시, 본인의 mypage에만 접속하도록 설정
@@ -83,7 +83,7 @@ public class NorMemberController {
     public String editForm(@PathVariable Long id, Model model,
                            @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
-        Long userId = customOAuth2UserDetails.getMember().getId();
+        Long userId = customOAuth2UserDetails.getId();
         NorMember loginedMember = norMemberService.findOne(userId);
 
         if (!loginedMember.getId().equals(id)) {
@@ -105,7 +105,7 @@ public class NorMemberController {
                              @PathVariable Long id,
                              @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
-        Long userId = customOAuth2UserDetails.getMember().getId();
+        Long userId = customOAuth2UserDetails.getId();
         NorMember loginedMember = norMemberService.findOne(userId);
 
         if (!loginedMember.getId().equals(id)) {

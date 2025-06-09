@@ -43,7 +43,7 @@ public class ReviewController {
                                 @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails,
                                 Model model) {
 
-        Long userId = customOAuth2UserDetails.getMember().getId();
+        Long userId = customOAuth2UserDetails.getId();
         NorMember loginedMember = norMemberService.findOne(userId);
 
         Trainer trainer = trainerService.findOne(trainerId);
@@ -69,7 +69,7 @@ public class ReviewController {
     public String addReview(@Validated ReviewSaveDto reviewSaveDto, BindingResult bindingResult,
                             @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
-        Long userId = customOAuth2UserDetails.getMember().getId();
+        Long userId = customOAuth2UserDetails.getId();
         NorMember loginedMember = norMemberService.findOne(userId);
 
         if (bindingResult.hasErrors()) {
@@ -89,7 +89,7 @@ public class ReviewController {
     public String reviewEditForm(@PathVariable Long reviewId, Model model,
                                  @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
-        Long userId = customOAuth2UserDetails.getMember().getId();
+        Long userId = customOAuth2UserDetails.getId();
         NorMember loginedMember = norMemberService.findOne(userId);
 
         Review review = reviewService.findByIdAndNorMember(reviewId, loginedMember);
@@ -113,7 +113,7 @@ public class ReviewController {
                              @PathVariable Long reviewId,
                              @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
-        Long userId = customOAuth2UserDetails.getMember().getId();
+        Long userId = customOAuth2UserDetails.getId();
         NorMember loginedMember = norMemberService.findOne(userId);
 
         if (bindingResult.hasErrors()) {
@@ -133,7 +133,7 @@ public class ReviewController {
     public String findReviewsByMember(@AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails,
                                       Model model) {
 
-        Long userId = customOAuth2UserDetails.getMember().getId();
+        Long userId = customOAuth2UserDetails.getId();
         NorMember loginedMember = norMemberService.findOne(userId);
 
         List<ReviewViewDto> reviewList = reviewService.findByMember(loginedMember).stream()
@@ -153,7 +153,7 @@ public class ReviewController {
     public String deleteReview(@PathVariable Long reviewId,
                                @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
-        Long userId = customOAuth2UserDetails.getMember().getId();
+        Long userId = customOAuth2UserDetails.getId();
         NorMember loginedMember = norMemberService.findOne(userId);
 
         reviewService.deleteReview(reviewId, loginedMember);

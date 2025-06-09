@@ -41,13 +41,14 @@ public class MemberApiController {
 
     /**
      * acess token으로 회원 정보 반환
+     * 홈 화면에서 로그인, 비로그인 구분하여 렌더링하기 위해 만든 api
      */
     @GetMapping("/info")
     public ResponseEntity<ApiResponse<MemberHomeInfoDto>> memberInfo(@AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
         /**
          * security filter에서 access token 확인 후, security context에 회원 정보 넣고 controller 진입
          */
-        Long userId = customOAuth2UserDetails.getMember().getId();
+        Long userId = customOAuth2UserDetails.getId();
         Member loginedMember = memberService.findOne(userId);
 
         String name = loginedMember.getName();
@@ -131,7 +132,7 @@ public class MemberApiController {
                                                          @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails,
                                                          @RequestBody PasswordDto passwordDto) {
 
-        Long userId = customOAuth2UserDetails.getMember().getId();
+        Long userId = customOAuth2UserDetails.getId();
         Member loginedMember = memberService.findOne(userId);
 
         // url 조작으로 다른 사용자 정보 접근 방지
@@ -150,7 +151,7 @@ public class MemberApiController {
     public ResponseEntity<ApiResponse<String>> deactivateMember(@PathVariable Long id,
                                                                 @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
-        Long userId = customOAuth2UserDetails.getMember().getId();
+        Long userId = customOAuth2UserDetails.getId();
         Member loginedMember = memberService.findOne(userId);
 
         // url 조작으로 다른 사용자 정보 접근 방지
