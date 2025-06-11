@@ -10,10 +10,10 @@ import org.springframework.stereotype.Service;
 import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
 import project.gymnawa.auth.oauth.domain.GoogleUserInfo;
 import project.gymnawa.auth.oauth.domain.OAuth2UserInfo;
-import project.gymnawa.domain.entity.Member;
+import project.gymnawa.member.entity.Member;
 import project.gymnawa.auth.oauth.domain.KakaoUserInfo;
-import project.gymnawa.domain.etcfield.Role;
-import project.gymnawa.repository.MemberRepository;
+import project.gymnawa.member.entity.etcfield.Role;
+import project.gymnawa.member.repository.MemberRepository;
 
 @Service
 @Slf4j

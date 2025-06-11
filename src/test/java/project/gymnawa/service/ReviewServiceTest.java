@@ -8,17 +8,17 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
-import project.gymnawa.domain.dto.review.ReviewSaveDto;
-import project.gymnawa.domain.entity.NorMember;
-import project.gymnawa.domain.entity.Review;
-import project.gymnawa.domain.entity.Trainer;
+import project.gymnawa.review.dto.ReviewSaveDto;
+import project.gymnawa.normember.entity.NorMember;
+import project.gymnawa.review.entity.Review;
+import project.gymnawa.review.service.ReviewService;
+import project.gymnawa.trainer.entity.Trainer;
 import project.gymnawa.errors.dto.ErrorCode;
 import project.gymnawa.errors.exception.CustomException;
-import project.gymnawa.repository.ReviewRepository;
+import project.gymnawa.review.repository.ReviewRepository;
+import project.gymnawa.trainer.service.TrainerService;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;

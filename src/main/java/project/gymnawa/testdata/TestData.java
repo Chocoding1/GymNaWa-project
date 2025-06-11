@@ -3,15 +3,18 @@ package project.gymnawa.testdata;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import project.gymnawa.domain.dto.normember.MemberSaveDto;
-import project.gymnawa.domain.dto.review.ReviewSaveDto;
-import project.gymnawa.domain.dto.trainer.TrainerSaveDto;
-import project.gymnawa.domain.entity.NorMember;
-import project.gymnawa.domain.entity.PtMembership;
-import project.gymnawa.domain.entity.Review;
-import project.gymnawa.domain.entity.Trainer;
-import project.gymnawa.domain.etcfield.Gender;
-import project.gymnawa.service.*;
+import project.gymnawa.normember.dto.MemberSaveDto;
+import project.gymnawa.ptmembership.service.PtMembershipService;
+import project.gymnawa.review.dto.ReviewSaveDto;
+import project.gymnawa.review.service.ReviewService;
+import project.gymnawa.trainer.dto.TrainerSaveDto;
+import project.gymnawa.normember.entity.NorMember;
+import project.gymnawa.ptmembership.entity.PtMembership;
+import project.gymnawa.review.entity.Review;
+import project.gymnawa.trainer.entity.Trainer;
+import project.gymnawa.member.entity.etcfield.Gender;
+import project.gymnawa.normember.service.NorMemberService;
+import project.gymnawa.trainer.service.TrainerService;
 
 @Component
 @RequiredArgsConstructor

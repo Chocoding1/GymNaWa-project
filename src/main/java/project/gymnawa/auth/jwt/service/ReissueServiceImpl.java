@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import project.gymnawa.auth.cookie.util.CookieUtil;
-import project.gymnawa.auth.jwt.domain.JwtInfoDto;
+import project.gymnawa.auth.jwt.dto.JwtInfoDto;
 import project.gymnawa.auth.jwt.util.JwtUtil;
 
 @Service

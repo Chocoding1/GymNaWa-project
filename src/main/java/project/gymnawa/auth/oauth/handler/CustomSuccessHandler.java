@@ -9,10 +9,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 import project.gymnawa.auth.cookie.util.CookieUtil;
-import project.gymnawa.auth.jwt.domain.JwtInfoDto;
+import project.gymnawa.auth.jwt.dto.JwtInfoDto;
 import project.gymnawa.auth.jwt.util.JwtUtil;
 import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
-import project.gymnawa.domain.etcfield.Role;
+import project.gymnawa.member.entity.etcfield.Role;
 
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -35,6 +35,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         JwtInfoDto jwtInfoDto = jwtUtil.createJwt(oAuth2UserDetails.getId());
 
+        // 쿠키 방식은 나중에 도메인 일치 후 사용
 //        Cookie accessCookie = cookieUtil.createAT(jwtInfoDto.getAccessToken());
 //        ResponseCookie refreshCookie = cookieUtil.createRT(jwtInfoDto.getRefreshToken());
 

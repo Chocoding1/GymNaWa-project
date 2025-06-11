@@ -7,11 +7,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
-import project.gymnawa.domain.etcfield.Gender;
-import project.gymnawa.domain.entity.Member;
+import project.gymnawa.member.entity.etcfield.Gender;
+import project.gymnawa.member.entity.Member;
 import project.gymnawa.errors.dto.ErrorCode;
 import project.gymnawa.errors.exception.CustomException;
-import project.gymnawa.repository.MemberRepository;
+import project.gymnawa.member.repository.MemberRepository;
+import project.gymnawa.member.service.MemberService;
 
 import java.util.*;
 

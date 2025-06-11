@@ -4,33 +4,29 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpSession;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import project.gymnawa.domain.etcfield.Gender;
-import project.gymnawa.domain.entity.Member;
-import project.gymnawa.domain.dto.member.MemberLoginDto;
-import project.gymnawa.service.MemberService;
-import project.gymnawa.service.NorMemberService;
-import project.gymnawa.web.SessionConst;
+import project.gymnawa.auth.jwt.service.ReissueServiceImpl;
+import project.gymnawa.auth.jwt.util.JwtUtil;
+import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
+import project.gymnawa.normember.entity.NorMember;
+import project.gymnawa.member.controller.MemberApiController;
+import project.gymnawa.member.service.MemberService;
+import project.gymnawa.normember.service.NorMemberService;
+import project.gymnawa.trainer.service.TrainerService;
 
 
-
-import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @WebMvcTest(MemberApiController.class)
-//@ExtendWith(MockitoExtension.class)
+@ExtendWith(MockitoExtension.class)
 class MemberApiControllerTest {
 
     @Autowired
@@ -49,15 +45,43 @@ class MemberApiControllerTest {
     @MockitoBean
     private MemberService memberService;
 
+    @MockitoBean
+    private TrainerService trainerService;
+
+    @MockitoBean
+    private NorMemberService norMemberService;
+
+    @MockitoBean
+    private ReissueServiceImpl reissueService;
+
+    @MockitoBean
+    private JwtUtil jwtUtil;
+
+    @MockitoBean
+    private CustomOAuth2UserDetails customOAuth2UserDetails;
+
     @Test
     @DisplayName("홈 화면용 기본 회원 정보 반환")
-    @WithMockUser()
-    void memberInfo() {
+    @WithMockUser(username = "email@naver.com", roles = {"USER"})
+    void memberInfo() throws Exception {
         //given
+        NorMember norMember = NorMember.builder()
+                .id(1L)
+                .name("name")
+                .build();
 
-        //when
+        when(customOAuth2UserDetails.getId()).thenReturn(1L); // thenReturn()에는 any()같은 매처 사용 금지
+        when(memberService.findOne(anyLong())).thenReturn(norMember);
 
-        //then
+        //when & then
+        mockMvc.perform(MockMvcRequestBuilders.get("/api/members/info"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1L))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("name"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.trainer").value(false));
+
+        verify(memberService, times(1)).findOne(anyLong());
     }
 /*
     @Test

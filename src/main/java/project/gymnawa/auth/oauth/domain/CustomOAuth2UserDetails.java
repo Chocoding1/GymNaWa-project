@@ -2,12 +2,11 @@ package project.gymnawa.auth.oauth.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
-import project.gymnawa.domain.entity.Member;
-import project.gymnawa.domain.etcfield.Role;
+import project.gymnawa.member.entity.Member;
+import project.gymnawa.member.entity.etcfield.Role;
 
 import java.util.ArrayList;
 import java.util.Collection;

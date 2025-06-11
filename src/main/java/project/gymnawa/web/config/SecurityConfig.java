@@ -21,9 +21,9 @@ import project.gymnawa.auth.jwt.repository.JwtRepository;
 import project.gymnawa.auth.jwt.util.JwtUtil;
 import project.gymnawa.auth.oauth.handler.CustomSuccessHandler;
 import project.gymnawa.auth.oauth.service.CustomOauth2UserService;
-import project.gymnawa.web.filter.CustomLogoutFilter;
-import project.gymnawa.web.filter.JwtAuthenticationFilter;
-import project.gymnawa.web.filter.LoginFilter;
+import project.gymnawa.auth.filter.CustomLogoutFilter;
+import project.gymnawa.auth.filter.JwtAuthenticationFilter;
+import project.gymnawa.auth.filter.LoginFilter;
 
 import java.util.Collections;
 import java.util.List;

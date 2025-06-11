@@ -9,10 +9,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import project.gymnawa.domain.etcfield.ContractStatus;
-import project.gymnawa.domain.entity.Gym;
-import project.gymnawa.domain.entity.GymTrainer;
-import project.gymnawa.domain.entity.Trainer;
-import project.gymnawa.repository.GymTrainerRepository;
+import project.gymnawa.gym.entity.Gym;
+import project.gymnawa.gymtrainer.entity.GymTrainer;
+import project.gymnawa.gymtrainer.service.GymTrainerService;
+import project.gymnawa.trainer.entity.Trainer;
+import project.gymnawa.gymtrainer.repository.GymTrainerRepository;
 
 import java.util.Arrays;
 import java.util.List;

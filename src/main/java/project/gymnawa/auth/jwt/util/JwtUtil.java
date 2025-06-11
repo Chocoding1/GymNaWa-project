@@ -5,8 +5,8 @@ import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import project.gymnawa.auth.jwt.domain.JwtInfoDto;
-import project.gymnawa.auth.jwt.domain.RefreshToken;
+import project.gymnawa.auth.jwt.dto.JwtInfoDto;
+import project.gymnawa.auth.jwt.dto.RefreshToken;
 import project.gymnawa.auth.jwt.repository.JwtRepository;
 
 import javax.crypto.SecretKey;

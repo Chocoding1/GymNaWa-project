@@ -2,7 +2,7 @@ package project.gymnawa.auth.jwt.repository;
 
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
-import project.gymnawa.auth.jwt.domain.RefreshToken;
+import project.gymnawa.auth.jwt.dto.RefreshToken;
 
 import java.util.Optional;
 

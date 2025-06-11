@@ -9,17 +9,18 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import project.gymnawa.domain.dto.member.UpdatePasswordDto;
-import project.gymnawa.domain.dto.normember.MemberEditDto;
-import project.gymnawa.domain.dto.normember.MemberSaveDto;
+import project.gymnawa.member.dto.UpdatePasswordDto;
+import project.gymnawa.normember.dto.MemberEditDto;
+import project.gymnawa.normember.dto.MemberSaveDto;
 import project.gymnawa.domain.etcfield.Address;
-import project.gymnawa.domain.etcfield.Gender;
-import project.gymnawa.domain.entity.NorMember;
-import project.gymnawa.domain.etcfield.Role;
+import project.gymnawa.member.entity.etcfield.Gender;
+import project.gymnawa.normember.entity.NorMember;
+import project.gymnawa.member.entity.etcfield.Role;
 import project.gymnawa.errors.dto.ErrorCode;
 import project.gymnawa.errors.exception.CustomException;
-import project.gymnawa.repository.MemberRepository;
-import project.gymnawa.repository.NorMemberRepository;
+import project.gymnawa.member.repository.MemberRepository;
+import project.gymnawa.normember.repository.NorMemberRepository;
+import project.gymnawa.normember.service.NorMemberService;
 
 import java.util.Optional;
 
