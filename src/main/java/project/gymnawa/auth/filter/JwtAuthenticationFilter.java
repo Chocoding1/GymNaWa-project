@@ -16,7 +16,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import project.gymnawa.auth.cookie.util.CookieUtil;
 import project.gymnawa.auth.jwt.util.JwtUtil;
 import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
-import project.gymnawa.member.entity.Member;
+import project.gymnawa.domain.member.entity.Member;
 
 import java.io.IOException;
 import java.io.PrintWriter;

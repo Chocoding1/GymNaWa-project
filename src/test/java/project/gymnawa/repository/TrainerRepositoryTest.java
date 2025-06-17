@@ -4,10 +4,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import project.gymnawa.domain.etcfield.Address;
-import project.gymnawa.member.entity.etcfield.Gender;
-import project.gymnawa.trainer.entity.Trainer;
-import project.gymnawa.trainer.repository.TrainerRepository;
+import project.gymnawa.domain.common.etcfield.Address;
+import project.gymnawa.domain.member.entity.etcfield.Gender;
+import project.gymnawa.domain.trainer.entity.Trainer;
+import project.gymnawa.domain.trainer.repository.TrainerRepository;
 
 import java.util.List;
 

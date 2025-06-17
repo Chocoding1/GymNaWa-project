@@ -5,8 +5,8 @@ import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
-import project.gymnawa.member.entity.Member;
-import project.gymnawa.member.entity.etcfield.Role;
+import project.gymnawa.domain.member.entity.Member;
+import project.gymnawa.domain.member.entity.etcfield.Role;
 
 import java.util.ArrayList;
 import java.util.Collection;

@@ -16,11 +16,11 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import project.gymnawa.auth.jwt.service.ReissueServiceImpl;
 import project.gymnawa.auth.jwt.util.JwtUtil;
 import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
-import project.gymnawa.normember.entity.NorMember;
-import project.gymnawa.member.controller.MemberApiController;
-import project.gymnawa.member.service.MemberService;
-import project.gymnawa.normember.service.NorMemberService;
-import project.gymnawa.trainer.service.TrainerService;
+import project.gymnawa.domain.normember.entity.NorMember;
+import project.gymnawa.domain.member.controller.MemberApiController;
+import project.gymnawa.domain.member.service.MemberService;
+import project.gymnawa.domain.normember.service.NorMemberService;
+import project.gymnawa.domain.trainer.service.TrainerService;
 
 
 import static org.mockito.Mockito.*;

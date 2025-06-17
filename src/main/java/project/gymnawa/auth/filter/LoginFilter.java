@@ -17,9 +17,7 @@ import project.gymnawa.auth.cookie.util.CookieUtil;
 import project.gymnawa.auth.jwt.dto.JwtInfoDto;
 import project.gymnawa.auth.jwt.util.JwtUtil;
 import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
-import project.gymnawa.errors.dto.ErrorCode;
-import project.gymnawa.errors.exception.CustomException;
-import project.gymnawa.member.dto.MemberLoginDto;
+import project.gymnawa.domain.member.dto.MemberLoginDto;
 
 import java.io.IOException;
 

@@ -12,7 +12,7 @@ import project.gymnawa.auth.cookie.util.CookieUtil;
 import project.gymnawa.auth.jwt.dto.JwtInfoDto;
 import project.gymnawa.auth.jwt.util.JwtUtil;
 import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
-import project.gymnawa.member.entity.etcfield.Role;
+import project.gymnawa.domain.member.entity.etcfield.Role;
 
 import java.io.IOException;
 import java.net.URLEncoder;
