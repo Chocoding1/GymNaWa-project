@@ -11,6 +11,8 @@ import project.gymnawa.domain.member.entity.Member;
 import project.gymnawa.domain.common.errors.exception.CustomException;
 import project.gymnawa.domain.member.repository.MemberRepository;
 
+import static project.gymnawa.domain.common.errors.dto.ErrorCode.*;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
