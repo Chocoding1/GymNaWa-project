@@ -9,6 +9,8 @@ import project.gymnawa.domain.gym.repository.GymRepository;
 
 import java.util.List;
 
+import static project.gymnawa.domain.common.errors.dto.ErrorCode.*;
+
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor

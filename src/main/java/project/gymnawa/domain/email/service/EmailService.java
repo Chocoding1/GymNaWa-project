@@ -13,6 +13,8 @@ import project.gymnawa.service.RedisService;
 
 import java.util.Random;
 
+import static project.gymnawa.domain.common.errors.dto.ErrorCode.*;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)

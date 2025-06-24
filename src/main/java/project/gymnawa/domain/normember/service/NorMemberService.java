@@ -15,6 +15,8 @@ import project.gymnawa.domain.common.errors.exception.CustomException;
 import project.gymnawa.domain.member.repository.MemberRepository;
 import project.gymnawa.domain.normember.repository.NorMemberRepository;
 
+import static project.gymnawa.domain.common.errors.dto.ErrorCode.*;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)

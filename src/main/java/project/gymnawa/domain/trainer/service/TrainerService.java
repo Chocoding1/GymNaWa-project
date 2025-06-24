@@ -16,6 +16,8 @@ import project.gymnawa.domain.member.repository.MemberRepository;
 
 import java.util.List;
 
+import static project.gymnawa.domain.common.errors.dto.ErrorCode.*;
+
 @Service
 // 서비스에서 DB에 여러 번 접근할 수 있기 때문에 서비스 단에서 한 번에 쿼리를 처리하기 위해 서비스 단에 트랜잭션을 달아준다.
 // 디비에 여러번 접근하면서 하나의 작업을 수행하는 서비스 계층 메서드에 주로 사용 (출처: https://swmobenz.tistory.com/34 [DevYGwan:티스토리])

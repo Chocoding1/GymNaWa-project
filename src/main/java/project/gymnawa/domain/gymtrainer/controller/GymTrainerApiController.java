@@ -21,6 +21,8 @@ import project.gymnawa.domain.trainer.service.TrainerService;
 
 import java.util.List;
 
+import static project.gymnawa.domain.common.errors.dto.ErrorCode.*;
+
 @RestController
 @RequiredArgsConstructor
 @Slf4j

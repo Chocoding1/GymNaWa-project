@@ -26,6 +26,8 @@ import project.gymnawa.domain.review.service.ReviewService;
 
 import java.util.List;
 
+import static project.gymnawa.domain.common.errors.dto.ErrorCode.*;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/normembers")

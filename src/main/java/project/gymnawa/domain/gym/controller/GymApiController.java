@@ -13,6 +13,8 @@ import project.gymnawa.kakao.dto.KakaoApiResponse;
 import project.gymnawa.domain.common.errors.exception.CustomException;
 import project.gymnawa.kakao.service.KakaoService;
 
+import static project.gymnawa.domain.common.errors.dto.ErrorCode.*;
+
 @RestController
 @Slf4j
 @RequestMapping("/api")

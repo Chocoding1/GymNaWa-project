@@ -25,6 +25,8 @@ import project.gymnawa.domain.common.errors.exception.CustomException;
 import project.gymnawa.domain.normember.service.NorMemberService;
 import project.gymnawa.domain.trainer.service.TrainerService;
 
+import static project.gymnawa.domain.common.errors.dto.ErrorCode.*;
+
 @Controller
 @RequiredArgsConstructor
 @RequestMapping("/api/members")

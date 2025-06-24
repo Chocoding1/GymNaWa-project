@@ -12,6 +12,8 @@ import project.gymnawa.domain.gymtrainer.repository.GymTrainerRepository;
 import java.time.LocalDate;
 import java.util.List;
 
+import static project.gymnawa.domain.common.errors.dto.ErrorCode.*;
+
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
