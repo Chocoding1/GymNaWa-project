@@ -40,7 +40,7 @@
 
 ---
 ### DB 구성도
-
+<img width="90%" src="https://github.com/user-attachments/assets/4c0d8952-2f51-4c9b-ab87-82229fce9d9d">
 ---
 ### 요구사항 및 기능 명세
 
