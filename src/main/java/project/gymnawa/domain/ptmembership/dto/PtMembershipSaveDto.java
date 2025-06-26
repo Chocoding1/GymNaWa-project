@@ -20,7 +20,7 @@ public class PtMembershipSaveDto {
     private Long norMemberId;
 
     @NotNull
-    private int initCount;
+    private int initPtCount;
 
     @NotNull
     private int price;
@@ -29,7 +29,7 @@ public class PtMembershipSaveDto {
         return PtMembership.builder()
                 .norMember(norMember)
                 .trainer(trainer)
-                .initCount(initCount)
+                .initPtCount(initPtCount)
                 .price(price)
                 .build();
     }

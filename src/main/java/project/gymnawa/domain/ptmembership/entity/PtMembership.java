@@ -26,7 +26,7 @@ public class PtMembership extends BaseTime {
     @JoinColumn(name = "TRAINER_ID")
     private Trainer trainer;
 
-    private int initCount;
+    private int initPtCount;
     private int remainPtCount;
     private int price;
 
@@ -35,7 +35,7 @@ public class PtMembership extends BaseTime {
                 .memberName(norMember.getName())
                 .trainerId(trainer.getId())
                 .trainerName(trainer.getName())
-                .initCount(initCount)
+                .initCount(initPtCount)
                 .remainCount(remainPtCount)
                 .build();
     }
