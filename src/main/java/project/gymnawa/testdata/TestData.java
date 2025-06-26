@@ -89,7 +89,7 @@ public class TestData {
         return PtMembership.builder()
                 .norMember(normalMember)
                 .trainer(trainer)
-                .initCount(initCnt)
+                .initPtCount(initCnt)
                 .remainPtCount(remainCnt)
                 .price(price)
                 .build();
