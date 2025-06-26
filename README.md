@@ -41,11 +41,51 @@
 ---
 ### DB 구성도
 <img width="90%" src="https://github.com/user-attachments/assets/4c0d8952-2f51-4c9b-ab87-82229fce9d9d">
+
 ---
 ### 요구사항 및 기능 명세
 
 ---
 ### API 명세서
+#### 회원 공통
+|기능|URL|HTTP Method|인증 여부|
+|---|---|---|---|
+|로그인|/api/members/login|POST|X|
+|로그아웃|/api/members/logout|POST|O|
+|회원 탈퇴|/api/members/{id}|DELETE|O|
+
+#### 일반 회원
+|기능|URL|HTTP Method|인증 여부|
+|---|---|---|---|
+|회원가입|/api/normembers|POST|X|
+|마이페이지|/api/normembers/{id}|GET|O|
+|회원 정보 수정|/api/normembers/{id}|PATCH|O|
+|비밀번호 변경|/api/normembers/{id}/password|PATCH|O|
+|내가 쓴 리뷰 조회|/api/normembers/{id}/reviews|GET|O|
+|진행 중인 PT 조회|/api/normembers/{id}/ptmemberships|GET|O|
+
+#### 트레이너
+|기능|URL|HTTP Method|인증 여부|
+|---|---|---|---|
+|회원가입|/api/trainers|POST|X|
+|마이페이지|/api/trainers/{id}|GET|O|
+|회원 정보 수정|/api/trainers/{id}|PATCH|O|
+|비밀번호 변경|/api/trainers/{id}/password|PATCH|O|
+|내게 달린 리뷰 조회|/api/trainers/{id}/reviews|GET|O|
+|진행 중인 PT 조회|/api/trainers/{id}/ptmemberships|GET|O|
+
+#### 헬스장 소속 트레이너
+|기능|URL|HTTP Method|인증 여부|
+|---|---|---|---|
+|헬스장 별 트레이너 조회|/api/gymtrainers/{gymId}/trainers|GET|X|
+
+#### 리뷰
+|기능|URL|HTTP Method|인증 여부|
+|---|---|---|---|
+|리뷰 작성|/api/reviews|POST|O|
+|리뷰 수정|/api/reviews/{id}|PATCH|O|
+|리뷰 삭제|/api/reviews/{id}|DELETE||O
+|트레이너 별 리뷰 조회|/api/reviews/{trainerId}|GET|X|
 
 ---
 ### 프로젝트 구조
