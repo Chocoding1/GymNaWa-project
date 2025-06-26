@@ -39,7 +39,7 @@
 ### 아키텍처 설계도
 
 ---
-### DB 구성도
+### ERD
 <img width="90%" src="https://github.com/user-attachments/assets/4c0d8952-2f51-4c9b-ab87-82229fce9d9d">
 
 ---
@@ -110,10 +110,6 @@
 
 **<기타>**
 - PT 시작 시, 알림 설정
-
----
-### ERD
-<img width="90%" src="https://github.com/user-attachments/assets/ffa71708-a75e-4ea8-94fc-99c88930abff">
 
 
 ---
