@@ -147,12 +147,6 @@ class GymTrainerServiceTest {
                 .build();
     }
 
-    private Gym createGym(String storeName) {
-        return Gym.builder()
-                .storeName(storeName)
-                .build();
-    }
-
     private Trainer createTrainer(String password, String name, String email) {
         return Trainer.builder()
                 .password(password)

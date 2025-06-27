@@ -1,4 +1,4 @@
-package project.gymnawa.service;
+package project.gymnawa.domain.review.service;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,7 +11,6 @@ import org.springframework.http.HttpStatus;
 import project.gymnawa.domain.review.dto.ReviewSaveDto;
 import project.gymnawa.domain.normember.entity.NorMember;
 import project.gymnawa.domain.review.entity.Review;
-import project.gymnawa.domain.review.service.ReviewService;
 import project.gymnawa.domain.trainer.entity.Trainer;
 import project.gymnawa.domain.common.errors.dto.ErrorCode;
 import project.gymnawa.domain.common.errors.exception.CustomException;

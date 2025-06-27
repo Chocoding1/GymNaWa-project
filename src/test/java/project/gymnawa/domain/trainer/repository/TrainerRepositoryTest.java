@@ -1,4 +1,4 @@
-package project.gymnawa.repository;
+package project.gymnawa.domain.trainer.repository;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -7,7 +7,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import project.gymnawa.domain.common.etcfield.Address;
 import project.gymnawa.domain.member.entity.etcfield.Gender;
 import project.gymnawa.domain.trainer.entity.Trainer;
-import project.gymnawa.domain.trainer.repository.TrainerRepository;
 
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package project.gymnawa.service;
+package project.gymnawa.domain.trainer.service;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -20,7 +20,6 @@ import project.gymnawa.domain.common.errors.dto.ErrorCode;
 import project.gymnawa.domain.common.errors.exception.CustomException;
 import project.gymnawa.domain.member.repository.MemberRepository;
 import project.gymnawa.domain.trainer.repository.TrainerRepository;
-import project.gymnawa.domain.trainer.service.TrainerService;
 
 import java.util.Optional;
 

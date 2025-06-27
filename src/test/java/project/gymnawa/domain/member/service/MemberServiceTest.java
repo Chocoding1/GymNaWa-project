@@ -1,4 +1,4 @@
-package project.gymnawa.service;
+package project.gymnawa.domain.member.service;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -12,7 +12,6 @@ import project.gymnawa.domain.member.entity.Member;
 import project.gymnawa.domain.common.errors.dto.ErrorCode;
 import project.gymnawa.domain.common.errors.exception.CustomException;
 import project.gymnawa.domain.member.repository.MemberRepository;
-import project.gymnawa.domain.member.service.MemberService;
 
 import java.util.*;
 
