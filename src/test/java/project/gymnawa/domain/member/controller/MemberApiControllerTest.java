@@ -1,10 +1,7 @@
-package project.gymnawa.controller.api;
+package project.gymnawa.domain.member.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,23 +14,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import project.gymnawa.auth.jwt.service.ReissueServiceImpl;
 import project.gymnawa.auth.jwt.util.JwtUtil;
 import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
-import project.gymnawa.domain.member.dto.MemberHomeInfoDto;
 import project.gymnawa.domain.member.dto.MemberOauthInfoDto;
 import project.gymnawa.domain.member.dto.PasswordDto;
 import project.gymnawa.domain.member.entity.Member;
 import project.gymnawa.domain.member.entity.etcfield.Gender;
-import project.gymnawa.domain.member.entity.etcfield.Role;
 import project.gymnawa.domain.normember.dto.MemberSaveDto;
 import project.gymnawa.domain.normember.entity.NorMember;
-import project.gymnawa.domain.member.controller.MemberApiController;
 import project.gymnawa.domain.member.service.MemberService;
 import project.gymnawa.domain.normember.service.NorMemberService;
 import project.gymnawa.domain.trainer.service.TrainerService;
@@ -41,6 +32,7 @@ import project.gymnawa.domain.trainer.service.TrainerService;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -80,13 +72,15 @@ class MemberApiControllerTest {
     @DisplayName("인증된 사용자가 추가 정보 조회 요청 성공")
     void getMemberInfoSuccess() throws Exception {
         //given
-        setupSecurityContext(); // security context에 사용자 정보 입력
+//        setupSecurityContext(); // security context에 사용자 정보 입력
         Member member = createMember();
 
         when(memberService.findOne(anyLong())).thenReturn(member); // thenReturn()에는 any()같은 매처 사용 금지
 
         //when & then
-        mockMvc.perform(get("/api/members/info"))
+        mockMvc.perform(get("/api/members/info")
+                        .with(user(createCustomUserDetails())) // 임의의 인증된 사용자 정보를 SecurityContext에 주입하는 방법
+                )
                 .andExpect(status().isOk());
     }
 
@@ -108,7 +102,7 @@ class MemberApiControllerTest {
         Long userId = 1L;
         Long newJoinId = 100L;
 
-        setupSecurityContext(); // 인증 처리(임시 세션에 사용자 정보 저장)
+//        setupSecurityContext(); // 인증 처리(임시 세션에 사용자 정보 저장)
         Member member = createMember();
 
         MemberOauthInfoDto memberOauthInfoDto = MemberOauthInfoDto.builder()
@@ -127,6 +121,7 @@ class MemberApiControllerTest {
         //when & then
         mockMvc.perform(post("/api/members/add-info")
                         .with(csrf()) // 이거 안 해주면 403에러 발생
+                        .with(user(createCustomUserDetails())) // 임의의 인증된 사용자 정보를 SecurityContext에 주입하는 방법
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization-Refresh", refreshToken)
                         .content(objectMapper.writeValueAsString(memberOauthInfoDto))
@@ -140,7 +135,7 @@ class MemberApiControllerTest {
         //given
         String refreshToken = "test-refresh-token";
 
-        setupSecurityContext(); // 인증 처리(임시 세션에 사용자 정보 저장)
+//        setupSecurityContext(); // 인증 처리(임시 세션에 사용자 정보 저장)
 
         // gender 필드 제거
         MemberOauthInfoDto memberOauthInfoDto = MemberOauthInfoDto.builder()
@@ -152,6 +147,7 @@ class MemberApiControllerTest {
         //when & then
         mockMvc.perform(post("/api/members/add-info")
                         .with(csrf()) // 이거 안 해주면 403에러 발생
+                        .with(user(createCustomUserDetails())) // 임의의 인증된 사용자 정보를 SecurityContext에 주입하는 방법
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization-Refresh", refreshToken)
                         .content(objectMapper.writeValueAsString(memberOauthInfoDto))
@@ -168,7 +164,7 @@ class MemberApiControllerTest {
         //given
         String refreshToken = "test-refresh-token";
 
-        setupSecurityContext(); // 인증 처리(임시 세션에 사용자 정보 저장)
+//        setupSecurityContext(); // 인증 처리(임시 세션에 사용자 정보 저장)
 
         // isTrainer 필드 제거
         MemberOauthInfoDto memberOauthInfoDto = MemberOauthInfoDto.builder()
@@ -179,6 +175,7 @@ class MemberApiControllerTest {
         //when & then
         mockMvc.perform(post("/api/members/add-info")
                         .with(csrf()) // 이거 안 해주면 403에러 발생
+                        .with(user(createCustomUserDetails())) // 임의의 인증된 사용자 정보를 SecurityContext에 주입하는 방법
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization-Refresh", refreshToken)
                         .content(objectMapper.writeValueAsString(memberOauthInfoDto))
@@ -195,7 +192,7 @@ class MemberApiControllerTest {
         //given
         String refreshToken = "test-refresh-token";
 
-        setupSecurityContext(); // 인증 처리(임시 세션에 사용자 정보 저장)
+//        setupSecurityContext(); // 인증 처리(임시 세션에 사용자 정보 저장)
 
         // isTrainer 필드 제거
         MemberOauthInfoDto memberOauthInfoDto = MemberOauthInfoDto.builder()
@@ -207,6 +204,7 @@ class MemberApiControllerTest {
         //when & then
         mockMvc.perform(post("/api/members/add-info")
                         .with(csrf()) // 이거 안 해주면 403에러 발생
+                        .with(user(createCustomUserDetails())) // 임의의 인증된 사용자 정보를 SecurityContext에 주입하는 방법
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("Authorization-Refresh", refreshToken)
                         .content(objectMapper.writeValueAsString(memberOauthInfoDto))
@@ -224,7 +222,7 @@ class MemberApiControllerTest {
         Long userId = 1L;
         String password = "testPw";
 
-        setupSecurityContext(); // 인증 처리(임시 세션에 사용자 정보 저장)
+//        setupSecurityContext(); // 인증 처리(임시 세션에 사용자 정보 저장)
         Member member = createMember();
 
         PasswordDto passwordDto = PasswordDto.builder().password(password).build();
@@ -235,6 +233,7 @@ class MemberApiControllerTest {
         //when & then
         mockMvc.perform(post("/api/members/{id}/verify-password", userId)
                         .with(csrf()) // 이거 안 해주면 403에러 발생
+                        .with(user(createCustomUserDetails())) // 임의의 인증된 사용자 정보를 SecurityContext에 주입하는 방법
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(passwordDto))
                 )
@@ -250,7 +249,7 @@ class MemberApiControllerTest {
         Long invalidId = 2L;
         String password = "testPw";
 
-        setupSecurityContext(); // 인증 처리(임시 세션에 사용자 정보 저장)
+//        setupSecurityContext(); // 인증 처리(임시 세션에 사용자 정보 저장)
         Member member = createMember();
 
         PasswordDto passwordDto = PasswordDto.builder().password(password).build();
@@ -261,6 +260,7 @@ class MemberApiControllerTest {
         //when & then
         mockMvc.perform(post("/api/members/{id}/verify-password", invalidId)
                         .with(csrf()) // 이거 안 해주면 403에러 발생
+                        .with(user(createCustomUserDetails())) // 임의의 인증된 사용자 정보를 SecurityContext에 주입하는 방법
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(passwordDto))
                 )
@@ -276,7 +276,7 @@ class MemberApiControllerTest {
         Long userId = 1L;
         String invalidPassword = "invalidPw";
 
-        setupSecurityContext(); // 인증 처리(임시 세션에 사용자 정보 저장)
+//        setupSecurityContext(); // 인증 처리(임시 세션에 사용자 정보 저장)
         Member member = createMember();
 
         PasswordDto passwordDto = PasswordDto.builder().password(invalidPassword).build();
@@ -287,6 +287,7 @@ class MemberApiControllerTest {
         //when & then
         mockMvc.perform(post("/api/members/{id}/verify-password", userId)
                         .with(csrf()) // 이거 안 해주면 403에러 발생
+                        .with(user(createCustomUserDetails())) // 임의의 인증된 사용자 정보를 SecurityContext에 주입하는 방법
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(passwordDto))
                 )
@@ -301,7 +302,7 @@ class MemberApiControllerTest {
         //given
         Long userId = 1L;
 
-        setupSecurityContext(); // 인증 처리(임시 세션에 사용자 정보 저장)
+//        setupSecurityContext(); // 인증 처리(임시 세션에 사용자 정보 저장)
         Member member = createMember();
 
         when(memberService.findOne(userId)).thenReturn(member);
@@ -310,6 +311,7 @@ class MemberApiControllerTest {
         //when & then
         mockMvc.perform(delete("/api/members/{id}", userId)
                         .with(csrf()) // 이거 안 해주면 403에러 발생
+                        .with(user(createCustomUserDetails())) // 임의의 인증된 사용자 정보를 SecurityContext에 주입하는 방법
                         .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isOk())
@@ -323,7 +325,7 @@ class MemberApiControllerTest {
         Long userId = 1L;
         Long invalidId = 2L;
 
-        setupSecurityContext(); // 인증 처리(임시 세션에 사용자 정보 저장)
+//        setupSecurityContext(); // 인증 처리(임시 세션에 사용자 정보 저장)
         Member member = createMember();
 
         when(memberService.findOne(userId)).thenReturn(member);
@@ -332,6 +334,7 @@ class MemberApiControllerTest {
         //when & then
         mockMvc.perform(delete("/api/members/{id}", invalidId)
                         .with(csrf()) // 이거 안 해주면 403에러 발생
+                        .with(user(createCustomUserDetails())) // 임의의 인증된 사용자 정보를 SecurityContext에 주입하는 방법
                         .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isBadRequest())
