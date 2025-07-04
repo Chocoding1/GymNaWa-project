@@ -42,6 +42,7 @@ public class MemberApiController {
     /**
      * acess token으로 회원 정보 반환
      * 홈 화면에서 로그인, 비로그인 구분하여 렌더링하기 위해 만든 api
+     * 로그인 회원의 정보를 추출해서 반환(화면 출력용)
      */
     @GetMapping("/info")
     public ResponseEntity<ApiResponse<MemberHomeInfoDto>> memberInfo(@AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
@@ -69,7 +70,7 @@ public class MemberApiController {
     }
 
     /**
-     * 추가 정보 입력
+     * 최초 소셜 로그인 시, 추가 정보 입력
      */
     @PostMapping("/add-info")
     public ResponseEntity<?> addInfo(@RequestBody @Validated MemberOauthInfoDto memberOauthInfoDto,
