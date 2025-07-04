@@ -36,11 +36,8 @@ public class KakaoService {
 
     public ResponseEntity<KakaoApiResponse<GymDto>> getGymsByAddress(double x, double y) {
 
-        log.info("x = " + x + ", y = " + y);
-
         // URI 생성
         URI uri = createUri("헬스장", x, y);
-        log.info("[findGymByAddress] URI : " + uri);
 
         // 요청 객체 생성
         HttpEntity<Object> entity = setHttpEntity();
@@ -60,9 +57,7 @@ public class KakaoService {
 
     public ResponseEntity<KakaoApiResponse<GymDto>> getGymsByKeyword(String keyword) {
         // URI 생성
-        log.info("keyword : " + keyword);
         URI uri = createUri(keyword, null, null);
-        log.info("[findGymByKeyword URI : " + uri);
 
         // 요청 객체 생성
         HttpEntity<Object> entity = setHttpEntity();
