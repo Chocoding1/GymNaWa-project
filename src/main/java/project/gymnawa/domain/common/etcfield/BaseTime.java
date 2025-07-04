@@ -1,4 +1,4 @@
-package project.gymnawa.domain.member.entity.etcfield;
+package project.gymnawa.domain.common.etcfield;
 
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
