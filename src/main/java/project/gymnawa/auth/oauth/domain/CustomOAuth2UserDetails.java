@@ -49,8 +49,16 @@ public class CustomOAuth2UserDetails implements UserDetails, OAuth2User {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        Collection<GrantedAuthority> collect = new ArrayList<>();
-        return List.of();
+        Collection<GrantedAuthority> collection = new ArrayList<>();
+
+        collection.add(new GrantedAuthority() {
+                           @Override
+                           public String getAuthority() {
+                               return String.valueOf(member.getRole());
+                           }
+                       });
+
+        return collection;
     }
 
     // 메서드명은 username이지만, email 반환
