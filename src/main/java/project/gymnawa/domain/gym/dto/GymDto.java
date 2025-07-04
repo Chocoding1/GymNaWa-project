@@ -8,6 +8,9 @@ import lombok.Data;
 @Builder
 public class GymDto {
 
+    @JsonProperty("id")
+    private String gymId;
+
     @JsonProperty("place_name")
     private String placeName;
 
