@@ -1,4 +1,4 @@
-package project.gymnawa.service;
+package project.gymnawa.domain.gymtrainer.service;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -9,9 +9,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import project.gymnawa.domain.common.etcfield.ContractStatus;
-import project.gymnawa.domain.gym.entity.Gym;
 import project.gymnawa.domain.gymtrainer.entity.GymTrainer;
-import project.gymnawa.domain.gymtrainer.service.GymTrainerService;
 import project.gymnawa.domain.trainer.entity.Trainer;
 import project.gymnawa.domain.gymtrainer.repository.GymTrainerRepository;
 
