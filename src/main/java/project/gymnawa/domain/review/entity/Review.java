@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import project.gymnawa.domain.review.dto.ReviewViewDto;
-import project.gymnawa.domain.member.entity.etcfield.BaseTime;
+import project.gymnawa.domain.common.etcfield.BaseTime;
 import project.gymnawa.domain.normember.entity.NorMember;
 import project.gymnawa.domain.trainer.entity.Trainer;
 

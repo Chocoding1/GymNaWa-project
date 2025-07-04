@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import project.gymnawa.domain.common.etcfield.Address;
-import project.gymnawa.domain.member.entity.etcfield.BaseTime;
+import project.gymnawa.domain.common.etcfield.BaseTime;
 import project.gymnawa.domain.member.entity.etcfield.Role;
 import project.gymnawa.domain.member.entity.etcfield.Gender;
 

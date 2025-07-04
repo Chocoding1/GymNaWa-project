@@ -3,7 +3,7 @@ package project.gymnawa.domain.ptmembership.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import project.gymnawa.domain.ptmembership.dto.PtMembershipViewDto;
-import project.gymnawa.domain.member.entity.etcfield.BaseTime;
+import project.gymnawa.domain.common.etcfield.BaseTime;
 import project.gymnawa.domain.normember.entity.NorMember;
 import project.gymnawa.domain.trainer.entity.Trainer;
 
