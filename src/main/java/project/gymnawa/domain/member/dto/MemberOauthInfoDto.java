@@ -22,5 +22,6 @@ public class MemberOauthInfoDto {
     private String detailAddress;
     private String buildingName;
 
+    @NotNull(message = "트레이너 여부는 필수입니다.")
     private Boolean isTrainer;
 }
