@@ -46,7 +46,6 @@ public class NorMemberApiController {
     public ResponseEntity<ApiResponse<?>> addMember(@Validated @RequestBody MemberSaveDto memberSaveDto) {
 
         if (!emailService.isEmailVerified(memberSaveDto.getEmail(), memberSaveDto.getEmailCode())) {
-            log.info("code : " + memberSaveDto.getEmailCode());
             throw new CustomException(INVALID_EMAIL_CODE);
         }
 
@@ -72,7 +71,7 @@ public class NorMemberApiController {
 
         MemberViewDto memberViewDto = createMemberViewDto(loginedMember);
 
-        return ResponseEntity.ok().body(ApiResponse.of("회원 조회 성공", memberViewDto));
+        return ResponseEntity.ok().body(ApiResponse.of("회원 정보 조회 성공", memberViewDto));
     }
 
     /**
@@ -110,10 +109,6 @@ public class NorMemberApiController {
             throw new CustomException(ACCESS_DENIED);
         }
 
-        log.info("curPw :" + updatePasswordDto.getCurrentPassword());
-        log.info("newPw :" + updatePasswordDto.getNewPassword());
-        log.info("confPw :" + updatePasswordDto.getConfirmPassword());
-
         norMemberService.changePassword(id, updatePasswordDto);
 
         return ResponseEntity.ok().body(ApiResponse.of("비밀번호 변경 성공"));
@@ -123,8 +118,8 @@ public class NorMemberApiController {
      * 내가 쓴 리뷰 조회
      */
     @GetMapping("/{id}/reviews")
-    public ResponseEntity<ApiResponse<List<ReviewViewDto>>> getReviewList(@PathVariable Long id,
-                                                                          @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
+    public ResponseEntity<ApiResponse<List<ReviewViewDto>>> getReviews(@PathVariable Long id,
+                                                                       @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
         Long userId = customOAuth2UserDetails.getId();
         NorMember loginedMember = norMemberService.findOne(userId);
@@ -144,8 +139,8 @@ public class NorMemberApiController {
      * 진행 중인 PT 조회
      */
     @GetMapping("/{id}/ptmemberships")
-    public ResponseEntity<ApiResponse<List<PtMembershipViewDto>>> getPtMembershipList(@PathVariable Long id,
-                                                                                      @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
+    public ResponseEntity<ApiResponse<List<PtMembershipViewDto>>> getPtMemberships(@PathVariable Long id,
+                                                                                   @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
         Long userId = customOAuth2UserDetails.getId();
         NorMember loginedMember = norMemberService.findOne(userId);
