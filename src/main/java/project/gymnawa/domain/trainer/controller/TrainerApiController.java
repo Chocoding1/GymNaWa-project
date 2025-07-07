@@ -1,6 +1,5 @@
 package project.gymnawa.domain.trainer.controller;
 
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -44,11 +43,9 @@ public class TrainerApiController {
      * 회원가입
      */
     @PostMapping
-    public ResponseEntity<ApiResponse<?>> addTrainer(@Validated @RequestBody TrainerSaveDto trainerSaveDto,
-                                                          HttpServletRequest request) {
+    public ResponseEntity<ApiResponse<?>> addTrainer(@Validated @RequestBody TrainerSaveDto trainerSaveDto) {
 
         if (!emailService.isEmailVerified(trainerSaveDto.getEmail(), trainerSaveDto.getEmailCode())) {
-            log.info("code : " + request.getParameter("code"));
             throw new CustomException(INVALID_EMAIL_CODE);
         }
 
@@ -111,10 +108,6 @@ public class TrainerApiController {
             throw new CustomException(ACCESS_DENIED);
         }
 
-        log.info("curPw :" + updatePasswordDto.getCurrentPassword());
-        log.info("newPw :" + updatePasswordDto.getNewPassword());
-        log.info("confPw :" + updatePasswordDto.getConfirmPassword());
-
         trainerService.changePassword(id, updatePasswordDto);
 
         return ResponseEntity.ok().body(ApiResponse.of("비밀번호 변경 성공"));
@@ -129,7 +122,6 @@ public class TrainerApiController {
 
         Long userId = customOAuth2UserDetails.getId();
         Trainer loginedTrainer = trainerService.findOne(userId);
-
 
         if (!loginedTrainer.getId().equals(id)) {
             throw new CustomException(ACCESS_DENIED);
@@ -160,7 +152,7 @@ public class TrainerApiController {
                 .map(PtMembership::of)
                 .toList();
 
-        return ResponseEntity.ok().body(ApiResponse.of("PT 조회 성공", ptMembershipList));
+        return ResponseEntity.ok().body(ApiResponse.of("진행 중인 PT 조회 성공", ptMembershipList));
     }
 
     private TrainerViewDto createTrainerViewDto(Trainer loginedTrainer) {
