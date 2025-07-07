@@ -1,285 +1,596 @@
-//package project.gymnawa.controller.api;
-//
-//import com.fasterxml.jackson.databind.ObjectMapper;
-//import org.junit.jupiter.api.DisplayName;
-//import org.junit.jupiter.api.Test;
-//import org.junit.jupiter.api.extension.ExtendWith;
-//import org.mockito.junit.jupiter.MockitoExtension;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-//import org.springframework.http.MediaType;
-//import org.springframework.mock.web.MockHttpSession;
-//import org.springframework.test.context.bean.override.mockito.MockitoBean;
-//import org.springframework.test.web.servlet.MockMvc;
-//import org.springframework.test.web.servlet.ResultActions;
-//import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-//import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-//import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-//import project.gymnawa.domain.common.etcfield.Address;
-//import project.gymnawa.domain.member.entity.etcfield.Gender;
-//import project.gymnawa.domain.trainer.controller.TrainerApiController;
-//import project.gymnawa.domain.trainer.entity.Trainer;
-//import project.gymnawa.domain.trainer.dto.TrainerEditDto;
-//import project.gymnawa.domain.trainer.dto.TrainerSaveDto;
-//import project.gymnawa.domain.email.service.EmailService;
-//import project.gymnawa.domain.trainer.service.TrainerService;
-//import project.gymnawa.web.SessionConst;
-//
-//import static org.mockito.ArgumentMatchers.any;
-//import static org.mockito.ArgumentMatchers.anyString;
-//import static org.mockito.Mockito.*;
-//
-//@WebMvcTest(TrainerApiController.class)
-//@ExtendWith(MockitoExtension.class)
-//class TrainerApiControllerTest {
-//
-//    @Autowired
-//    private MockMvc mockMvc;
-//
-//    @Autowired
-//    private ObjectMapper objectMapper;
-//
-//    @MockitoBean
-//    private TrainerService trainerService;
-//
-//    @MockitoBean
-//    private EmailService emailService;
-//
-//    MockHttpSession session;
-//
-//    @Test
-//    @DisplayName("회원가입 시 초기 DTO 생성")
-//    void createAddDto() throws Exception {
-//        //given
-//        String email = "";
-//        String password = "";
-//        Gender gender = Gender.MALE;
-//
-//        //when
-//        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.get("/api/member/t/add"));
-//
-//        //then
-//        resultActions
-//                .andDo(MockMvcResultHandlers.print())
-//                .andExpect(MockMvcResultMatchers.jsonPath("$.email").value(email))
-//                .andExpect(MockMvcResultMatchers.jsonPath("$.password").value(password));
-//    }
-//
-//    @Test
-//    @DisplayName("회원가입 성공")
-//    void addSuccess() throws Exception {
-//        //given
-//        Long id = 1L;
-//        TrainerSaveDto trainerSaveDto = createTrainerSaveDto("password",
-//                "name", "email", Gender.MALE, "zoneCode", "address", "detailAddress", "buildingName");
-//
-//        when(emailService.isEmailVerified(anyString(), anyString())).thenReturn(true);
-//        when(trainerService.join(any(TrainerSaveDto.class))).thenReturn(id);
-//
-//        //when
-//        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/api/member/t/add")
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .content(objectMapper.writeValueAsString(trainerSaveDto))
-//                .param("code", "correctCode"));
-//
-//        //then
-//        resultActions
-//                .andDo(MockMvcResultHandlers.print())
-//                .andExpect(MockMvcResultMatchers.status().isCreated())
-//                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("요청 성공"))
-//                .andExpect(MockMvcResultMatchers.jsonPath("$.data.email").value("email"));
-//
-//        verify(emailService, times(1)).isEmailVerified(anyString(), anyString());
-//        verify(trainerService, times(1)).join(any(TrainerSaveDto.class));
-//    }
-//
-//    @Test
-//    @DisplayName("회원가입 실패 - 잘못된 입력값")
-//    void addFail_WrongInput() throws Exception {
-//        //given
-//        TrainerSaveDto trainerSaveDto = createTrainerSaveDto("", "", "", Gender.MALE, "", "", "", "");
-//
-//        //when
-//        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/api/member/t/add")
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .content(objectMapper.writeValueAsString(trainerSaveDto)));
-//
-//        //then
-//        resultActions
-//                .andDo(MockMvcResultHandlers.print())
-//                .andExpect(MockMvcResultMatchers.status().isBadRequest())
-//                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("입력값이 올바르지 않습니다."));
-//    }
-//
-//    @Test
-//    @DisplayName("회원가입 실패 - 이메일 인증 실패")
-//    void addFail_EmailNotVerified() throws Exception {
-//        //given
-//        TrainerSaveDto trainerSaveDto = createTrainerSaveDto("password",
-//                "name", "email", Gender.MALE, "zoneCode", "address", "detailAddress", "buildingName");
-//
-//        when(emailService.isEmailVerified(anyString(), anyString())).thenReturn(false);
-//
-//        //when
-//        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/api/member/t/add")
-//                .contentType(MediaType.APPLICATION_JSON)
-//                .content(objectMapper.writeValueAsString(trainerSaveDto))
-//                .param("code", "wrongCode"));
-//
-//        //then
-//        resultActions
-//                .andDo(MockMvcResultHandlers.print())
-//                .andExpect(MockMvcResultMatchers.status().isBadRequest())
-//                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("이메일 인증이 필요합니다."));
-//
-//        verify(emailService, times(1)).isEmailVerified(anyString(), anyString());
-//    }
-//
-//    @Test
-//    @DisplayName("마이페이지")
-//    void mypage() throws Exception {
-//        //given
-//        Trainer trainer = createTrainer("password", "name", "email", Gender.MALE, Address.builder().build());
-//
-//        when(trainerService.findOne(1L)).thenReturn(trainer);
-//
-//        // 마이페이지는 인터셉터에서 로그인 인증을 해야하기 때문에 임의로 세션 설정
-//        session = new MockHttpSession();
-//        session.setAttribute(SessionConst.LOGIN_MEMBER, trainer);
-//
-//        //when
-//        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.get("/api/member/t/1/mypage")
-//                .session(session)); // 세션 주입
-//
-//        //then
-//        resultActions
-//                .andDo(MockMvcResultHandlers.print())
-//                .andExpect(MockMvcResultMatchers.status().isOk())
-//                .andExpect(MockMvcResultMatchers.jsonPath("$.data.email").value("email"));
-//
-//        verify(trainerService, times(1)).findOne(1L);
-//    }
-//
-//    @Test
-//    @DisplayName("회원 정보 수정 시 초기 DTO 생성")
-//    void createEditDto() throws Exception {
-//        //given
-//        Trainer trainer = createTrainer("password", "name", "email", Gender.MALE, Address.builder().build());
-//
-//        when(trainerService.findOne(1L)).thenReturn(trainer);
-//
-//        // 인터셉터 통과를 위한 세션 설정
-//        session = new MockHttpSession();
-//        session.setAttribute(SessionConst.LOGIN_MEMBER, trainer);
-//
-//        //when
-//        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.get("/api/member/t/1/edit")
-//                .session(session));
-//
-//        //then
-//        resultActions
-//                .andDo(MockMvcResultHandlers.print())
-//                .andExpect(MockMvcResultMatchers.status().isOk())
-//                .andExpect(MockMvcResultMatchers.jsonPath("$.data.email").value(trainer.getEmail()));
-//
-//        verify(trainerService, times(1)).findOne(1L);
-//    }
-//
-//    @Test
-//    @DisplayName("회원 정보 수정 성공")
-//    void editSuccess() throws Exception {
-//        //given
-//        Trainer trainer = createTrainer("oldPassword", "oldName", "email", Gender.MALE, Address.builder().build());
-//
-//        TrainerEditDto trainerEditDto = createTrainerEditDto("oldPassword", "oldName", "zoneCode", "address", "detailAddress", "buildingName");
-//
-//        Address address = Address.builder()
-//                .zoneCode("zoneCode")
-//                .address("address")
-//                .detailAddress("detailAddress")
-//                .buildingName("buildingName")
-//                .build();
-//
-//        // 인터셉터 통과를 위한 세션 설정
-//        session = new MockHttpSession();
-//        session.setAttribute(SessionConst.LOGIN_MEMBER, trainer);
-//
-//        //when
-//        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/api/member/t/1/edit")
-//                .session(session)
-//                .content(objectMapper.writeValueAsString(trainerEditDto))
-//                .contentType(MediaType.APPLICATION_JSON));
-//
-//        //then
-//        resultActions
-//                .andDo(MockMvcResultHandlers.print())
-//                .andExpect(MockMvcResultMatchers.status().isOk())
-//                .andExpect(MockMvcResultMatchers.jsonPath("$.data").value("edit successful"));
-//
-//        verify(trainerService, times(1)).updateTrainer(eq(1L), eq(trainerEditDto));
-//    }
-//
-//    @Test
-//    @DisplayName("회원 정보 수정 실패 - 잘못된 입력값")
-//    void editFail_WrongInput() throws Exception {
-//        //given
-//        Trainer trainer = createTrainer("oldPassword", "oldName", "email", Gender.MALE, Address.builder().build());
-//
-//        TrainerEditDto trainerEditDto = createTrainerEditDto("", "newName", "zoneCode", "address", "detailAddress", "buildingName");
-//
-//        // 인터셉터 통과를 위한 세션 설정
-//        session = new MockHttpSession();
-//        session.setAttribute(SessionConst.LOGIN_MEMBER, trainer);
-//
-//        //when
-//        ResultActions resultActions = mockMvc.perform(MockMvcRequestBuilders.post("/api/member/t/1/edit")
-//                .session(session)
-//                .content(objectMapper.writeValueAsString(trainerEditDto))
-//                .contentType(MediaType.APPLICATION_JSON));
-//
-//        //then
-//        resultActions
-//                .andDo(MockMvcResultHandlers.print())
-//                .andExpect(MockMvcResultMatchers.status().isBadRequest())
-//                .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("입력값이 올바르지 않습니다."));
-//
-//        verify(trainerService, never()).updateTrainer(eq(1L), eq(trainerEditDto));
-//    }
-//
-//    private TrainerSaveDto createTrainerSaveDto(String password, String name,
-//                                                       String email, Gender gender, String zoneCode, String address,
-//                                                       String detailAddress, String buildingName) {
-//        return TrainerSaveDto.builder()
-//                .password(password)
-//                .name(name)
-//                .email(email)
-//                .gender(gender)
-//                .zoneCode(zoneCode)
-//                .address(address)
-//                .detailAddress(detailAddress)
-//                .buildingName(buildingName)
-//                .build();
-//    }
-//
-//    private Trainer createTrainer(String password, String name,
-//                                         String email, Gender gender, Address address) {
-//        return Trainer.builder()
-//                .password(password)
-//                .name(name)
-//                .email(email)
-//                .gender(gender)
-//                .address(address)
-//                .build();
-//    }
-//
-//    private TrainerEditDto createTrainerEditDto(String password, String name, String zoneCode,
-//                                                String address, String detailAddress, String buildingName) {
-//        return TrainerEditDto.builder()
-//                .name(name)
-//                .zoneCode(zoneCode)
-//                .address(address)
-//                .detailAddress(detailAddress)
-//                .buildingName(buildingName)
-//                .build();
-//    }
-//}
+package project.gymnawa.domain.trainer.controller;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
+import project.gymnawa.domain.member.dto.UpdatePasswordDto;
+import project.gymnawa.domain.member.entity.etcfield.Gender;
+import project.gymnawa.domain.ptmembership.entity.PtMembership;
+import project.gymnawa.domain.ptmembership.service.PtMembershipService;
+import project.gymnawa.domain.review.entity.Review;
+import project.gymnawa.domain.review.service.ReviewService;
+import project.gymnawa.domain.trainer.dto.TrainerSaveDto;
+import project.gymnawa.domain.trainer.entity.Trainer;
+import project.gymnawa.domain.trainer.dto.TrainerEditDto;
+import project.gymnawa.domain.email.service.EmailService;
+import project.gymnawa.domain.trainer.service.TrainerService;
+import project.gymnawa.web.config.SecurityTestConfig;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@WebMvcTest(TrainerApiController.class)
+@Import(SecurityTestConfig.class)
+class TrainerApiControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @MockitoBean
+    private TrainerService trainerService;
+
+    @MockitoBean
+    private EmailService emailService;
+
+    @MockitoBean
+    private ReviewService reviewService;
+
+    @MockitoBean
+    private PtMembershipService ptMembershipService;
+
+    @Test
+    @DisplayName("회원가입 성공")
+    void addTrainerSuccess() throws Exception {
+        //given
+        TrainerSaveDto trainerSaveDto = TrainerSaveDto.builder()
+                .email("testEmail")
+                .password("testPassword")
+                .name("testName")
+                .gender(Gender.MALE)
+                .zoneCode("testZoneCode")
+                .address("testAddress")
+                .emailCode("testEmailCode")
+                .build();
+
+        when(emailService.isEmailVerified(trainerSaveDto.getEmail(), trainerSaveDto.getEmailCode())).thenReturn(true);
+        when(trainerService.join(trainerSaveDto)).thenReturn(1L);
+
+        //when & then
+        mockMvc.perform(post("/api/trainers")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(trainerSaveDto))
+                )
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.message").value("회원가입 성공"));
+    }
+
+    @Test
+    @DisplayName("회원가입 실패(400) - 이메일 인증 실패")
+    void addTrainerFail_invalidEmail() throws Exception {
+        //given
+        // email 필드 제거
+        TrainerSaveDto trainerSaveDto = TrainerSaveDto.builder()
+                .email("testEmail")
+                .password("testPassword")
+                .name("testName")
+                .gender(Gender.MALE)
+                .zoneCode("testZoneCode")
+                .address("testAddress")
+                .emailCode("testEmailCode")
+                .build();
+
+        when(emailService.isEmailVerified(trainerSaveDto.getEmail(), trainerSaveDto.getEmailCode())).thenReturn(false);
+
+        //when & then
+        mockMvc.perform(post("/api/trainers")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(trainerSaveDto))
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errorCode").value("INVALID_EMAIL_CODE"))
+                .andExpect(jsonPath("$.errorMessage").value("이메일 인증 코드가 일치하지 않습니다."));
+    }
+
+    @Test
+    @DisplayName("회원가입 실패(400) - 필수정보(이메일) 미입력")
+    void addTrainerFail_email() throws Exception {
+        //given
+        // email 필드 제거
+        TrainerSaveDto trainerSaveDto = TrainerSaveDto.builder()
+                .password("testPassword")
+                .name("testName")
+                .gender(Gender.MALE)
+                .zoneCode("testZoneCode")
+                .address("testAddress")
+                .emailCode("testEmailCode")
+                .build();
+
+        //when & then
+        mockMvc.perform(post("/api/trainers")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(trainerSaveDto))
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errorCode").value("VALIDATION_ERROR"))
+                .andExpect(jsonPath("$.errorMessage").value("입력값이 유효하지 않습니다."))
+                .andExpect(jsonPath("$.errors.email").value("이메일은 필수입니다."));
+    }
+
+    @Test
+    @DisplayName("회원가입 실패(400) - 필수정보(비밀번호) 미입력")
+    void addTrainerFail_password() throws Exception {
+        //given
+        // password 필드 제거
+        TrainerSaveDto trainerSaveDto = TrainerSaveDto.builder()
+                .email("testEmail")
+                .name("testName")
+                .gender(Gender.MALE)
+                .zoneCode("testZoneCode")
+                .address("testAddress")
+                .emailCode("testEmailCode")
+                .build();
+
+        //when & then
+        mockMvc.perform(post("/api/trainers")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(trainerSaveDto))
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errorCode").value("VALIDATION_ERROR"))
+                .andExpect(jsonPath("$.errorMessage").value("입력값이 유효하지 않습니다."))
+                .andExpect(jsonPath("$.errors.password").value("비밀번호는 필수입니다."));
+    }
+
+    @Test
+    @DisplayName("회원가입 실패(400) - 필수정보(이름) 미입력")
+    void addTrainerFail_name() throws Exception {
+        //given
+        // name 필드 제거
+        TrainerSaveDto trainerSaveDto = TrainerSaveDto.builder()
+                .email("testEmail")
+                .password("testPassword")
+                .gender(Gender.MALE)
+                .zoneCode("testZoneCode")
+                .address("testAddress")
+                .emailCode("testEmailCode")
+                .build();
+
+        //when & then
+        mockMvc.perform(post("/api/trainers")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(trainerSaveDto))
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errorCode").value("VALIDATION_ERROR"))
+                .andExpect(jsonPath("$.errorMessage").value("입력값이 유효하지 않습니다."))
+                .andExpect(jsonPath("$.errors.name").value("이름은 필수입니다."));
+    }
+
+    @Test
+    @DisplayName("회원가입 실패(400) - 필수정보(성별) 미입력")
+    void addTrainerFail_gender() throws Exception {
+        //given
+        // gender 필드 제거
+        TrainerSaveDto trainerSaveDto = TrainerSaveDto.builder()
+                .email("testEmail")
+                .password("testPassword")
+                .name("testName")
+                .zoneCode("testZoneCode")
+                .address("testAddress")
+                .emailCode("testEmailCode")
+                .build();
+
+        //when & then
+        mockMvc.perform(post("/api/trainers")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(trainerSaveDto))
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errorCode").value("VALIDATION_ERROR"))
+                .andExpect(jsonPath("$.errorMessage").value("입력값이 유효하지 않습니다."))
+                .andExpect(jsonPath("$.errors.gender").value("성별은 필수입니다."));
+    }
+
+    @Test
+    @DisplayName("회원가입 실패(400) - 필수정보(주소) 미입력")
+    void addTrainerFail_address() throws Exception {
+        //given
+        // zoneCode, address 필드 제거
+        TrainerSaveDto trainerSaveDto = TrainerSaveDto.builder()
+                .email("testEmail")
+                .password("testPassword")
+                .name("testName")
+                .gender(Gender.MALE)
+                .emailCode("testEmailCode")
+                .build();
+
+        //when & then
+        mockMvc.perform(post("/api/trainers")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(trainerSaveDto))
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errorCode").value("VALIDATION_ERROR"))
+                .andExpect(jsonPath("$.errorMessage").value("입력값이 유효하지 않습니다."));
+    }
+
+    @Test
+    @DisplayName("마이페이지 조회 성공")
+    void myPageSuccess() throws Exception {
+        //given
+        Long userId = 1L;
+        Trainer trainer = createTrainer();
+
+        when(trainerService.findOne(userId)).thenReturn(trainer);
+
+        //when & then
+        mockMvc.perform(get("/api/trainers/{id}", userId)
+                        .with(user(createCustomUserDetails()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("회원 정보 조회 성공"))
+                .andExpect(jsonPath("$.data.email").value("test@naver.com"));
+    }
+
+    @Test
+    @DisplayName("마이페이지 조회 실패(400) - 유효하지 않은 id pathVariable")
+    void myPageFail_invalidId() throws Exception {
+        //given
+        Long userId = 1L;
+        Long invalidId = 100L;
+        Trainer trainer = createTrainer();
+
+        when(trainerService.findOne(userId)).thenReturn(trainer);
+
+        //when & then
+        mockMvc.perform(get("/api/trainers/{id}", invalidId)
+                        .with(user(createCustomUserDetails()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errorCode").value("ACCESS_DENIED"))
+                .andExpect(jsonPath("$.errorMessage").value("잘못된 접근입니다."));
+    }
+
+    @Test
+    @DisplayName("회원 정보 수정 성공")
+    void editTrainerSuccess() throws Exception {
+        //given
+        Long userId = 1L;
+        Trainer trainer = createTrainer();
+        TrainerEditDto trainerEditDto = TrainerEditDto.builder()
+                .name("editName")
+                .zoneCode("newZoneCode")
+                .address("newAddress")
+                .build();
+
+        when(trainerService.findOne(userId)).thenReturn(trainer);
+        doNothing().when(trainerService).updateTrainer(userId, trainerEditDto);
+
+        //when & then
+        mockMvc.perform(patch("/api/trainers/{id}", userId)
+                        .with(user(createCustomUserDetails()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(trainerEditDto))
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("회원 정보 수정 성공"));
+    }
+
+    @Test
+    @DisplayName("회원 정보 수정 실패(400) - 유효하지 않은 id pathVariable")
+    void editTrainerFail_invalidId() throws Exception {
+        //given
+        Long userId = 1L;
+        Long invalidId = 100L;
+        Trainer trainer = createTrainer();
+
+        when(trainerService.findOne(userId)).thenReturn(trainer);
+
+        //when & then
+        mockMvc.perform(get("/api/trainers/{id}", invalidId)
+                        .with(user(createCustomUserDetails()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errorCode").value("ACCESS_DENIED"))
+                .andExpect(jsonPath("$.errorMessage").value("잘못된 접근입니다."));
+    }
+
+    @Test
+    @DisplayName("회원 정보 수정 실패(400) - 필수정보(이름) 미입력")
+    void editTrainerFail_name() throws Exception {
+        //given
+        Long userId = 1L;
+        Trainer trainer = createTrainer();
+
+        // name 필드 제거
+        TrainerEditDto trainerEditDto = TrainerEditDto.builder()
+                .zoneCode("newZoneCode")
+                .address("newAddress")
+                .build();
+
+        when(trainerService.findOne(userId)).thenReturn(trainer);
+
+        //when & then
+        mockMvc.perform(patch("/api/trainers/{id}", userId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(trainerEditDto))
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errorCode").value("VALIDATION_ERROR"))
+                .andExpect(jsonPath("$.errorMessage").value("입력값이 유효하지 않습니다."))
+                .andExpect(jsonPath("$.errors.name").value("이름은 필수입니다."));
+    }
+
+    @Test
+    @DisplayName("회원 정보 수정 실패(400) - 필수정보(주소) 미입력")
+    void editTrainerFail_address() throws Exception {
+        //given
+        Long userId = 1L;
+        Trainer trainer = createTrainer();
+
+        // zoneCode, address 필드 제거
+        TrainerEditDto trainerEditDto = TrainerEditDto.builder()
+                .name("editName")
+                .build();
+
+        when(trainerService.findOne(userId)).thenReturn(trainer);
+
+        //when & then
+        mockMvc.perform(patch("/api/trainers/{id}", userId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(trainerEditDto))
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errorCode").value("VALIDATION_ERROR"))
+                .andExpect(jsonPath("$.errorMessage").value("입력값이 유효하지 않습니다."));
+    }
+
+    @Test
+    @DisplayName("비밀번호 변경 성공")
+    void updatePwSuccess() throws Exception {
+        //given
+        Long userId = 1L;
+        Trainer trainer = createTrainer();
+        UpdatePasswordDto updatePasswordDto = UpdatePasswordDto.builder()
+                .currentPassword("testPw")
+                .newPassword("newPw")
+                .confirmPassword("confirmPw")
+                .build();
+
+        when(trainerService.findOne(userId)).thenReturn(trainer);
+        doNothing().when(trainerService).changePassword(userId, updatePasswordDto);
+
+        //when & then
+        mockMvc.perform(post("/api/trainers/{id}/password", userId)
+                        .with(user(createCustomUserDetails()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updatePasswordDto))
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("비밀번호 변경 성공"));
+    }
+
+    @Test
+    @DisplayName("비밀번호 변경 실패(400) - 유효하지 않은 id pathVariable")
+    void updatePwFail_invalidId() throws Exception {
+        //given
+        Long userId = 1L;
+        Long invalidId = 100L;
+        Trainer trainer = createTrainer();
+        UpdatePasswordDto updatePasswordDto = UpdatePasswordDto.builder()
+                .currentPassword("testPw")
+                .newPassword("newPw")
+                .confirmPassword("confirmPw")
+                .build();
+
+        when(trainerService.findOne(userId)).thenReturn(trainer);
+
+        //when & then
+        mockMvc.perform(post("/api/trainers/{id}/password", invalidId)
+                        .with(user(createCustomUserDetails()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updatePasswordDto))
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errorCode").value("ACCESS_DENIED"))
+                .andExpect(jsonPath("$.errorMessage").value("잘못된 접근입니다."));
+    }
+
+    @Test
+    @DisplayName("비밀번호 변경 실패(400) - 필수정보(현재 비밀번호) 미입력")
+    void updatePwFail_currentPw() throws Exception {
+        //given
+        Long userId = 1L;
+        Trainer trainer = createTrainer();
+
+        // currentPw 필드 제거
+        UpdatePasswordDto updatePasswordDto = UpdatePasswordDto.builder()
+                .newPassword("newPw")
+                .confirmPassword("confirmPw")
+                .build();
+
+        when(trainerService.findOne(userId)).thenReturn(trainer);
+
+        //when & then
+        mockMvc.perform(post("/api/trainers/{id}/password", userId)
+                        .with(user(createCustomUserDetails()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updatePasswordDto))
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errorCode").value("VALIDATION_ERROR"))
+                .andExpect(jsonPath("$.errorMessage").value("입력값이 유효하지 않습니다."))
+                .andExpect(jsonPath("$.errors.currentPassword").value("현재 비밀번호는 필수입니다."));
+    }
+
+    @Test
+    @DisplayName("비밀번호 변경 실패(400) - 필수정보(새 비밀번호) 미입력")
+    void updatePwFail_newPw() throws Exception {
+        //given
+        Long userId = 1L;
+        Trainer trainer = createTrainer();
+
+        // newPw 필드 제거
+        UpdatePasswordDto updatePasswordDto = UpdatePasswordDto.builder()
+                .currentPassword("testPw")
+                .confirmPassword("confirmPw")
+                .build();
+
+        when(trainerService.findOne(userId)).thenReturn(trainer);
+
+        //when & then
+        mockMvc.perform(post("/api/trainers/{id}/password", userId)
+                        .with(user(createCustomUserDetails()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updatePasswordDto))
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errorCode").value("VALIDATION_ERROR"))
+                .andExpect(jsonPath("$.errorMessage").value("입력값이 유효하지 않습니다."))
+                .andExpect(jsonPath("$.errors.newPassword").value("새 비밀번호는 필수입니다."));
+    }
+
+    @Test
+    @DisplayName("비밀번호 변경 실패(400) - 필수정보(재입력 비밀번호) 미입력")
+    void updatePwFail_confirmPw() throws Exception {
+        //given
+        Long userId = 1L;
+        Trainer trainer = createTrainer();
+
+        // confirmPw 필드 제거
+        UpdatePasswordDto updatePasswordDto = UpdatePasswordDto.builder()
+                .currentPassword("testPw")
+                .newPassword("newPw")
+                .build();
+
+        when(trainerService.findOne(userId)).thenReturn(trainer);
+
+        //when & then
+        mockMvc.perform(post("/api/trainers/{id}/password", userId)
+                        .with(user(createCustomUserDetails()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updatePasswordDto))
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errorCode").value("VALIDATION_ERROR"))
+                .andExpect(jsonPath("$.errorMessage").value("입력값이 유효하지 않습니다."))
+                .andExpect(jsonPath("$.errors.confirmPassword").value("재입력 비밀번호는 필수입니다."));
+    }
+
+    @Test
+    @DisplayName("나에게 달린 리뷰 조회 성공")
+    void getReviewsSuccess() throws Exception {
+        //given
+        Long userId = 1L;
+        Trainer trainer = createTrainer();
+        List<Review> reviews = new ArrayList<>();
+
+        when(trainerService.findOne(userId)).thenReturn(trainer);
+        when(reviewService.findByTrainer(trainer)).thenReturn(reviews);
+
+        //when & then
+        mockMvc.perform(get("/api/trainers/{id}/reviews", userId)
+                        .with(user(createCustomUserDetails()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("리뷰 조회 성공"));
+    }
+
+    @Test
+    @DisplayName("나에게 달린 리뷰 조회 실패(400) - 유효하지 않은 id pathVariable")
+    void getReviewsFail_invalidId() throws Exception {
+        //given
+        Long userId = 1L;
+        Long invalidId = 100L;
+        Trainer trainer = createTrainer();
+
+        when(trainerService.findOne(userId)).thenReturn(trainer);
+
+        //when & then
+        mockMvc.perform(get("/api/trainers/{id}/reviews", invalidId)
+                        .with(user(createCustomUserDetails()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errorCode").value("ACCESS_DENIED"))
+                .andExpect(jsonPath("$.errorMessage").value("잘못된 접근입니다."));
+    }
+
+    @Test
+    @DisplayName("진행 중인 PT 조회 성공")
+    void getPtMembershipsSuccess() throws Exception {
+        //given
+        Long userId = 1L;
+        Trainer trainer = createTrainer();
+        List<PtMembership> ptMemberships = new ArrayList<>();
+
+        when(trainerService.findOne(userId)).thenReturn(trainer);
+        when(ptMembershipService.findByTrainer(trainer)).thenReturn(ptMemberships);
+
+        //when & then
+        mockMvc.perform(get("/api/trainers/{id}/ptmemberships", userId)
+                        .with(user(createCustomUserDetails()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("진행 중인 PT 조회 성공"));
+    }
+
+    @Test
+    @DisplayName("진행 중인 PT 조회 실패(400) - 유효하지 않은 id pathVariable")
+    void getPtMembershipsFail_invalidId() throws Exception {
+        //given
+        Long userId = 1L;
+        Long invalidId = 100L;
+        Trainer trainer = createTrainer();
+
+        when(trainerService.findOne(userId)).thenReturn(trainer);
+
+        //when & then
+        mockMvc.perform(get("/api/trainers/{id}/ptmemberships", invalidId)
+                        .with(user(createCustomUserDetails()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errorCode").value("ACCESS_DENIED"))
+                .andExpect(jsonPath("$.errorMessage").value("잘못된 접근입니다."));
+    }
+
+    private CustomOAuth2UserDetails createCustomUserDetails() {
+        Trainer testMember = createTrainer();
+
+        return new CustomOAuth2UserDetails(testMember);
+    }
+
+    private Trainer createTrainer() {
+        return Trainer.builder()
+                .id(1L)
+                .email("test@naver.com")
+                .password("testPw")
+                .name("testUser")
+                .gender(Gender.MALE)
+                .deleted(false)
+                .build();
+    }
+}
