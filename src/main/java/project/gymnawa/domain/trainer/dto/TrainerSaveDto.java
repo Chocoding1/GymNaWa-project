@@ -15,21 +15,21 @@ import project.gymnawa.domain.member.entity.etcfield.Role;
 @Builder
 public class TrainerSaveDto {
 
-    @NotBlank
-    private String password;
-
-    @NotBlank
-    private String name;
-
-    @NotBlank
+    @NotBlank(message = "이메일은 필수입니다.")
     private String email;
 
-    @NotNull
+    @NotBlank(message = "비밀번호는 필수입니다.")
+    private String password;
+
+    @NotBlank(message = "이름은 필수입니다.")
+    private String name;
+
+    @NotNull(message = "성별은 필수입니다.")
     private Gender gender;
 
-    @NotBlank
+    @NotBlank(message = "주소는 필수입니다.")
     private String zoneCode;
-    @NotBlank
+    @NotBlank(message = "주소는 필수입니다.")
     private String address;
     private String detailAddress;
     private String buildingName;
