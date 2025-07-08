@@ -1,4 +1,4 @@
-package project.gymnawa.kakao.service;
+package project.gymnawa.domain.kakao.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import project.gymnawa.domain.gym.dto.GymDto;
-import project.gymnawa.kakao.dto.KakaoApiResponse;
+import project.gymnawa.domain.kakao.dto.KakaoApiResponse;
 
 import java.net.URI;
 import java.nio.charset.StandardCharsets;

@@ -1,4 +1,4 @@
-package project.gymnawa.service;
+package project.gymnawa.domain.email.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;

@@ -1,4 +1,4 @@
-package project.gymnawa.kakao.dto;
+package project.gymnawa.domain.kakao.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;

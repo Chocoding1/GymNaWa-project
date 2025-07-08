@@ -9,9 +9,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import project.gymnawa.domain.common.api.ApiResponse;
 import project.gymnawa.domain.gym.dto.GymDto;
-import project.gymnawa.kakao.dto.KakaoApiResponse;
+import project.gymnawa.domain.kakao.dto.KakaoApiResponse;
 import project.gymnawa.domain.common.errors.exception.CustomException;
-import project.gymnawa.kakao.service.KakaoService;
+import project.gymnawa.domain.kakao.service.KakaoService;
 
 import static project.gymnawa.domain.common.errors.dto.ErrorCode.*;
 
