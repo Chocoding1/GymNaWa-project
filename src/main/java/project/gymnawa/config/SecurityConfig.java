@@ -1,4 +1,4 @@
-package project.gymnawa.web.config;
+package project.gymnawa.config;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;

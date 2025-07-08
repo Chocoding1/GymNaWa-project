@@ -1,4 +1,4 @@
-package project.gymnawa.domain.email.config;
+package project.gymnawa.config;
 
 
 import org.springframework.beans.factory.annotation.Value;

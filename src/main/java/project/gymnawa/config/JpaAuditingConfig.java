@@ -1,9 +1,9 @@
-package project.gymnawa.web.config;
+package project.gymnawa.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @Configuration
 @EnableJpaAuditing
-public class JpaAuditingConfiguration {
+public class JpaAuditingConfig {
 }

@@ -1,4 +1,4 @@
-package project.gymnawa.web.config;
+package project.gymnawa.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
