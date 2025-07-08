@@ -23,8 +23,7 @@ import project.gymnawa.domain.normember.dto.MemberSaveDto;
 import project.gymnawa.domain.normember.entity.NorMember;
 import project.gymnawa.domain.member.service.MemberService;
 import project.gymnawa.domain.normember.service.NorMemberService;
-import project.gymnawa.domain.trainer.service.TrainerService;
-import project.gymnawa.web.config.SecurityTestConfig;
+import project.gymnawa.config.SecurityTestConfig;
 
 
 import static org.mockito.Mockito.*;

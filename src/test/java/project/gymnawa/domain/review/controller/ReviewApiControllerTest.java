@@ -19,7 +19,7 @@ import project.gymnawa.domain.review.entity.Review;
 import project.gymnawa.domain.review.service.ReviewService;
 import project.gymnawa.domain.trainer.entity.Trainer;
 import project.gymnawa.domain.trainer.service.TrainerService;
-import project.gymnawa.web.config.SecurityTestConfig;
+import project.gymnawa.config.SecurityTestConfig;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;

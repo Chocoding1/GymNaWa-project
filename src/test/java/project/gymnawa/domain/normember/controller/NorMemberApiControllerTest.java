@@ -21,7 +21,7 @@ import project.gymnawa.domain.ptmembership.entity.PtMembership;
 import project.gymnawa.domain.ptmembership.service.PtMembershipService;
 import project.gymnawa.domain.review.entity.Review;
 import project.gymnawa.domain.review.service.ReviewService;
-import project.gymnawa.web.config.SecurityTestConfig;
+import project.gymnawa.config.SecurityTestConfig;
 
 import java.util.ArrayList;
 import java.util.List;

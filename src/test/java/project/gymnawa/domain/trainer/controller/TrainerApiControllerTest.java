@@ -21,7 +21,7 @@ import project.gymnawa.domain.trainer.entity.Trainer;
 import project.gymnawa.domain.trainer.dto.TrainerEditDto;
 import project.gymnawa.domain.email.service.EmailService;
 import project.gymnawa.domain.trainer.service.TrainerService;
-import project.gymnawa.web.config.SecurityTestConfig;
+import project.gymnawa.config.SecurityTestConfig;
 
 import java.util.ArrayList;
 import java.util.List;
