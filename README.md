@@ -84,7 +84,7 @@
 |---|---|---|---|
 |리뷰 작성|/api/reviews|POST|O|
 |리뷰 수정|/api/reviews/{id}|PATCH|O|
-|리뷰 삭제|/api/reviews/{id}|DELETE||O|
+|리뷰 삭제|/api/reviews/{id}|DELETE|O|
 |트레이너 별 리뷰 조회|/api/reviews/{trainerId}|GET|X|
 
 ---
