@@ -21,11 +21,11 @@ import project.gymnawa.domain.normember.dto.MemberSaveDto;
 import project.gymnawa.domain.trainer.dto.TrainerSaveDto;
 import project.gymnawa.domain.common.api.ApiResponse;
 import project.gymnawa.domain.normember.entity.NorMember;
-import project.gymnawa.domain.common.errors.exception.CustomException;
+import project.gymnawa.domain.common.error.exception.CustomException;
 import project.gymnawa.domain.normember.service.NorMemberService;
 import project.gymnawa.domain.trainer.service.TrainerService;
 
-import static project.gymnawa.domain.common.errors.dto.ErrorCode.*;
+import static project.gymnawa.domain.common.error.dto.ErrorCode.*;
 
 @Controller
 @RequiredArgsConstructor
@@ -134,12 +134,13 @@ public class MemberApiController {
                                                          @RequestBody PasswordDto passwordDto) {
 
         Long userId = customOAuth2UserDetails.getId();
-        Member loginedMember = memberService.findOne(userId);
 
         // url 조작으로 다른 사용자 정보 접근 방지
-        if (!loginedMember.getId().equals(id)) {
+        if (!userId.equals(id)) {
             throw new CustomException(ACCESS_DENIED);
         }
+
+        Member loginedMember = memberService.findOne(userId);
 
         if (memberService.verifyPassword(passwordDto.getPassword(), loginedMember.getPassword())) {
             return ResponseEntity.ok().body(ApiResponse.of("비밀번호 검증 성공"));
@@ -153,14 +154,15 @@ public class MemberApiController {
                                                                 @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
         Long userId = customOAuth2UserDetails.getId();
-        Member loginedMember = memberService.findOne(userId);
+//        Member loginedMember = memberService.findOne(userId);
 
         // url 조작으로 다른 사용자 정보 접근 방지
-        if (!loginedMember.getId().equals(id)) {
+        if (!userId.equals(id)) {
             throw new CustomException(ACCESS_DENIED);
         }
 
         memberService.deactivateMember(userId);
+        // 회원 탈퇴 시, RT도 제거해야 함
 
         return ResponseEntity.ok().body(ApiResponse.of("회원 탈퇴 성공"));
     }
