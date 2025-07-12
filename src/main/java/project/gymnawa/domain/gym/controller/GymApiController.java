@@ -10,10 +10,10 @@ import org.springframework.web.bind.annotation.RestController;
 import project.gymnawa.domain.common.api.ApiResponse;
 import project.gymnawa.domain.gym.dto.GymDto;
 import project.gymnawa.domain.kakao.dto.KakaoApiResponse;
-import project.gymnawa.domain.common.errors.exception.CustomException;
+import project.gymnawa.domain.common.error.exception.CustomException;
 import project.gymnawa.domain.kakao.service.KakaoService;
 
-import static project.gymnawa.domain.common.errors.dto.ErrorCode.*;
+import static project.gymnawa.domain.common.error.dto.ErrorCode.*;
 
 @RestController
 @Slf4j
