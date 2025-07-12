@@ -12,7 +12,7 @@ import project.gymnawa.auth.jwt.service.ReissueServiceImpl;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
-public class JwtController {
+public class ReissueController {
 
     private final ReissueServiceImpl reissueServiceImpl;
 
