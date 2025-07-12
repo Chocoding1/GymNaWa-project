@@ -1,5 +1,7 @@
 package project.gymnawa.auth.jwt.util;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
@@ -7,12 +9,15 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import project.gymnawa.auth.jwt.dto.JwtInfoDto;
 import project.gymnawa.auth.jwt.dto.RefreshToken;
+import project.gymnawa.auth.jwt.error.CustomJwtException;
 import project.gymnawa.auth.jwt.repository.JwtRepository;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.NoSuchElementException;
+
+import static project.gymnawa.domain.common.error.dto.ErrorCode.*;
 
 @Component
 @Slf4j
@@ -39,8 +44,8 @@ public class JwtUtil {
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 토큰입니다."));
     }
 
-    public boolean isExpired(String token) {
-        return Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token).getPayload().getExpiration().before(new Date());
+    public void validateToken(String token) {
+        Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token);
     }
 
     public Long getId(String token) {
