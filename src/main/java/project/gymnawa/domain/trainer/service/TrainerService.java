@@ -11,12 +11,12 @@ import project.gymnawa.domain.trainer.entity.Trainer;
 import project.gymnawa.domain.trainer.repository.TrainerRepository;
 import project.gymnawa.domain.common.etcfield.Address;
 import project.gymnawa.domain.member.entity.etcfield.Role;
-import project.gymnawa.domain.common.errors.exception.CustomException;
+import project.gymnawa.domain.common.error.exception.CustomException;
 import project.gymnawa.domain.member.repository.MemberRepository;
 
 import java.util.List;
 
-import static project.gymnawa.domain.common.errors.dto.ErrorCode.*;
+import static project.gymnawa.domain.common.error.dto.ErrorCode.*;
 
 @Service
 // 서비스에서 DB에 여러 번 접근할 수 있기 때문에 서비스 단에서 한 번에 쿼리를 처리하기 위해 서비스 단에 트랜잭션을 달아준다.
