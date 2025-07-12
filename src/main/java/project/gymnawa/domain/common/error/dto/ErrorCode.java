@@ -1,4 +1,4 @@
-package project.gymnawa.domain.common.errors.dto;
+package project.gymnawa.domain.common.error.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -33,7 +33,8 @@ public enum ErrorCode {
 
     // JWT
     TOKEN_EXPIRED("TOKEN_EXPIRED", HttpStatus.UNAUTHORIZED, "토큰이 만료되었습니다."),
-    INVALID_TOKEN("INVALID_TOKEN", HttpStatus.UNAUTHORIZED, "토큰이 유효하지 않습니다.");
+    INVALID_TOKEN("INVALID_TOKEN", HttpStatus.UNAUTHORIZED, "토큰이 유효하지 않습니다."),
+    TOKEN_NULL("TOKEN_NULL", HttpStatus.BAD_REQUEST, "토큰이 존재하지 않습니다.");
 
 
     private final String code;
