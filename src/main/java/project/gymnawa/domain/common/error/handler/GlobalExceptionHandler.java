@@ -1,4 +1,4 @@
-package project.gymnawa.domain.common.errors.handler;
+package project.gymnawa.domain.common.error.handler;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -6,9 +6,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import project.gymnawa.domain.common.errors.dto.ErrorCode;
-import project.gymnawa.domain.common.errors.exception.CustomException;
-import project.gymnawa.domain.common.errors.dto.ErrorResponse;
+import project.gymnawa.domain.common.error.dto.ErrorCode;
+import project.gymnawa.domain.common.error.exception.CustomException;
+import project.gymnawa.domain.common.error.dto.ErrorResponse;
 
 import java.util.HashMap;
 import java.util.Map;

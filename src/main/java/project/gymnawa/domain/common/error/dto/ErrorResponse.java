@@ -1,4 +1,4 @@
-package project.gymnawa.domain.common.errors.dto;
+package project.gymnawa.domain.common.error.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -1,7 +1,7 @@
-package project.gymnawa.domain.common.errors.exception;
+package project.gymnawa.domain.common.error.exception;
 
 import lombok.Getter;
-import project.gymnawa.domain.common.errors.dto.ErrorCode;
+import project.gymnawa.domain.common.error.dto.ErrorCode;
 
 @Getter
 public class CustomException extends RuntimeException {
