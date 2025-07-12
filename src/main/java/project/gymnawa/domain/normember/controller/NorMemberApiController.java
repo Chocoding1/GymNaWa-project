@@ -19,14 +19,14 @@ import project.gymnawa.domain.normember.dto.MemberEditDto;
 import project.gymnawa.domain.normember.dto.MemberViewDto;
 import project.gymnawa.domain.ptmembership.entity.PtMembership;
 import project.gymnawa.domain.review.entity.Review;
-import project.gymnawa.domain.common.errors.exception.CustomException;
+import project.gymnawa.domain.common.error.exception.CustomException;
 import project.gymnawa.domain.email.service.EmailService;
 import project.gymnawa.domain.ptmembership.service.PtMembershipService;
 import project.gymnawa.domain.review.service.ReviewService;
 
 import java.util.List;
 
-import static project.gymnawa.domain.common.errors.dto.ErrorCode.*;
+import static project.gymnawa.domain.common.error.dto.ErrorCode.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -62,12 +62,13 @@ public class NorMemberApiController {
                                                              @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
         Long userId = customOAuth2UserDetails.getId();
-        NorMember loginedMember = norMemberService.findOne(userId);
 
         // url 조작으로 다른 사용자 마이페이지 접속 방지
-        if (!loginedMember.getId().equals(id)) {
+        if (!userId.equals(id)) {
             throw new CustomException(ACCESS_DENIED);
         }
+
+        NorMember loginedMember = norMemberService.findOne(userId);
 
         MemberViewDto memberViewDto = createMemberViewDto(loginedMember);
 
@@ -83,9 +84,8 @@ public class NorMemberApiController {
                                                           @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
         Long userId = customOAuth2UserDetails.getId();
-        NorMember loginedMember = norMemberService.findOne(userId);
 
-        if (!loginedMember.getId().equals(id)) {
+        if (!userId.equals(id)) { // 애초에 로그인된 사용자의 아이디를 security context에 저장해놨기 때문에 아이디만 비교한다면 굳이 또 회원을 조회해올 필요가 없음
             throw new CustomException(ACCESS_DENIED);
         }
 
@@ -103,9 +103,8 @@ public class NorMemberApiController {
                                                          @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
         Long userId = customOAuth2UserDetails.getId();
-        NorMember loginedMember = norMemberService.findOne(userId);
 
-        if (!loginedMember.getId().equals(id)) {
+        if (!userId.equals(id)) {
             throw new CustomException(ACCESS_DENIED);
         }
 
@@ -122,11 +121,12 @@ public class NorMemberApiController {
                                                                        @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
         Long userId = customOAuth2UserDetails.getId();
-        NorMember loginedMember = norMemberService.findOne(userId);
 
-        if (!loginedMember.getId().equals(id)) {
+        if (!userId.equals(id)) {
             throw new CustomException(ACCESS_DENIED);
         }
+
+        NorMember loginedMember = norMemberService.findOne(userId);
 
         List<ReviewViewDto> reviewList = reviewService.findByMember(loginedMember).stream()
                 .map(Review::of)
@@ -143,11 +143,12 @@ public class NorMemberApiController {
                                                                                    @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
         Long userId = customOAuth2UserDetails.getId();
-        NorMember loginedMember = norMemberService.findOne(userId);
 
-        if (!loginedMember.getId().equals(id)) {
+        if (!userId.equals(id)) {
             throw new CustomException(ACCESS_DENIED);
         }
+
+        NorMember loginedMember = norMemberService.findOne(userId);
 
         List<PtMembershipViewDto> ptMembershipList = ptMembershipService.findByMember(loginedMember).stream()
                 .map(PtMembership::of)
