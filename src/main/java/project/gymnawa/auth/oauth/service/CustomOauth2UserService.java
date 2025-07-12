@@ -24,12 +24,9 @@ public class CustomOauth2UserService extends DefaultOAuth2UserService {
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-        log.info("loadUser 함수 진입");
-        log.info("getClientRegistration : " + userRequest.getClientRegistration());
-        log.info("getAccessToken : " + userRequest.getAccessToken());
+        log.info("CustomOauth2UserService -> loadUser");
 
         OAuth2User oAuth2User = super.loadUser(userRequest);
-        log.info("oAuth2User.getAttributes : " + oAuth2User.getAttributes());
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
 
         OAuth2UserInfo oAuth2UserInfo = null;
