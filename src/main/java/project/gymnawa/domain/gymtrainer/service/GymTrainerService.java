@@ -6,13 +6,13 @@ import org.springframework.transaction.annotation.Transactional;
 import project.gymnawa.domain.common.etcfield.ContractStatus;
 import project.gymnawa.domain.gymtrainer.entity.GymTrainer;
 import project.gymnawa.domain.trainer.entity.Trainer;
-import project.gymnawa.domain.common.errors.exception.CustomException;
+import project.gymnawa.domain.common.error.exception.CustomException;
 import project.gymnawa.domain.gymtrainer.repository.GymTrainerRepository;
 
 import java.time.LocalDate;
 import java.util.List;
 
-import static project.gymnawa.domain.common.errors.dto.ErrorCode.*;
+import static project.gymnawa.domain.common.error.dto.ErrorCode.*;
 
 @Service
 @Transactional(readOnly = true)

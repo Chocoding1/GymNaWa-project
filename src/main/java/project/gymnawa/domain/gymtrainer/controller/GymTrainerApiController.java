@@ -16,12 +16,12 @@ import project.gymnawa.domain.common.api.ApiResponse;
 import project.gymnawa.domain.gymtrainer.dto.GymTrainerRequestDto;
 import project.gymnawa.domain.gymtrainer.dto.GymTrainerResponseDto;
 import project.gymnawa.domain.gymtrainer.dto.GymTrainerViewDto;
-import project.gymnawa.domain.common.errors.exception.CustomException;
+import project.gymnawa.domain.common.error.exception.CustomException;
 import project.gymnawa.domain.trainer.service.TrainerService;
 
 import java.util.List;
 
-import static project.gymnawa.domain.common.errors.dto.ErrorCode.*;
+import static project.gymnawa.domain.common.error.dto.ErrorCode.*;
 
 @RestController
 @RequiredArgsConstructor
