@@ -154,7 +154,6 @@ public class MemberApiController {
                                                                 @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
         Long userId = customOAuth2UserDetails.getId();
-//        Member loginedMember = memberService.findOne(userId);
 
         // url 조작으로 다른 사용자 정보 접근 방지
         if (!userId.equals(id)) {
