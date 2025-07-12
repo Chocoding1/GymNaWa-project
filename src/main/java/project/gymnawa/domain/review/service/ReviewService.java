@@ -7,13 +7,13 @@ import project.gymnawa.domain.review.entity.Review;
 import project.gymnawa.domain.review.dto.ReviewSaveDto;
 import project.gymnawa.domain.normember.entity.NorMember;
 import project.gymnawa.domain.trainer.entity.Trainer;
-import project.gymnawa.domain.common.errors.exception.CustomException;
+import project.gymnawa.domain.common.error.exception.CustomException;
 import project.gymnawa.domain.review.repository.ReviewRepository;
 import project.gymnawa.domain.trainer.service.TrainerService;
 
 import java.util.List;
 
-import static project.gymnawa.domain.common.errors.dto.ErrorCode.*;
+import static project.gymnawa.domain.common.error.dto.ErrorCode.*;
 
 @Service
 @Transactional(readOnly = true)

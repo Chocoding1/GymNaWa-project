@@ -11,11 +11,11 @@ import project.gymnawa.domain.member.dto.UpdatePasswordDto;
 import project.gymnawa.domain.common.etcfield.Address;
 import project.gymnawa.domain.normember.entity.NorMember;
 import project.gymnawa.domain.member.entity.etcfield.Role;
-import project.gymnawa.domain.common.errors.exception.CustomException;
+import project.gymnawa.domain.common.error.exception.CustomException;
 import project.gymnawa.domain.member.repository.MemberRepository;
 import project.gymnawa.domain.normember.repository.NorMemberRepository;
 
-import static project.gymnawa.domain.common.errors.dto.ErrorCode.*;
+import static project.gymnawa.domain.common.error.dto.ErrorCode.*;
 
 @Service
 @RequiredArgsConstructor

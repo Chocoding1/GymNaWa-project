@@ -5,10 +5,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.gymnawa.domain.member.entity.Member;
-import project.gymnawa.domain.common.errors.exception.CustomException;
+import project.gymnawa.domain.common.error.exception.CustomException;
 import project.gymnawa.domain.member.repository.MemberRepository;
 
-import static project.gymnawa.domain.common.errors.dto.ErrorCode.*;
+import static project.gymnawa.domain.common.error.dto.ErrorCode.*;
 
 @Service
 @Transactional(readOnly = true)
