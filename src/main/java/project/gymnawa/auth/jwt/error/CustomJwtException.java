@@ -4,11 +4,11 @@ import lombok.Getter;
 import project.gymnawa.domain.common.error.dto.ErrorCode;
 
 @Getter
-public class JwtException extends RuntimeException {
+public class CustomJwtException extends RuntimeException {
 
     private final ErrorCode errorCode;
 
-    public JwtException(ErrorCode errorCode) {
+    public CustomJwtException(ErrorCode errorCode) {
         super(errorCode.getErrorMessage());
         this.errorCode = errorCode;
     }
