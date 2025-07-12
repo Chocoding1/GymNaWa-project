@@ -18,7 +18,7 @@ import project.gymnawa.domain.common.api.ApiResponse;
 import project.gymnawa.domain.trainer.dto.TrainerEditDto;
 import project.gymnawa.domain.trainer.dto.TrainerSaveDto;
 import project.gymnawa.domain.trainer.dto.TrainerViewDto;
-import project.gymnawa.domain.common.errors.exception.CustomException;
+import project.gymnawa.domain.common.error.exception.CustomException;
 import project.gymnawa.domain.email.service.EmailService;
 import project.gymnawa.domain.ptmembership.service.PtMembershipService;
 import project.gymnawa.domain.review.service.ReviewService;
@@ -26,7 +26,7 @@ import project.gymnawa.domain.trainer.service.TrainerService;
 
 import java.util.List;
 
-import static project.gymnawa.domain.common.errors.dto.ErrorCode.*;
+import static project.gymnawa.domain.common.error.dto.ErrorCode.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -62,11 +62,12 @@ public class TrainerApiController {
                                                               @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
         Long userId = customOAuth2UserDetails.getId();
-        Trainer loginedTrainer = trainerService.findOne(userId);
 
-        if (!loginedTrainer.getId().equals(id)) {
+        if (!userId.equals(id)) {
             throw new CustomException(ACCESS_DENIED);
         }
+
+        Trainer loginedTrainer = trainerService.findOne(userId);
 
         TrainerViewDto trainerViewDto = createTrainerViewDto(loginedTrainer);
 
@@ -82,9 +83,8 @@ public class TrainerApiController {
                                                            @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
         Long userId = customOAuth2UserDetails.getId();
-        Trainer loginedTrainer = trainerService.findOne(userId);
 
-        if (!loginedTrainer.getId().equals(id)) {
+        if (!userId.equals(id)) {
             throw new CustomException(ACCESS_DENIED);
         }
 
@@ -102,9 +102,8 @@ public class TrainerApiController {
                                                          @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
         Long userId = customOAuth2UserDetails.getId();
-        Trainer loginedTrainer = trainerService.findOne(userId);
 
-        if (!loginedTrainer.getId().equals(id)) {
+        if (!userId.equals(id)) {
             throw new CustomException(ACCESS_DENIED);
         }
 
@@ -121,11 +120,12 @@ public class TrainerApiController {
                                                                           @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
         Long userId = customOAuth2UserDetails.getId();
-        Trainer loginedTrainer = trainerService.findOne(userId);
 
-        if (!loginedTrainer.getId().equals(id)) {
+        if (!userId.equals(id)) {
             throw new CustomException(ACCESS_DENIED);
         }
+
+        Trainer loginedTrainer = trainerService.findOne(userId);
 
         List<ReviewViewDto> reviewList = reviewService.findByTrainer(loginedTrainer).stream()
                 .map(Review::of)
@@ -140,13 +140,13 @@ public class TrainerApiController {
     @GetMapping("/{id}/ptmemberships")
     public ResponseEntity<ApiResponse<List<PtMembershipViewDto>>> getPtMembershipList(@PathVariable Long id,
                                                                                       @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
-
         Long userId = customOAuth2UserDetails.getId();
-        Trainer loginedTrainer = trainerService.findOne(userId);
 
-        if (!loginedTrainer.getId().equals(id)) {
+        if (!userId.equals(id)) {
             throw new CustomException(ACCESS_DENIED);
         }
+
+        Trainer loginedTrainer = trainerService.findOne(userId);
 
         List<PtMembershipViewDto> ptMembershipList = ptMembershipService.findByTrainer(loginedTrainer).stream()
                 .map(PtMembership::of)
