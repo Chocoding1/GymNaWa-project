@@ -5,6 +5,7 @@ import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import project.gymnawa.domain.member.dto.MemberSessionDto;
 import project.gymnawa.domain.member.entity.Member;
 import project.gymnawa.domain.member.entity.etcfield.Role;
 
@@ -17,11 +18,11 @@ import java.util.Map;
 @AllArgsConstructor
 public class CustomOAuth2UserDetails implements UserDetails, OAuth2User {
 
-    private final Member member;
+    private final MemberSessionDto memberSessionDto;
     private Map<String, Object> attributes; // 소셜 계정에서 받아온 정보들
 
-    public CustomOAuth2UserDetails(Member member) {
-        this.member = member;
+    public CustomOAuth2UserDetails(MemberSessionDto memberSessionDto) {
+        this.memberSessionDto = memberSessionDto;
     }
 
     @Override
@@ -31,20 +32,20 @@ public class CustomOAuth2UserDetails implements UserDetails, OAuth2User {
 
     @Override
     public String getName() {
-        return member.getName();
+        return memberSessionDto.getName();
     }
 
     @Override
     public String getPassword() {
-        return member.getPassword();
+        return memberSessionDto.getPassword();
     }
 
     public Long getId() {
-        return member.getId();
+        return memberSessionDto.getId();
     }
 
     public Role getRole() {
-        return member.getRole();
+        return memberSessionDto.getRole();
     }
 
     @Override
@@ -54,7 +55,7 @@ public class CustomOAuth2UserDetails implements UserDetails, OAuth2User {
         collection.add(new GrantedAuthority() {
                            @Override
                            public String getAuthority() {
-                               return String.valueOf(member.getRole());
+                               return String.valueOf(memberSessionDto.getRole());
                            }
                        });
 
@@ -64,7 +65,7 @@ public class CustomOAuth2UserDetails implements UserDetails, OAuth2User {
     // 메서드명은 username이지만, email 반환
     @Override
     public String getUsername() {
-        return member.getEmail();
+        return memberSessionDto.getEmail();
     }
 
     @Override

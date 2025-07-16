@@ -18,6 +18,7 @@ import project.gymnawa.auth.cookie.util.CookieUtil;
 import project.gymnawa.auth.jwt.error.CustomAuthException;
 import project.gymnawa.auth.jwt.util.JwtUtil;
 import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
+import project.gymnawa.domain.member.dto.MemberSessionDto;
 import project.gymnawa.domain.member.entity.Member;
 
 import java.io.IOException;
@@ -86,18 +87,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
          * id값을 넣는 이유 : 컨트롤러에서 회원의 정보가 필요할 수 있기 때문에 DB에서 조회하기 위해 id값은 포함
          * Entity보다는 DTO 객체를 만들어서 사용하자
          */
-        Member member = Member.builder() // 임의로 세션에 UserDetails 객체를 넣어서 인증된 사용자라는 것을 증명
-                .id(id)
-                .password("temppwd")
-                .build();
         // DTo로 바꾸려 했으나 CustomUserDetails의 파라미터가 Member 객체라서 어떻게 해야할지 추후 결정할 예정
-//        MemberSessionDto memberSessionDto = MemberSessionDto.builder()
-//                .id(id)
-//                .password("tempPwd")
-//                .build();
+        MemberSessionDto memberSessionDto = MemberSessionDto.builder()
+                .id(id)
+                .password("tempPwd")
+                .build();
 
         // Authentication에 담을 객체 생성
-        CustomOAuth2UserDetails customOAuth2UserDetails = new CustomOAuth2UserDetails(member);
+        CustomOAuth2UserDetails customOAuth2UserDetails = new CustomOAuth2UserDetails(memberSessionDto);
 
         // 권한 설정(안 해주면 403 에러 발생)
         List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));

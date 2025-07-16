@@ -8,6 +8,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import project.gymnawa.auth.jwt.error.CustomAuthException;
 import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
+import project.gymnawa.domain.member.dto.MemberSessionDto;
 import project.gymnawa.domain.member.entity.Member;
 import project.gymnawa.domain.member.repository.MemberRepository;
 
@@ -30,6 +31,14 @@ public class CustomUserDetailsService implements UserDetailsService {
         // 로그인은 서블릿까지 가지 않고 필터 단에서 끝나기 때문에 오류 처리도 필터단에서 해야 한다.
         // 따라서 필터단에서 잡을 수 있는 커스텀 에러를 발생시켰다.
 
-        return new CustomOAuth2UserDetails(member);
+        MemberSessionDto memberSessionDto = MemberSessionDto.builder()
+                .id(member.getId())
+                .password(member.getPassword())
+                .email(member.getEmail())
+                .name(member.getName())
+                .role(member.getRole())
+                .build();
+
+        return new CustomOAuth2UserDetails(memberSessionDto);
     }
 }

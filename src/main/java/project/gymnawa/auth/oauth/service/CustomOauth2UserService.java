@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
 import project.gymnawa.auth.oauth.domain.GoogleUserInfo;
 import project.gymnawa.auth.oauth.domain.OAuth2UserInfo;
+import project.gymnawa.domain.member.dto.MemberSessionDto;
 import project.gymnawa.domain.member.entity.Member;
 import project.gymnawa.auth.oauth.domain.KakaoUserInfo;
 import project.gymnawa.domain.member.entity.etcfield.Role;
@@ -68,7 +69,15 @@ public class CustomOauth2UserService extends DefaultOAuth2UserService {
             memberRepository.save(member); // 추후 일반 회원 or 트레이너로 저장 예정
         }
 
-        return new CustomOAuth2UserDetails(member, oAuth2User.getAttributes());
+        MemberSessionDto memberSessionDto = MemberSessionDto.builder()
+                .id(member.getId())
+                .password("socialMember")
+                .email(member.getEmail())
+                .name(member.getName())
+                .role(member.getRole())
+                .build();
+
+        return new CustomOAuth2UserDetails(memberSessionDto, oAuth2User.getAttributes());
     }
 }
 
