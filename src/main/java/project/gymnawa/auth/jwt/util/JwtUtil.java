@@ -55,14 +55,6 @@ public class JwtUtil {
         String accessToken = createAccessToken(id);
         String refreshToken = createRefreshToken(id);
 
-        RefreshToken refreshTokenEntity = RefreshToken.builder()
-                .userId(id)
-                .refreshToken(refreshToken)
-                .build();
-
-        // refreshToken redis에 저장
-        jwtRepository.save(refreshTokenEntity);
-
         return JwtInfoDto.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
@@ -85,12 +77,22 @@ public class JwtUtil {
     }
 
     public String createRefreshToken(Long id) {
-        return Jwts.builder()
+        String refreshToken = Jwts.builder()
                 .claim("category", "refresh")
                 .claim("id", id)
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + refreshTokenExpiredMs))
                 .signWith(secretKey)
                 .compact();
+
+        RefreshToken refreshTokenEntity = RefreshToken.builder()
+                .userId(id)
+                .refreshToken(refreshToken)
+                .build();
+
+        // refreshToken redis에 저장
+        jwtRepository.save(refreshTokenEntity);
+
+        return refreshToken;
     }
 }
