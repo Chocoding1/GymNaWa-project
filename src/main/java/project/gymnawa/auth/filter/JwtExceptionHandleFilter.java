@@ -7,7 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.filter.OncePerRequestFilter;
-import project.gymnawa.auth.jwt.error.CustomJwtException;
+import project.gymnawa.auth.jwt.error.CustomAuthException;
 import project.gymnawa.domain.common.error.dto.ErrorResponse;
 
 import java.io.IOException;
@@ -21,12 +21,12 @@ public class JwtExceptionHandleFilter extends OncePerRequestFilter {
 
         try {
             filterChain.doFilter(request, response);
-        } catch (CustomJwtException e) {
+        } catch (CustomAuthException e) {
             sendErrorResponse(response, e);
         }
     }
 
-    private void sendErrorResponse(HttpServletResponse response, CustomJwtException e) throws IOException {
+    private void sendErrorResponse(HttpServletResponse response, CustomAuthException e) throws IOException {
         ErrorResponse errorResponse = ErrorResponse.of(e.getErrorCode().getCode(), e.getErrorCode().getErrorMessage());
         ObjectMapper om = new ObjectMapper();
 
