@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import project.gymnawa.auth.cookie.util.CookieUtil;
 import project.gymnawa.auth.jwt.dto.JwtInfoDto;
-import project.gymnawa.auth.jwt.error.CustomJwtException;
+import project.gymnawa.auth.jwt.error.CustomAuthException;
 import project.gymnawa.auth.jwt.util.JwtUtil;
 
 import static project.gymnawa.domain.common.error.dto.ErrorCode.*;
@@ -46,15 +46,15 @@ public class ReissueServiceImpl implements ReissueService {
         try {
             jwtUtil.validateToken(refreshToken);
         } catch (ExpiredJwtException e) {
-            throw new CustomJwtException(TOKEN_EXPIRED);
+            throw new CustomAuthException(TOKEN_EXPIRED);
         } catch (JwtException e) {
-            throw new CustomJwtException(INVALID_TOKEN);
+            throw new CustomAuthException(INVALID_TOKEN);
         }
 
         // refresh 토큰이 아님
         String category = jwtUtil.getCategory(refreshToken);
         if(!category.equals("refresh")) {
-            throw new CustomJwtException(INVALID_TOKEN);
+            throw new CustomAuthException(INVALID_TOKEN);
         }
 
         // 실제 DB에 저장된 RT와 일치하는지 비교
@@ -63,7 +63,7 @@ public class ReissueServiceImpl implements ReissueService {
 
         // DB 에 없는 리프레시 토큰 (혹은 블랙리스트 처리된 리프레시 토큰)
         if(!findRefreshToken.equals(refreshToken)) {
-            throw new CustomJwtException(TOKEN_EXPIRED);
+            throw new CustomAuthException(TOKEN_EXPIRED);
         }
 
         // 기존 RT redis에서 삭제
@@ -100,15 +100,15 @@ public class ReissueServiceImpl implements ReissueService {
         try {
             jwtUtil.validateToken(refreshToken);
         } catch (ExpiredJwtException e) {
-            throw new CustomJwtException(TOKEN_EXPIRED);
+            throw new CustomAuthException(TOKEN_EXPIRED);
         } catch (JwtException e) {
-            throw new CustomJwtException(INVALID_TOKEN);
+            throw new CustomAuthException(INVALID_TOKEN);
         }
 
         // refresh 토큰이 아님
         String category = jwtUtil.getCategory(refreshToken);
         if(!category.equals("refresh")) {
-            throw new CustomJwtException(INVALID_TOKEN);
+            throw new CustomAuthException(INVALID_TOKEN);
         }
 
         // 실제 DB에 저장된 RT와 일치하는지 비교
@@ -117,7 +117,7 @@ public class ReissueServiceImpl implements ReissueService {
 
         // DB 에 없는 리프레시 토큰 (혹은 블랙리스트 처리된 리프레시 토큰)
         if(!findRefreshToken.equals(refreshToken)) {
-            throw new CustomJwtException(TOKEN_EXPIRED);
+            throw new CustomAuthException(TOKEN_EXPIRED);
         }
 
         // 기존 RT redis에서 삭제
