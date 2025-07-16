@@ -8,10 +8,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.filter.GenericFilterBean;
-import project.gymnawa.auth.jwt.error.CustomJwtException;
-import project.gymnawa.auth.jwt.repository.JwtRepository;
+import project.gymnawa.auth.jwt.error.CustomAuthException;
 import project.gymnawa.auth.jwt.util.JwtUtil;
-import project.gymnawa.domain.common.error.dto.ErrorCode;
 
 import java.io.IOException;
 
@@ -22,7 +20,6 @@ import static project.gymnawa.domain.common.error.dto.ErrorCode.*;
 public class CustomLogoutFilter extends GenericFilterBean {
 
     private final JwtUtil jwtUtil;
-    private final JwtRepository jwtRepository;
 
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
@@ -48,22 +45,22 @@ public class CustomLogoutFilter extends GenericFilterBean {
         // refresh token이 존재하지 않으면 400 반환
         String refreshToken = request.getHeader("Authorization-Refresh");
         if (refreshToken == null) {
-            throw new CustomJwtException(TOKEN_NULL);
+            throw new CustomAuthException(TOKEN_NULL);
         }
 
         // 토큰 검증
         try {
             jwtUtil.validateToken(refreshToken);
         } catch (ExpiredJwtException e) {
-            throw new CustomJwtException(TOKEN_EXPIRED);
+            throw new CustomAuthException(TOKEN_EXPIRED);
         } catch (JwtException e) {
-            throw new CustomJwtException(INVALID_TOKEN);
+            throw new CustomAuthException(INVALID_TOKEN);
         }
 
         // 토큰이 refresh token인지 확인
         String category = jwtUtil.getCategory(refreshToken);
         if (!category.equals("refresh")) {
-            throw new CustomJwtException(INVALID_TOKEN);
+            throw new CustomAuthException(INVALID_TOKEN);
         }
 
         // 로그아웃 처리
