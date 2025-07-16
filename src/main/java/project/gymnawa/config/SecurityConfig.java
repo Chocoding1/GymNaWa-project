@@ -24,7 +24,7 @@ import project.gymnawa.auth.oauth.handler.CustomSuccessHandler;
 import project.gymnawa.auth.oauth.service.CustomOauth2UserService;
 import project.gymnawa.auth.filter.CustomLogoutFilter;
 import project.gymnawa.auth.filter.JwtAuthenticationFilter;
-import project.gymnawa.auth.filter.LoginFilter;
+import project.gymnawa.auth.filter.CustomLoginFilter;
 
 import java.util.Collections;
 import java.util.List;
@@ -94,10 +94,10 @@ public class SecurityConfig {
                         .successHandler(customSuccessHandler)
                 )
 
-                .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, cookieUtil), LoginFilter.class)
-                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, cookieUtil), UsernamePasswordAuthenticationFilter.class)
-                .addFilterAt(new CustomLogoutFilter(jwtUtil, jwtRepository), LogoutFilter.class)
-                .addFilterBefore(new JwtExceptionHandleFilter(), CustomLogoutFilter.class);
+                .addFilterAt(new CustomLogoutFilter(jwtUtil), LogoutFilter.class)
+                .addFilterBefore(new JwtExceptionHandleFilter(), CustomLogoutFilter.class)
+                .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, cookieUtil), CustomLoginFilter.class)
+                .addFilterAt(new CustomLoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, cookieUtil), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
