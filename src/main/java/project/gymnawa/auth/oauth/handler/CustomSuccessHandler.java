@@ -33,7 +33,7 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         CustomOAuth2UserDetails oAuth2UserDetails = (CustomOAuth2UserDetails) authentication.getPrincipal();
 
-        JwtInfoDto jwtInfoDto = jwtUtil.createJwt(oAuth2UserDetails.getId());
+        String refreshToken = jwtUtil.createRefreshToken(oAuth2UserDetails.getId());
 
         // 쿠키 방식은 나중에 도메인 일치 후 사용
 //        Cookie accessCookie = cookieUtil.createAT(jwtInfoDto.getAccessToken());
@@ -44,11 +44,11 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         if (oAuth2UserDetails.getRole() == Role.GUEST) {
             String redirectUrl = "https://chocoding1.github.io/pages/member/addInfoForm.html"
-                    + "?refreshToken=" + jwtInfoDto.getRefreshToken()
+                    + "?refreshToken=" + refreshToken
                     + "&username=" + URLEncoder.encode(oAuth2UserDetails.getName(), StandardCharsets.UTF_8);
             response.sendRedirect(redirectUrl);
         } else {
-            response.sendRedirect("https://chocoding1.github.io?refreshToken=" + jwtInfoDto.getRefreshToken());
+            response.sendRedirect("https://chocoding1.github.io?refreshToken=" + refreshToken);
         }
     }
 }
