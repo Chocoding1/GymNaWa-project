@@ -19,6 +19,7 @@ public enum ErrorCode {
     // 이메일
     DUPLICATE_EMAIL("DUPLICATE_EMAIL", HttpStatus.CONFLICT, "이미 가입된 이메일입니다."),
     INVALID_EMAIL_CODE("INVALID_EMAIL_CODE", HttpStatus.BAD_REQUEST, "이메일 인증 코드가 일치하지 않습니다."),
+    SEND_EMAIL_FAIL("SEND_EMAIL_FAIL", HttpStatus.INTERNAL_SERVER_ERROR, "이메일 전송 중 오류가 발생했습니다. 다시 시도해주십시오."),
 
     // 헬스장
     GYM_NOT_FOUND("GYM_NOT_FOUND", HttpStatus.NOT_FOUND, "존재하지 않는 헬스장입니다."),

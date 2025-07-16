@@ -33,7 +33,7 @@ public class EmailService {
             mailSender.send(emailForm);
         } catch (RuntimeException e) {
             log.info("MailService.sendEmail exception occur toEmail: {}, ", toEmail);
-            throw new RuntimeException("Unable to send email in sendEmail", e);
+            throw new CustomException(SEND_EMAIL_FAIL);
         }
 
         redisService.setData(toEmail + code, code);
