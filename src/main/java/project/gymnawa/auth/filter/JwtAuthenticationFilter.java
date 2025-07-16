@@ -15,10 +15,9 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 import project.gymnawa.auth.cookie.util.CookieUtil;
-import project.gymnawa.auth.jwt.error.CustomJwtException;
+import project.gymnawa.auth.jwt.error.CustomAuthException;
 import project.gymnawa.auth.jwt.util.JwtUtil;
 import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
-import project.gymnawa.domain.member.dto.MemberSessionDto;
 import project.gymnawa.domain.member.entity.Member;
 
 import java.io.IOException;
@@ -60,16 +59,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             jwtUtil.validateToken(accessToken);
         } catch (ExpiredJwtException e) {
-            throw new CustomJwtException(TOKEN_EXPIRED);
+            throw new CustomAuthException(TOKEN_EXPIRED);
         } catch (JwtException e) {
-            throw new CustomJwtException(INVALID_TOKEN);
+            throw new CustomAuthException(INVALID_TOKEN);
         }
 
         // 토큰이 AT인지 확인
         String category = jwtUtil.getCategory(accessToken);
 
         if (!category.equals("access")) {
-            throw new CustomJwtException(INVALID_TOKEN);
+            throw new CustomAuthException(INVALID_TOKEN);
         }
 
         // session에 회원 정보 저장
