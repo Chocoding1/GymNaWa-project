@@ -90,7 +90,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // DTo로 바꾸려 했으나 CustomUserDetails의 파라미터가 Member 객체라서 어떻게 해야할지 추후 결정할 예정
         MemberSessionDto memberSessionDto = MemberSessionDto.builder()
                 .id(id)
-                .password("tempPwd")
+                .password("tempSession")
                 .build();
 
         // Authentication에 담을 객체 생성
