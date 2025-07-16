@@ -1,7 +1,5 @@
 package project.gymnawa.auth.jwt.util;
 
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
@@ -9,15 +7,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import project.gymnawa.auth.jwt.dto.JwtInfoDto;
 import project.gymnawa.auth.jwt.dto.RefreshToken;
-import project.gymnawa.auth.jwt.error.CustomJwtException;
 import project.gymnawa.auth.jwt.repository.JwtRepository;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.NoSuchElementException;
-
-import static project.gymnawa.domain.common.error.dto.ErrorCode.*;
 
 @Component
 @Slf4j
@@ -79,7 +74,7 @@ public class JwtUtil {
         jwtRepository.deleteById(id);
     }
 
-    private String createAccessToken(Long id) {
+    public String createAccessToken(Long id) {
         return Jwts.builder()
                 .claim("category", "access")
                 .claim("id", id)
@@ -89,7 +84,7 @@ public class JwtUtil {
                 .compact();
     }
 
-    private String createRefreshToken(Long id) {
+    public String createRefreshToken(Long id) {
         return Jwts.builder()
                 .claim("category", "refresh")
                 .claim("id", id)
