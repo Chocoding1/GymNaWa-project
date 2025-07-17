@@ -39,7 +39,7 @@ public class ReissueServiceImpl implements ReissueService {
 
         // 헤더에 refresh 토큰 x
         if (refreshToken == null) {
-            return new ResponseEntity<>("refresh token is null", HttpStatus.BAD_REQUEST);
+            throw new CustomAuthException(TOKEN_NULL);
         }
 
         // 만료된 토큰은 payload 읽을 수 없음 -> ExpiredJwtException 발생
@@ -58,18 +58,20 @@ public class ReissueServiceImpl implements ReissueService {
         }
 
         // 실제 DB에 저장된 RT와 일치하는지 비교
-        Long id = jwtUtil.getId(refreshToken);
-        String findRefreshToken = jwtUtil.getRefreshToken(id).getRefreshToken();
+        Long userId = jwtUtil.getId(refreshToken);
+        String findRefreshToken = jwtUtil.getRefreshToken(userId);
 
-        // DB 에 없는 리프레시 토큰 (혹은 블랙리스트 처리된 리프레시 토큰)
-        if(!findRefreshToken.equals(refreshToken)) {
-            throw new CustomAuthException(TOKEN_EXPIRED);
+        // DB에 refresh token 없을 시 오류
+        if (findRefreshToken == null) {
+            throw new CustomAuthException(REFRESH_TOKEN_NULL_WHEN_REISSUE);
         }
 
-        // 기존 RT redis에서 삭제
-        jwtUtil.removeRefreshToken(refreshToken);
+        // DB에서 조회한 RT와 회원이 가지고 온 RT가 다른 경우 오류
+        if(!findRefreshToken.equals(refreshToken)) {
+            throw new CustomAuthException(INVALID_TOKEN);
+        }
 
-        JwtInfoDto jwtInfoDto = jwtUtil.createJwt(id);
+        JwtInfoDto jwtInfoDto = jwtUtil.createJwt(userId);
 
         // 헤더에 AT 저장
         response.setHeader("Authorization", "Bearer " + jwtInfoDto.getAccessToken());
@@ -93,7 +95,7 @@ public class ReissueServiceImpl implements ReissueService {
 
         // 헤더에 refresh 토큰 x
         if (refreshToken == null) {
-            return new ResponseEntity<>("refresh token is null", HttpStatus.BAD_REQUEST);
+            throw new CustomAuthException(TOKEN_NULL);
         }
 
         // 만료된 토큰은 payload 읽을 수 없음 -> ExpiredJwtException 발생
@@ -112,16 +114,17 @@ public class ReissueServiceImpl implements ReissueService {
         }
 
         // 실제 DB에 저장된 RT와 일치하는지 비교
-        Long id = jwtUtil.getId(refreshToken);
-        String findRefreshToken = jwtUtil.getRefreshToken(id).getRefreshToken();
+        String findRefreshToken = jwtUtil.getRefreshToken(userId);
 
-        // DB 에 없는 리프레시 토큰 (혹은 블랙리스트 처리된 리프레시 토큰)
-        if(!findRefreshToken.equals(refreshToken)) {
-            throw new CustomAuthException(TOKEN_EXPIRED);
+        // DB에 refresh token 없을 시 오류
+        if (findRefreshToken == null) {
+            throw new CustomAuthException(REFRESH_TOKEN_NULL_WHEN_REISSUE);
         }
 
-        // 기존 RT redis에서 삭제
-        jwtUtil.removeRefreshToken(refreshToken);
+        // DB에서 조회한 RT와 회원이 가지고 온 RT가 다른 경우 오류
+        if(!findRefreshToken.equals(refreshToken)) {
+            throw new CustomAuthException(INVALID_TOKEN);
+        }
 
         JwtInfoDto jwtInfoDto = jwtUtil.createJwt(userId);
 

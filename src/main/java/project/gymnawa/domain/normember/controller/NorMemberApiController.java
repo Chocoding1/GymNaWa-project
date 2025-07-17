@@ -45,8 +45,8 @@ public class NorMemberApiController {
     @PostMapping
     public ResponseEntity<ApiResponse<?>> addMember(@Validated @RequestBody MemberSaveDto memberSaveDto) {
 
-        if (!emailService.isEmailVerified(memberSaveDto.getEmail(), memberSaveDto.getEmailCode())) {
-            throw new CustomException(INVALID_EMAIL_CODE);
+        if (!emailService.isEmailVerified(memberSaveDto.getEmail())) {
+            throw new CustomException(EMAIL_VERIFY_FAILED);
         }
 
         Long joinId = norMemberService.join(memberSaveDto);

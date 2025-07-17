@@ -45,8 +45,8 @@ public class TrainerApiController {
     @PostMapping
     public ResponseEntity<ApiResponse<?>> addTrainer(@Validated @RequestBody TrainerSaveDto trainerSaveDto) {
 
-        if (!emailService.isEmailVerified(trainerSaveDto.getEmail(), trainerSaveDto.getEmailCode())) {
-            throw new CustomException(INVALID_EMAIL_CODE);
+        if (!emailService.isEmailVerified(trainerSaveDto.getEmail())) {
+            throw new CustomException(EMAIL_VERIFY_FAILED);
         }
 
         Long joinId = trainerService.join(trainerSaveDto);

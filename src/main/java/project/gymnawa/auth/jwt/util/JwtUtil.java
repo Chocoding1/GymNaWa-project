@@ -6,13 +6,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import project.gymnawa.auth.jwt.dto.JwtInfoDto;
-import project.gymnawa.auth.jwt.dto.RefreshToken;
-import project.gymnawa.auth.jwt.repository.JwtRepository;
+import project.gymnawa.domain.email.service.RedisService;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
-import java.util.NoSuchElementException;
 
 @Component
 @Slf4j
@@ -21,22 +19,23 @@ public class JwtUtil {
     private final SecretKey secretKey;
     private final Long accessTokenExpiredMs;
     private final Long refreshTokenExpiredMs;
-    private final JwtRepository jwtRepository;
+    private final RedisService redisService;
 
     public JwtUtil(@Value("${jwt.secret_key}") String secretKey,
                    @Value("${jwt.expiration_time.access}") Long accessTokenExpiredMs,
                    @Value("${jwt.expiration_time.refresh}") Long refreshTokenExpiredMs,
-                   JwtRepository jwtRepository) {
+                   RedisService redisService) {
         this.secretKey = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
         this.accessTokenExpiredMs = accessTokenExpiredMs;
         this.refreshTokenExpiredMs = refreshTokenExpiredMs;
-        this.jwtRepository = jwtRepository;
+        this.redisService = redisService;
     }
 
     // userId로 redis에서 refresh token 조회
-    public RefreshToken getRefreshToken(Long id) {
-        return jwtRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 토큰입니다."));
+    public String getRefreshToken(Long id) {
+        return redisService.getRefreshToken(id);
+//        return jwtRepository.findById(id)
+//                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 토큰입니다."));
     }
 
     public void validateToken(String token) {
@@ -61,9 +60,8 @@ public class JwtUtil {
                 .build();
     }
 
-    public void removeRefreshToken(String refreshToken) {
-        Long id = getId(refreshToken);
-        jwtRepository.deleteById(id);
+    public void deleteRefreshToken(Long id) {
+        redisService.deleteRefreshToken(id);
     }
 
     public String createAccessToken(Long id) {
@@ -85,13 +83,7 @@ public class JwtUtil {
                 .signWith(secretKey)
                 .compact();
 
-        RefreshToken refreshTokenEntity = RefreshToken.builder()
-                .userId(id)
-                .refreshToken(refreshToken)
-                .build();
-
-        // refreshToken redis에 저장
-        jwtRepository.save(refreshTokenEntity);
+        redisService.saveRefreshToken(id, refreshToken);
 
         return refreshToken;
     }

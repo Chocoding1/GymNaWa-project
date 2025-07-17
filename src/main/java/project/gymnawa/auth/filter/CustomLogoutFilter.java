@@ -45,7 +45,15 @@ public class CustomLogoutFilter extends GenericFilterBean {
         // refresh token이 존재하지 않으면 400 반환
         String refreshToken = request.getHeader("Authorization-Refresh");
         if (refreshToken == null) {
-            throw new CustomAuthException(TOKEN_NULL);
+            throw new CustomAuthException(REFRESH_TOKEN_NULL_WHEN_LOGOUT);
+        }
+
+        // Redis에 저장된 RT와 일치하는지 검증
+        Long userId = jwtUtil.getId(refreshToken);
+        String redisRefreshToken = jwtUtil.getRefreshToken(userId);
+
+        if (!refreshToken.equals(redisRefreshToken)) {
+            throw new CustomAuthException(INVALID_TOKEN);
         }
 
         // 토큰 검증
@@ -65,7 +73,7 @@ public class CustomLogoutFilter extends GenericFilterBean {
 
         // 로그아웃 처리
         // refresh token DB에서 제거
-        jwtUtil.removeRefreshToken(refreshToken);
+        jwtUtil.deleteRefreshToken(userId);
 
         response.setStatus(HttpServletResponse.SC_OK);
     }

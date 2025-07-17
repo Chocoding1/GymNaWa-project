@@ -24,19 +24,19 @@ public class EmailService {
     private final RedisService redisService;
     private final MemberRepository memberRepository;
 
-    public void sendMail(String toEmail) throws MessagingException {
-        validateDuplicateEmail(toEmail);
+    public void sendMail(String email) throws MessagingException {
+        validateDuplicateEmail(email);
 
         String code = createCode();
-        MimeMessage emailForm = createEmailForm(toEmail, code);
+        MimeMessage emailForm = createEmailForm(email, code);
         try {
             mailSender.send(emailForm);
         } catch (RuntimeException e) {
-            log.info("MailService.sendEmail exception occur toEmail: {}, ", toEmail);
+            log.info("MailService.sendEmail exception occur toEmail: {}, ", email);
             throw new CustomException(SEND_EMAIL_FAIL);
         }
 
-        redisService.setData(toEmail + code, code);
+        redisService.saveEmailAuthCode(email, code);
     }
 
     private void validateDuplicateEmail(String email) {
@@ -73,7 +73,7 @@ public class EmailService {
     }
 
     public boolean verifyCode(String email, String code) {
-        String findCode = redisService.getData(email + code);
+        String findCode = redisService.getEmailAuthCode(email);
         if (findCode == null) {
             throw new CustomException(INVALID_EMAIL_CODE);
         }
@@ -82,13 +82,13 @@ public class EmailService {
             throw new CustomException(INVALID_EMAIL_CODE);
         }
 
-        redisService.setData(email + code + "verified", "verified");
+        redisService.saveEmailAuthCode(email, "verified");
 
         return true;
     }
 
-    public boolean isEmailVerified(String email, String code) {
-        String data = redisService.getData(email + code + "verified");
+    public boolean isEmailVerified(String email) {
+        String data = redisService.getEmailAuthCode(email);
         if (data == null) {
             return false;
         } else {
