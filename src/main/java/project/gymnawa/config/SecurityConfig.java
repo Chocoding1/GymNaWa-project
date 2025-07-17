@@ -18,7 +18,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import project.gymnawa.auth.cookie.util.CookieUtil;
 import project.gymnawa.auth.filter.JwtExceptionHandleFilter;
-import project.gymnawa.auth.jwt.repository.JwtRepository;
 import project.gymnawa.auth.jwt.util.JwtUtil;
 import project.gymnawa.auth.oauth.handler.CustomSuccessHandler;
 import project.gymnawa.auth.oauth.service.CustomOauth2UserService;
@@ -40,12 +39,11 @@ public class SecurityConfig {
     private final CustomSuccessHandler customSuccessHandler;
     private final JwtUtil jwtUtil;
     private final CookieUtil cookieUtil;
-    private final JwtRepository jwtRepository;
     private final AuthenticationConfiguration authenticationConfiguration;
     private final String[] permitUrls = {
             "/login", "/logout", "/api/normembers", "/api/trainers",
             "/api/reviews/{trainerId:\\d+}", // pathvariable은 정규 표현식 사용해야 함
-            "/api/gyms", "/reissue"
+            "/api/gyms", "/reissue", "/api/emails/*"
     };
 
     @Bean
