@@ -10,8 +10,10 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
+import project.gymnawa.domain.member.dto.MemberSessionDto;
 import project.gymnawa.domain.member.dto.UpdatePasswordDto;
 import project.gymnawa.domain.member.entity.etcfield.Gender;
+import project.gymnawa.domain.member.entity.etcfield.Role;
 import project.gymnawa.domain.ptmembership.entity.PtMembership;
 import project.gymnawa.domain.ptmembership.service.PtMembershipService;
 import project.gymnawa.domain.review.entity.Review;
@@ -69,7 +71,7 @@ class TrainerApiControllerTest {
                 .emailCode("testEmailCode")
                 .build();
 
-        when(emailService.isEmailVerified(trainerSaveDto.getEmail(), trainerSaveDto.getEmailCode())).thenReturn(true);
+        when(emailService.isEmailVerified(trainerSaveDto.getEmail())).thenReturn(true);
         when(trainerService.join(trainerSaveDto)).thenReturn(1L);
 
         //when & then
@@ -96,7 +98,7 @@ class TrainerApiControllerTest {
                 .emailCode("testEmailCode")
                 .build();
 
-        when(emailService.isEmailVerified(trainerSaveDto.getEmail(), trainerSaveDto.getEmailCode())).thenReturn(false);
+        when(emailService.isEmailVerified(trainerSaveDto.getEmail())).thenReturn(false);
 
         //when & then
         mockMvc.perform(post("/api/trainers")
@@ -578,9 +580,9 @@ class TrainerApiControllerTest {
     }
 
     private CustomOAuth2UserDetails createCustomUserDetails() {
-        Trainer testMember = createTrainer();
+        MemberSessionDto memberSessionDto = createMemberSessionDto();
 
-        return new CustomOAuth2UserDetails(testMember);
+        return new CustomOAuth2UserDetails(memberSessionDto);
     }
 
     private Trainer createTrainer() {
@@ -591,6 +593,16 @@ class TrainerApiControllerTest {
                 .name("testUser")
                 .gender(Gender.MALE)
                 .deleted(false)
+                .build();
+    }
+
+    private MemberSessionDto createMemberSessionDto() {
+        return MemberSessionDto.builder()
+                .id(1L)
+                .email("test@naver.com")
+                .password("testPw")
+                .name("testUser")
+                .role(Role.USER)
                 .build();
     }
 }
