@@ -1,6 +1,6 @@
 package project.gymnawa.auth.jwt.service;
 
-import io.jsonwebtoken.ExpiredJwtException;
+import  io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -67,6 +67,12 @@ public class ReissueServiceImpl implements ReissueService {
         }
 
         // DB에서 조회한 RT와 회원이 가지고 온 RT가 다른 경우 오류
+        /**
+         * RT가 만료되지 않은 상황에서 누가 /reissue 요청을 날리면 유효한 RT가 두 개가 된다.
+         * 현재 DB에는 userId당 RT가 하나씩 저장되기 때문에 현재 저장되어 있지 않은 이전에 발급한 RT를 가지고 오면
+         * 위의 RT 검증 로직을 모두 통과한다. 그러나 현재 회원이 가지고 있는 RT가 아니기 때문에 최종적으로
+         * DB에 저장된 RT와 동일한지를 체크해야 한다.
+         */
         if(!findRefreshToken.equals(refreshToken)) {
             throw new CustomAuthException(INVALID_TOKEN);
         }
