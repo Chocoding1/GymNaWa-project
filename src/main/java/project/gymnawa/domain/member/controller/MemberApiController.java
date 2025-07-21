@@ -27,7 +27,7 @@ import project.gymnawa.domain.trainer.service.TrainerService;
 
 import static project.gymnawa.domain.common.error.dto.ErrorCode.*;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/members")
 @Slf4j
