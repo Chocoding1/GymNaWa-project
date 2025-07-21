@@ -106,8 +106,8 @@ class TrainerApiControllerTest {
                         .content(objectMapper.writeValueAsString(trainerSaveDto))
                 )
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.errorCode").value("INVALID_EMAIL_CODE"))
-                .andExpect(jsonPath("$.errorMessage").value("이메일 인증 코드가 일치하지 않습니다."));
+                .andExpect(jsonPath("$.errorCode").value("EMAIL_VERIFY_FAILED"))
+                .andExpect(jsonPath("$.errorMessage").value("이메일 인증이 되지 않았습니다."));
     }
 
     @Test
