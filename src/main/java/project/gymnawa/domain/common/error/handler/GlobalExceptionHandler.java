@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import project.gymnawa.auth.jwt.error.CustomAuthException;
 import project.gymnawa.domain.common.error.dto.ErrorCode;
 import project.gymnawa.domain.common.error.exception.CustomException;
 import project.gymnawa.domain.common.error.dto.ErrorResponse;
@@ -36,5 +37,14 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(ErrorResponse.of("VALIDATION_ERROR", "입력값이 유효하지 않습니다.", errorMap));
+    }
+
+    // ReissueController에서 발생하는 인증오류를 해결하기 위해 추가
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> handleCustomAuthException(CustomAuthException e) {
+        ErrorCode errorCode = e.getErrorCode();
+        return ResponseEntity
+                .status(errorCode.getStatus())
+                .body(ErrorResponse.of(errorCode.getCode(), errorCode.getErrorMessage()));
     }
 }
