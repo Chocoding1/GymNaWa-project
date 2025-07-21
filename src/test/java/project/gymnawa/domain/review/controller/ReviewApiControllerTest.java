@@ -10,7 +10,9 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
+import project.gymnawa.domain.member.dto.MemberSessionDto;
 import project.gymnawa.domain.member.entity.etcfield.Gender;
+import project.gymnawa.domain.member.entity.etcfield.Role;
 import project.gymnawa.domain.normember.entity.NorMember;
 import project.gymnawa.domain.normember.service.NorMemberService;
 import project.gymnawa.domain.review.dto.ReviewEditDto;
@@ -140,9 +142,9 @@ class ReviewApiControllerTest {
     }
 
     private CustomOAuth2UserDetails createCustomUserDetails() {
-        NorMember testMember = createNorMember();
+        MemberSessionDto memberSessionDto = createMemberSessionDto();
 
-        return new CustomOAuth2UserDetails(testMember);
+        return new CustomOAuth2UserDetails(memberSessionDto);
     }
 
     private NorMember createNorMember() {
@@ -153,6 +155,16 @@ class ReviewApiControllerTest {
                 .name("testUser")
                 .gender(Gender.MALE)
                 .deleted(false)
+                .build();
+    }
+
+    private MemberSessionDto createMemberSessionDto() {
+        return MemberSessionDto.builder()
+                .id(1L)
+                .email("test@naver.com")
+                .password("testPw")
+                .name("testUser")
+                .role(Role.USER)
                 .build();
     }
 }

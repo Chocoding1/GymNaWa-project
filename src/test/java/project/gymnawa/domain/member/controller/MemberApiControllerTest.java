@@ -16,14 +16,17 @@ import project.gymnawa.auth.jwt.service.ReissueServiceImpl;
 import project.gymnawa.auth.jwt.util.JwtUtil;
 import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
 import project.gymnawa.domain.member.dto.MemberOauthInfoDto;
+import project.gymnawa.domain.member.dto.MemberSessionDto;
 import project.gymnawa.domain.member.dto.PasswordDto;
 import project.gymnawa.domain.member.entity.Member;
 import project.gymnawa.domain.member.entity.etcfield.Gender;
+import project.gymnawa.domain.member.entity.etcfield.Role;
 import project.gymnawa.domain.normember.dto.MemberSaveDto;
 import project.gymnawa.domain.normember.entity.NorMember;
 import project.gymnawa.domain.member.service.MemberService;
 import project.gymnawa.domain.normember.service.NorMemberService;
 import project.gymnawa.config.SecurityTestConfig;
+import project.gymnawa.domain.trainer.service.TrainerService;
 
 
 import static org.mockito.Mockito.*;
@@ -57,6 +60,9 @@ class MemberApiControllerTest {
 
     @MockitoBean
     private NorMemberService norMemberService;
+
+    @MockitoBean
+    private TrainerService trainerService;
 
     @MockitoBean
     private ReissueServiceImpl reissueServiceImpl;
@@ -307,9 +313,9 @@ class MemberApiControllerTest {
     }
 
     private CustomOAuth2UserDetails createCustomUserDetails() {
-        Member testMember = createMember();
+        MemberSessionDto memberSessionDto = createMemberSessionDto();
 
-        return new CustomOAuth2UserDetails(testMember);
+        return new CustomOAuth2UserDetails(memberSessionDto);
     }
 
     private Member createMember() {
@@ -319,6 +325,16 @@ class MemberApiControllerTest {
                 .password("testPw")
                 .name("testUser")
                 .deleted(false)
+                .build();
+    }
+
+    private MemberSessionDto createMemberSessionDto() {
+        return MemberSessionDto.builder()
+                .id(1L)
+                .email("test@naver.com")
+                .password("testPw")
+                .name("testUser")
+                .role(Role.USER)
                 .build();
     }
 }
