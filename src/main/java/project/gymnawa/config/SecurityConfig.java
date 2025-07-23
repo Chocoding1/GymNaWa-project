@@ -38,7 +38,6 @@ public class SecurityConfig {
     private final CustomOauth2UserService customOauth2UserService;
     private final CustomSuccessHandler customSuccessHandler;
     private final JwtUtil jwtUtil;
-    private final CookieUtil cookieUtil;
     private final AuthenticationConfiguration authenticationConfiguration;
     private final String[] permitUrls = {
             "/login", "/logout", "/api/normembers", "/api/trainers",
@@ -94,8 +93,8 @@ public class SecurityConfig {
 
                 .addFilterAt(new CustomLogoutFilter(jwtUtil), LogoutFilter.class)
                 .addFilterBefore(new JwtExceptionHandleFilter(), CustomLogoutFilter.class)
-                .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, cookieUtil), CustomLoginFilter.class)
-                .addFilterAt(new CustomLoginFilter(authenticationManager(authenticationConfiguration), jwtUtil, cookieUtil), UsernamePasswordAuthenticationFilter.class);
+                .addFilterBefore(new JwtAuthenticationFilter(jwtUtil), CustomLoginFilter.class)
+                .addFilterAt(new CustomLoginFilter(authenticationManager(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

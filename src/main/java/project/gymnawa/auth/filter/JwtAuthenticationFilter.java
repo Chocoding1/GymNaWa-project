@@ -14,12 +14,10 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
-import project.gymnawa.auth.cookie.util.CookieUtil;
 import project.gymnawa.auth.jwt.error.CustomAuthException;
 import project.gymnawa.auth.jwt.util.JwtUtil;
 import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
 import project.gymnawa.domain.member.dto.MemberSessionDto;
-import project.gymnawa.domain.member.entity.Member;
 
 import java.io.IOException;
 import java.util.List;
@@ -34,7 +32,6 @@ import static project.gymnawa.domain.common.error.dto.ErrorCode.*;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
-    private final CookieUtil cookieUtil;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {

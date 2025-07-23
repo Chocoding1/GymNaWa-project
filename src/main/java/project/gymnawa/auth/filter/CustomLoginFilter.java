@@ -12,12 +12,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import project.gymnawa.auth.cookie.util.CookieUtil;
-import project.gymnawa.auth.jwt.dto.JwtInfoDto;
 import project.gymnawa.auth.jwt.error.CustomAuthException;
 import project.gymnawa.auth.jwt.util.JwtUtil;
 import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
-import project.gymnawa.domain.common.error.dto.ErrorResponse;
 import project.gymnawa.domain.member.dto.MemberLoginDto;
 
 import java.io.IOException;
@@ -34,7 +31,6 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
 
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
-    private final CookieUtil cookieUtil;
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
@@ -61,11 +57,6 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
         CustomOAuth2UserDetails oAuth2UserDetails = (CustomOAuth2UserDetails) authResult.getPrincipal();
         String refreshToken = jwtUtil.createRefreshToken(oAuth2UserDetails.getId());
 
-//        Cookie accessCookie = cookieUtil.createAT(jwtInfoDto.getAccessToken());
-//        ResponseCookie refreshCookie = cookieUtil.createRT(jwtInfoDto.getRefreshToken());
-
-//        response.addCookie(accessCookie);
-//        response.setHeader("Set-Cookie", refreshCookie.toString());
         response.setHeader("Authorization-Refresh", refreshToken);
     }
 
