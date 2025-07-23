@@ -20,6 +20,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler
     public ResponseEntity<ErrorResponse> handleCustomException(CustomException e) {
+        log.info("GlobalExceptionHandler");
         ErrorCode errorCode = e.getErrorCode();
         return ResponseEntity
                 .status(errorCode.getStatus())
@@ -28,6 +29,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler
     public ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException e) {
+        log.info("GlobalExceptionHandler");
         Map<String, String> errorMap = new HashMap<>();
 
         e.getBindingResult().getFieldErrors().forEach(error -> {
@@ -42,6 +44,7 @@ public class GlobalExceptionHandler {
     // ReissueController에서 발생하는 인증오류를 해결하기 위해 추가
     @ExceptionHandler
     public ResponseEntity<ErrorResponse> handleCustomAuthException(CustomAuthException e) {
+        log.info("GlobalExceptionHandler");
         ErrorCode errorCode = e.getErrorCode();
         return ResponseEntity
                 .status(errorCode.getStatus())
