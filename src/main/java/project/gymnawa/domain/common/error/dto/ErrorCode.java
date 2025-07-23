@@ -14,7 +14,7 @@ public enum ErrorCode {
     ACCESS_DENIED("ACCESS_DENIED", HttpStatus.BAD_REQUEST, "잘못된 접근입니다."),
     DEACTIVATE_MEMBER("DEACTIVATE_MEMBER", HttpStatus.NOT_FOUND, "탈퇴한 회원입니다."),
     MEMBER_NOT_FOUND("MEMBER_NOT_FOUND", HttpStatus.NOT_FOUND, "존재하지 않는 회원입니다."),
-    LOGIN_FAILED("INVALID_LOGIN", HttpStatus.BAD_REQUEST, "이메일 또는 비밀번호가 일치하지 않습니다."), // 로그인 필터에서 로그인 정보 역직렬화 시에 발생하는 오류
+    LOGIN_FAILED("LOGIN_FAILED", HttpStatus.BAD_REQUEST, "이메일 또는 비밀번호가 일치하지 않습니다."), // 로그인 필터에서 로그인 정보 역직렬화 시에 발생하는 오류
 
     // 이메일
     DUPLICATE_EMAIL("DUPLICATE_EMAIL", HttpStatus.CONFLICT, "이미 가입된 이메일입니다."),
