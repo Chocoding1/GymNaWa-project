@@ -73,11 +73,6 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
         log.info("CustomLoginFilter -> unsuccessfulAuthentication");
 
-        ObjectMapper om = new ObjectMapper();
-        ErrorResponse errorResponse = ErrorResponse.of("LOGIN_FAILED", "이메일 또는 비밀번호가 일치하지 않습니다.");
-        response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-        response.setContentType("application/json");
-        response.setCharacterEncoding("utf-8");
-        response.getWriter().write(om.writeValueAsString(errorResponse));
+        throw new CustomAuthException(LOGIN_FAILED);
     }
 }
