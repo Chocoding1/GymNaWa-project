@@ -22,6 +22,7 @@ public class JwtExceptionHandleFilter extends OncePerRequestFilter {
         try {
             filterChain.doFilter(request, response);
         } catch (CustomAuthException e) {
+            log.info("JwtExceptionHandlerFilter - CustomAuthException 발생");
             sendErrorResponse(response, e);
         }
     }
