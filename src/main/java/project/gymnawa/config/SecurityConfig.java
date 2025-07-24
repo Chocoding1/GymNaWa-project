@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -17,6 +18,7 @@ import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import project.gymnawa.auth.cookie.util.CookieUtil;
+import project.gymnawa.auth.domain.SecurityWhiteListProperties;
 import project.gymnawa.auth.filter.JwtExceptionHandleFilter;
 import project.gymnawa.auth.jwt.util.JwtUtil;
 import project.gymnawa.auth.oauth.handler.CustomSuccessHandler;
@@ -27,6 +29,8 @@ import project.gymnawa.auth.filter.CustomLoginFilter;
 
 import java.util.Collections;
 import java.util.List;
+
+import static project.gymnawa.auth.domain.SecurityWhiteListProperties.*;
 
 
 @Configuration
@@ -39,11 +43,12 @@ public class SecurityConfig {
     private final CustomSuccessHandler customSuccessHandler;
     private final JwtUtil jwtUtil;
     private final AuthenticationConfiguration authenticationConfiguration;
-    private final String[] permitUrls = {
-            "/login", "/logout", "/api/normembers", "/api/trainers",
-            "/api/reviews/{trainerId:\\d+}", // pathvariable은 정규 표현식 사용해야 함
-            "/api/gyms", "/reissue", "/api/emails/*"
-    };
+    private final SecurityWhiteListProperties whiteListProps;
+//    private final String[] permitUrls = {
+//            "/login", "/logout", "/api/normembers", "/api/trainers",
+//            "/api/reviews/{trainerId:\\d+}", // pathvariable은 정규 표현식 사용해야 함
+//            "/api/gyms", "/reissue", "/api/emails/*"
+//    };
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
@@ -75,10 +80,13 @@ public class SecurityConfig {
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // stateless 방식에서는 단순 소셜 로그인 진행해도 Authentication 객체 유지 X
 
-                .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(permitUrls).permitAll()
-                        .anyRequest().authenticated()
-                )
+                .authorizeHttpRequests(authorize -> {
+                    authorize.requestMatchers(toWhitePaths(whiteListProps.getPaths())).permitAll();
+                    for (MethodPath methodPath : whiteListProps.getMethodPaths()) {
+                        authorize.requestMatchers(HttpMethod.valueOf(methodPath.getMethod()), methodPath.getPath()).permitAll();
+                    }
+                    authorize.anyRequest().authenticated();
+                })
 
                 .httpBasic(HttpBasicConfigurer::disable)
                 .formLogin(FormLoginConfigurer::disable) // jwt는 세션을 사용하지 않기 때문에 폼 로그인 기능 off
@@ -93,9 +101,13 @@ public class SecurityConfig {
 
                 .addFilterAt(new CustomLogoutFilter(jwtUtil), LogoutFilter.class)
                 .addFilterBefore(new JwtExceptionHandleFilter(), CustomLogoutFilter.class)
-                .addFilterBefore(new JwtAuthenticationFilter(jwtUtil), CustomLoginFilter.class)
+                .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, whiteListProps), CustomLoginFilter.class)
                 .addFilterAt(new CustomLoginFilter(authenticationManager(authenticationConfiguration), jwtUtil), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
+
+    private String[] toWhitePaths(List<String> paths) {
+        return paths.toArray(new String[0]);
     }
 }
