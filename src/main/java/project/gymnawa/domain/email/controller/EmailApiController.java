@@ -32,7 +32,7 @@ public class EmailApiController {
         return ResponseEntity.ok().body(ApiResponse.of("이메일 전송 성공", response));
     }
 
-    @PostMapping("verify-code")
+    @PostMapping("/verify-code")
     public ResponseEntity<ApiResponse<?>> verifyCode(@RequestBody EmailDto emailDto) {
         emailService.verifyCode(emailDto.getEmail(), emailDto.getCode());
 
