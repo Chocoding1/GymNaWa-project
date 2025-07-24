@@ -13,7 +13,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.util.AntPathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
+import project.gymnawa.auth.domain.SecurityWhiteListProperties;
 import project.gymnawa.auth.jwt.error.CustomAuthException;
 import project.gymnawa.auth.jwt.util.JwtUtil;
 import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
@@ -22,6 +24,7 @@ import project.gymnawa.domain.member.dto.MemberSessionDto;
 import java.io.IOException;
 import java.util.List;
 
+import static project.gymnawa.auth.domain.SecurityWhiteListProperties.*;
 import static project.gymnawa.domain.common.error.dto.ErrorCode.*;
 
 @Slf4j
@@ -32,23 +35,32 @@ import static project.gymnawa.domain.common.error.dto.ErrorCode.*;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
+    private final SecurityWhiteListProperties whiteListProps;
+    private final AntPathMatcher pathMatcher = new AntPathMatcher();
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         log.info("JwtAuthenticationFilter");
         log.info("request url : " + request.getRequestURI());
+        log.info("request method : " + request.getMethod());
+
+        // 화이트 리스트에 포함된 uri는 토큰 검증 없이 다음 필터로
+        String requestUri = request.getRequestURI();
+        String method = request.getMethod();
+        if (isWhiteList(requestUri, method)) {
+            log.info("permit uri");
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         // Authorization 헤더 추출
         String accessHeader = request.getHeader("Authorization");
-
-
+        
         // 헤더가 없으면 다음 필터로 이동
         // 다음 필터로 이동하는 것이 아니라 오류 응답값을 바로 넘겨주는 것이 가장 올바르다.
         // 보통 jwtfilter 앞 단에 jwt 오류 핸들러를 붙이기도 한다.
         if (accessHeader == null || !accessHeader.startsWith("Bearer ")) {
-            log.info("token null");
-            filterChain.doFilter(request, response);
-            return;
+            throw new CustomAuthException(TOKEN_NULL);
         }
 
         // 헤더에서 토큰 추출
@@ -101,5 +113,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         // SecurityContextHolder에 저장 (세션에 사용자 저장하는 것. 이 때 이 세션은 일회성 세션으로 해당 요청이 끝나면 세션도 삭제됨)
         SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
+
+    private boolean isWhiteList(String requestUri, String method) {
+        // 메서드 상관없는 uri 검사
+        for (String path : whiteListProps.getPaths()) {
+            if (pathMatcher.match(path, requestUri)) {
+                return true;
+            }
+        }
+
+        // 메서드 상관있는 uri 검사
+        for (MethodPath methodPath : whiteListProps.getMethodPaths()) {
+            if (pathMatcher.match(methodPath.getPath(), requestUri) &&
+                    methodPath.getMethod().equals(method)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
