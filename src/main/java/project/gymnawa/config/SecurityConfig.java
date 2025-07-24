@@ -44,11 +44,6 @@ public class SecurityConfig {
     private final JwtUtil jwtUtil;
     private final AuthenticationConfiguration authenticationConfiguration;
     private final SecurityWhiteListProperties whiteListProps;
-//    private final String[] permitUrls = {
-//            "/login", "/logout", "/api/normembers", "/api/trainers",
-//            "/api/reviews/{trainerId:\\d+}", // pathvariable은 정규 표현식 사용해야 함
-//            "/api/gyms", "/reissue", "/api/emails/*"
-//    };
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
