@@ -31,7 +31,7 @@ public class JwtExceptionHandleFilter extends OncePerRequestFilter {
         ErrorResponse errorResponse = ErrorResponse.of(e.getErrorCode().getCode(), e.getErrorCode().getErrorMessage());
         ObjectMapper om = new ObjectMapper();
 
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // custom error 도입 필요
+        response.setStatus(e.getErrorCode().getStatus().value()); // custom error 도입 필요
         response.setCharacterEncoding("utf-8");
         response.setContentType("application/json");
         response.getWriter().write(om.writeValueAsString(errorResponse));
