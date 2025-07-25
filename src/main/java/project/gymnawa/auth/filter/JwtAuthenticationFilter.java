@@ -56,9 +56,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // Authorization 헤더 추출
         String accessHeader = request.getHeader("Authorization");
 
-        // 헤더가 없으면 다음 필터로 이동
+        // 토큰 없으면 오류 발생
         // 다음 필터로 이동하는 것이 아니라 오류 응답값을 바로 넘겨주는 것이 가장 올바르다.
-        // 보통 jwtfilter 앞 단에 jwt 오류 핸들러를 붙이기도 한다.
         if (accessHeader == null || !accessHeader.startsWith("Bearer ")) {
             throw new CustomAuthException(TOKEN_NULL);
         }
