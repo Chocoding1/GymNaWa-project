@@ -35,11 +35,10 @@ public class CustomLogoutFilter extends GenericFilterBean {
             return;
         }
 
-        // 요청 method가 POST가 아니면 필터 통과
+        // 요청 method가 POST가 아니면 오류 발생(405)
         String requestMethod = request.getMethod();
         if (!requestMethod.equals("POST")) {
-            filterChain.doFilter(request, response);
-            return;
+            throw new CustomAuthException(INVALID_METHOD);
         }
 
         // refresh token이 존재하지 않으면 400 반환
