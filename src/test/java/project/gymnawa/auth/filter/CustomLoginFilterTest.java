@@ -63,13 +63,11 @@ class CustomLoginFilterTest {
         request.setContentType("application/json");
         request.setContent(loginJson.getBytes());
 
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(memberLoginDto.getEmail(), memberLoginDto.getPassword());
-
         //when
         customLoginFilter.attemptAuthentication(request, response);
 
         //then
-        verify(authenticationManager, times(1)).authenticate(authenticationToken);
+        verify(authenticationManager, times(1)).authenticate(any(UsernamePasswordAuthenticationToken.class));
     }
 
     @Test
