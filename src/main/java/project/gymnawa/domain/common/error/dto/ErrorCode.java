@@ -36,9 +36,12 @@ public enum ErrorCode {
     // JWT
     TOKEN_EXPIRED("TOKEN_EXPIRED", HttpStatus.UNAUTHORIZED, "토큰이 만료되었습니다."),
     INVALID_TOKEN("INVALID_TOKEN", HttpStatus.UNAUTHORIZED, "토큰이 유효하지 않습니다."),
-    TOKEN_NULL("TOKEN_NULL", HttpStatus.BAD_REQUEST, "토큰이 존재하지 않습니다."),
+    TOKEN_NULL("TOKEN_NULL", HttpStatus.UNAUTHORIZED, "토큰이 존재하지 않습니다."),
     REFRESH_TOKEN_NULL_WHEN_LOGOUT("REFRESH_TOKEN_NULL_IN_LOGOUT", HttpStatus.OK, "refreshToken이 Redis에 존재하지 않습니다."),
-    REFRESH_TOKEN_NULL_WHEN_REISSUE("REFRESH_TOKEN_NULL_IN_REISSUE", HttpStatus.BAD_REQUEST, "refreshToken이 Redis에 존재하지 않습니다.");
+    REFRESH_TOKEN_NULL_WHEN_REISSUE("REFRESH_TOKEN_NULL_IN_REISSUE", HttpStatus.UNAUTHORIZED, "refreshToken이 Redis에 존재하지 않습니다."),
+
+    // API
+    INVALID_METHOD("INVALID_METHOD", HttpStatus.METHOD_NOT_ALLOWED, "잘못된 요청입니다.");
 
 
     private final String code;
