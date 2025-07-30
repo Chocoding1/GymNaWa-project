@@ -41,7 +41,7 @@ public class MemberServiceTest {
         Member findMember = memberService.findOne(memberId);
 
         //then
-        assertThat(findMember).isNull();
+        assertThat(findMember).isNotNull();
         assertThat(findMember).isEqualTo(member);
         assertThat(findMember.getName()).isEqualTo("조성진");
         verify(memberRepository, times(1)).findById(anyLong());
