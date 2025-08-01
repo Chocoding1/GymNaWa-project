@@ -18,6 +18,7 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
+      # 이거 안 하면 권한 오류 발생
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
