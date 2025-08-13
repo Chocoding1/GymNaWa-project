@@ -103,6 +103,7 @@ class CustomLoginFilterTest {
 
         //then
         assertEquals(refreshToken, response.getHeader("Authorization-Refresh"));
+        assertEquals("로그인 성공", response.getContentAsString());
     }
 
     @Test

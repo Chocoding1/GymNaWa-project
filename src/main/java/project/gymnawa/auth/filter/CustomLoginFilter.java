@@ -15,6 +15,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import project.gymnawa.auth.jwt.error.CustomAuthException;
 import project.gymnawa.auth.jwt.util.JwtUtil;
 import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
+import project.gymnawa.domain.common.api.ApiResponse;
+import project.gymnawa.domain.common.error.dto.ErrorResponse;
 import project.gymnawa.domain.member.dto.MemberLoginDto;
 
 import java.io.IOException;
@@ -57,7 +59,14 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
         CustomOAuth2UserDetails oAuth2UserDetails = (CustomOAuth2UserDetails) authResult.getPrincipal();
         String refreshToken = jwtUtil.createRefreshToken(oAuth2UserDetails.getId());
 
+        ApiResponse<?> apiResponse = ApiResponse.of("로그인 성공");
+        ObjectMapper om = new ObjectMapper();
+
         response.setHeader("Authorization-Refresh", refreshToken);
+        response.setStatus(200);
+        response.setCharacterEncoding("utf-8");
+        response.setContentType("application/json");
+        response.getWriter().write(om.writeValueAsString(apiResponse));
     }
 
     @Override
