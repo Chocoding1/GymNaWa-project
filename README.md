@@ -36,31 +36,8 @@
 - JWT
 
 ---
-### 아키텍처 설계도
-
----
 ### ERD
 <img width="90%" src="https://github.com/user-attachments/assets/4c0d8952-2f51-4c9b-ab87-82229fce9d9d">
-
----
-### 요구사항 및 기능 명세
-**<주요 기능>**
-- 내 주변 헬스장 표시
-  - 내 좌표 기준 반경 5키로 내의 헬스장 표시(좌표값으로 거리 계산하면 될 듯?)
-- 지도에 원하는 지역 주변 헬스장 표시
-- 해당 지역 내에서 트레이너 필터링(별점 높은 순, 리뷰 많은 순 등)
-- 이 달의 top 트레이너(평균 평점)
-
-**<리뷰>**
-- 해당 트레이너에게 PT를 받은 기록이 있어야 리뷰 작성 가능
-
-**<회원>**
-- 마이페이지
-- 회원가입
-- 로그인
-- 정보 수정
-
-**<기타>**
 
 ---
 ### API 명세서
@@ -107,284 +84,305 @@
 ---
 ### 프로젝트 구조
 ```
-├───main
-│   ├───java
-│   │   └───project
-│   │       └───gymnawa
-│   │           │   GymnawaApplication.java
-│   │           │   
-│   │           ├───auth
-│   │           │   ├───cookie
-│   │           │   │   └───util
-│   │           │   │           CookieUtil.java
-│   │           │   │           
-│   │           │   ├───filter
-│   │           │   │       CustomLogoutFilter.java
-│   │           │   │       JwtAuthenticationFilter.java
-│   │           │   │       LoginFilter.java
-│   │           │   │       
-│   │           │   ├───jwt
-│   │           │   │   ├───controller
-│   │           │   │   │       JwtController.java
-│   │           │   │   │       
-│   │           │   │   ├───dto
-│   │           │   │   │       JwtInfoDto.java
-│   │           │   │   │       RefreshToken.java
-│   │           │   │   │       
-│   │           │   │   ├───repository
-│   │           │   │   │       JwtRepository.java
-│   │           │   │   │       
-│   │           │   │   ├───service
-│   │           │   │   │       ReissueService.java
-│   │           │   │   │       ReissueServiceImpl.java
-│   │           │   │   │       
-│   │           │   │   └───util
-│   │           │   │           JwtUtil.java
-│   │           │   │           
-│   │           │   └───oauth
-│   │           │       ├───domain
-│   │           │       │       CustomOAuth2UserDetails.java
-│   │           │       │       GoogleUserInfo.java
-│   │           │       │       KakaoUserInfo.java
-│   │           │       │       OAuth2UserInfo.java
-│   │           │       │       
-│   │           │       ├───handler
-│   │           │       │       CustomSuccessHandler.java
-│   │           │       │       
-│   │           │       └───service
-│   │           │               CustomOauth2UserService.java
-│   │           │               CustomUserDetailsService.java
-│   │           │               
-│   │           ├───config
-│   │           │       EmailConfig.java
-│   │           │       EncodeConfig.java
-│   │           │       JpaAuditingConfig.java
-│   │           │       RedisConfig.java
-│   │           │       RestTemplateConfig.java
-│   │           │       SecurityConfig.java
-│   │           │       
-│   │           ├───domain
-│   │           │   ├───common
-│   │           │   │   ├───api
-│   │           │   │   │       ApiResponse.java
-│   │           │   │   │       
-│   │           │   │   ├───errors
-│   │           │   │   │   ├───dto
-│   │           │   │   │   │       ErrorCode.java
-│   │           │   │   │   │       ErrorResponse.java
-│   │           │   │   │   │       
-│   │           │   │   │   ├───exception
-│   │           │   │   │   │       CustomException.java
-│   │           │   │   │   │       
-│   │           │   │   │   └───handler
-│   │           │   │   │           GlobalExceptionHandler.java
-│   │           │   │   │           
-│   │           │   │   └───etcfield
-│   │           │   │           Address.java
-│   │           │   │           BaseTime.java
-│   │           │   │           ContractStatus.java
-│   │           │   │           
-│   │           │   ├───email
-│   │           │   │   ├───controller
-│   │           │   │   │       EmailApiController.java
-│   │           │   │   │       
-│   │           │   │   ├───dto
-│   │           │   │   │       EmailDto.java
-│   │           │   │   │       
-│   │           │   │   └───service
-│   │           │   │           EmailService.java
-│   │           │   │           RedisService.java
-│   │           │   │           
-│   │           │   ├───gym
-│   │           │   │   ├───controller
-│   │           │   │   │       GymApiController.java
-│   │           │   │   │       
-│   │           │   │   ├───dto
-│   │           │   │   │       GymDto.java
-│   │           │   │   │       
-│   │           │   │   ├───entity
-│   │           │   │   │       Gym.java
-│   │           │   │   │       
-│   │           │   │   ├───repository
-│   │           │   │   │       GymRepository.java
-│   │           │   │   │       
-│   │           │   │   └───service
-│   │           │   │           GymService.java
-│   │           │   │           
-│   │           │   ├───gymtrainer
-│   │           │   │   ├───controller
-│   │           │   │   │       GymTrainerApiController.java
-│   │           │   │   │       
-│   │           │   │   ├───dto
-│   │           │   │   │       GymTrainerRequestDto.java
-│   │           │   │   │       GymTrainerResponseDto.java
-│   │           │   │   │       GymTrainerViewDto.java
-│   │           │   │   │       
-│   │           │   │   ├───entity
-│   │           │   │   │       GymTrainer.java
-│   │           │   │   │       
-│   │           │   │   ├───repository
-│   │           │   │   │       GymTrainerRepository.java
-│   │           │   │   │       
-│   │           │   │   └───service
-│   │           │   │           GymTrainerService.java
-│   │           │   │           
-│   │           │   ├───kakao
-│   │           │   │   ├───dto
-│   │           │   │   │       KakaoApiResponse.java
-│   │           │   │   │       MetaData.java
-│   │           │   │   │       
-│   │           │   │   └───service
-│   │           │   │           KakaoService.java
-│   │           │   │           
-│   │           │   ├───member
-│   │           │   │   ├───controller
-│   │           │   │   │       MemberApiController.java
-│   │           │   │   │       
-│   │           │   │   ├───dto
-│   │           │   │   │       MemberHomeInfoDto.java
-│   │           │   │   │       MemberLoginDto.java
-│   │           │   │   │       MemberOauthInfoDto.java
-│   │           │   │   │       PasswordDto.java
-│   │           │   │   │       UpdatePasswordDto.java
-│   │           │   │   │       
-│   │           │   │   ├───entity
-│   │           │   │   │   │   Member.java
-│   │           │   │   │   │   
-│   │           │   │   │   └───etcfield
-│   │           │   │   │           Gender.java
-│   │           │   │   │           Role.java
-│   │           │   │   │           
-│   │           │   │   ├───repository
-│   │           │   │   │       MemberRepository.java
-│   │           │   │   │       
-│   │           │   │   └───service
-│   │           │   │           MemberService.java
-│   │           │   │           
-│   │           │   ├───normember
-│   │           │   │   ├───controller
-│   │           │   │   │       NorMemberApiController.java
-│   │           │   │   │       
-│   │           │   │   ├───dto
-│   │           │   │   │       MemberEditDto.java
-│   │           │   │   │       MemberSaveDto.java
-│   │           │   │   │       MemberViewDto.java
-│   │           │   │   │       
-│   │           │   │   ├───entity
-│   │           │   │   │       NorMember.java
-│   │           │   │   │       
-│   │           │   │   ├───repository
-│   │           │   │   │       NorMemberRepository.java
-│   │           │   │   │       
-│   │           │   │   └───service
-│   │           │   │           NorMemberService.java
-│   │           │   │           
-│   │           │   ├───ptmembership
-│   │           │   │   ├───controller
-│   │           │   │   │       PtMembershipApiController.java
-│   │           │   │   │       
-│   │           │   │   ├───dto
-│   │           │   │   │       PtMembershipSaveDto.java
-│   │           │   │   │       PtMembershipViewDto.java
-│   │           │   │   │       
-│   │           │   │   ├───entity
-│   │           │   │   │       PtMembership.java
-│   │           │   │   │       
-│   │           │   │   ├───repository
-│   │           │   │   │       PtMembershipRepository.java
-│   │           │   │   │       
-│   │           │   │   └───service
-│   │           │   │           PtMembershipService.java
-│   │           │   │           
-│   │           │   ├───review
-│   │           │   │   ├───controller
-│   │           │   │   │       ReviewApiController.java
-│   │           │   │   │       
-│   │           │   │   ├───dto
-│   │           │   │   │       ReviewEditDto.java
-│   │           │   │   │       ReviewSaveDto.java
-│   │           │   │   │       ReviewViewDto.java
-│   │           │   │   │       
-│   │           │   │   ├───entity
-│   │           │   │   │       Review.java
-│   │           │   │   │       
-│   │           │   │   ├───repository
-│   │           │   │   │       ReviewRepository.java
-│   │           │   │   │       
-│   │           │   │   └───service
-│   │           │   │           ReviewService.java
-│   │           │   │           
-│   │           │   └───trainer
-│   │           │       ├───controller
-│   │           │       │       TrainerApiController.java
-│   │           │       │       
-│   │           │       ├───dto
-│   │           │       │       TrainerEditDto.java
-│   │           │       │       TrainerSaveDto.java
-│   │           │       │       TrainerViewDto.java
-│   │           │       │       
-│   │           │       ├───entity
-│   │           │       │       Trainer.java
-│   │           │       │       
-│   │           │       ├───repository
-│   │           │       │       TrainerRepository.java
-│   │           │       │       
-│   │           │       └───service
-│   │           │               TrainerService.java
-│   │           │               
-│   │           └───testdata
-│   │                   TestData.java
-│   │                   
-│   └───resources
-│       │   application.yml
-│       │   
-│       ├───static
-│       └───templates
-└───test
-    ├───java
-    │   └───project
-    │       └───gymnawa
-    │           │   GymnawaApplicationTests.java
-    │           │   
-    │           ├───config
-    │           │       SecurityTestConfig.java
-    │           │       
-    │           └───domain
-    │               ├───gymtrainer
-    │               │   └───service
-    │               │           GymTrainerServiceTest.java
-    │               │           
-    │               ├───member
-    │               │   ├───controller
-    │               │   │       MemberApiControllerTest.java
-    │               │   │       
-    │               │   └───service
-    │               │           MemberServiceTest.java
-    │               │           
-    │               ├───normember
-    │               │   ├───controller
-    │               │   │       NorMemberApiControllerTest.java
-    │               │   │       
-    │               │   └───service
-    │               │           NorMemberServiceTest.java
-    │               │           
-    │               ├───review
-    │               │   ├───controller
-    │               │   │       ReviewApiControllerTest.java
-    │               │   │       
-    │               │   └───service
-    │               │           ReviewServiceTest.java
-    │               │           
-    │               └───trainer
-    │                   ├───controller
-    │                   │       TrainerApiControllerTest.java
-    │                   │       
-    │                   ├───repository
-    │                   │       TrainerRepositoryTest.java
-    │                   │       
-    │                   └───service
-    │                           TrainerServiceTest.java
-    │                           
-    └───resources
-            application.yml
+src
+    ├───main
+    │   ├───java
+    │   │   └───project
+    │   │       └───gymnawa
+    │   │           │   GymnawaApplication.java
+    │   │           │   
+    │   │           ├───auth
+    │   │           │   ├───cookie
+    │   │           │   │   └───util
+    │   │           │   │           CookieUtil.java
+    │   │           │   │           
+    │   │           │   ├───domain
+    │   │           │   │       SecurityWhiteListProperties.java
+    │   │           │   │       
+    │   │           │   ├───filter
+    │   │           │   │       CustomLoginFilter.java
+    │   │           │   │       CustomLogoutFilter.java
+    │   │           │   │       JwtAuthenticationFilter.java
+    │   │           │   │       JwtExceptionHandleFilter.java
+    │   │           │   │       
+    │   │           │   ├───jwt
+    │   │           │   │   ├───controller
+    │   │           │   │   │       ReissueController.java
+    │   │           │   │   │       
+    │   │           │   │   ├───dto
+    │   │           │   │   │       JwtInfoDto.java
+    │   │           │   │   │       
+    │   │           │   │   ├───error
+    │   │           │   │   │       CustomAuthException.java
+    │   │           │   │   │       
+    │   │           │   │   ├───service
+    │   │           │   │   │       ReissueService.java
+    │   │           │   │   │       ReissueServiceImpl.java
+    │   │           │   │   │       
+    │   │           │   │   └───util
+    │   │           │   │           JwtUtil.java
+    │   │           │   │           
+    │   │           │   └───oauth
+    │   │           │       ├───domain
+    │   │           │       │       CustomOAuth2UserDetails.java
+    │   │           │       │       GoogleUserInfo.java
+    │   │           │       │       KakaoUserInfo.java
+    │   │           │       │       OAuth2UserInfo.java
+    │   │           │       │       
+    │   │           │       ├───handler
+    │   │           │       │       CustomSuccessHandler.java
+    │   │           │       │       
+    │   │           │       └───service
+    │   │           │               CustomOauth2UserService.java
+    │   │           │               CustomUserDetailsService.java
+    │   │           │               
+    │   │           ├───config
+    │   │           │       EmailConfig.java
+    │   │           │       EncodeConfig.java
+    │   │           │       JpaAuditingConfig.java
+    │   │           │       RedisConfig.java
+    │   │           │       RestTemplateConfig.java
+    │   │           │       SecurityConfig.java
+    │   │           │       
+    │   │           ├───domain
+    │   │           │   ├───common
+    │   │           │   │   ├───api
+    │   │           │   │   │       ApiResponse.java
+    │   │           │   │   │       
+    │   │           │   │   ├───error
+    │   │           │   │   │   ├───dto
+    │   │           │   │   │   │       ErrorCode.java
+    │   │           │   │   │   │       ErrorResponse.java
+    │   │           │   │   │   │       
+    │   │           │   │   │   ├───exception
+    │   │           │   │   │   │       CustomException.java
+    │   │           │   │   │   │       
+    │   │           │   │   │   └───handler
+    │   │           │   │   │           GlobalExceptionHandler.java
+    │   │           │   │   │           
+    │   │           │   │   └───etcfield
+    │   │           │   │           Address.java
+    │   │           │   │           BaseTime.java
+    │   │           │   │           ContractStatus.java
+    │   │           │   │           
+    │   │           │   ├───email
+    │   │           │   │   ├───controller
+    │   │           │   │   │       EmailApiController.java
+    │   │           │   │   │       
+    │   │           │   │   ├───dto
+    │   │           │   │   │       EmailDto.java
+    │   │           │   │   │       
+    │   │           │   │   └───service
+    │   │           │   │           EmailService.java
+    │   │           │   │           RedisService.java
+    │   │           │   │           
+    │   │           │   ├───gym
+    │   │           │   │   ├───controller
+    │   │           │   │   │       GymApiController.java
+    │   │           │   │   │       
+    │   │           │   │   ├───dto
+    │   │           │   │   │       GymDto.java
+    │   │           │   │   │       
+    │   │           │   │   ├───entity
+    │   │           │   │   │       Gym.java
+    │   │           │   │   │       
+    │   │           │   │   ├───repository
+    │   │           │   │   │       GymRepository.java
+    │   │           │   │   │       
+    │   │           │   │   └───service
+    │   │           │   │           GymService.java
+    │   │           │   │           
+    │   │           │   ├───gymtrainer
+    │   │           │   │   ├───controller
+    │   │           │   │   │       GymTrainerApiController.java
+    │   │           │   │   │       
+    │   │           │   │   ├───dto
+    │   │           │   │   │       GymTrainerRequestDto.java
+    │   │           │   │   │       GymTrainerResponseDto.java
+    │   │           │   │   │       GymTrainerViewDto.java
+    │   │           │   │   │       
+    │   │           │   │   ├───entity
+    │   │           │   │   │       GymTrainer.java
+    │   │           │   │   │       
+    │   │           │   │   ├───repository
+    │   │           │   │   │       GymTrainerRepository.java
+    │   │           │   │   │       
+    │   │           │   │   └───service
+    │   │           │   │           GymTrainerService.java
+    │   │           │   │           
+    │   │           │   ├───kakao
+    │   │           │   │   ├───dto
+    │   │           │   │   │       KakaoApiResponse.java
+    │   │           │   │   │       MetaData.java
+    │   │           │   │   │       
+    │   │           │   │   └───service
+    │   │           │   │           KakaoService.java
+    │   │           │   │           
+    │   │           │   ├───member
+    │   │           │   │   ├───controller
+    │   │           │   │   │       MemberApiController.java
+    │   │           │   │   │       
+    │   │           │   │   ├───dto
+    │   │           │   │   │       MemberHomeInfoDto.java
+    │   │           │   │   │       MemberLoginDto.java
+    │   │           │   │   │       MemberOauthInfoDto.java
+    │   │           │   │   │       MemberSessionDto.java
+    │   │           │   │   │       PasswordDto.java
+    │   │           │   │   │       UpdatePasswordDto.java
+    │   │           │   │   │       
+    │   │           │   │   ├───entity
+    │   │           │   │   │   │   Member.java
+    │   │           │   │   │   │   
+    │   │           │   │   │   └───etcfield
+    │   │           │   │   │           Gender.java
+    │   │           │   │   │           Role.java
+    │   │           │   │   │           
+    │   │           │   │   ├───repository
+    │   │           │   │   │       MemberRepository.java
+    │   │           │   │   │       
+    │   │           │   │   └───service
+    │   │           │   │           MemberService.java
+    │   │           │   │           
+    │   │           │   ├───normember
+    │   │           │   │   ├───controller
+    │   │           │   │   │       NorMemberApiController.java
+    │   │           │   │   │       
+    │   │           │   │   ├───dto
+    │   │           │   │   │       MemberEditDto.java
+    │   │           │   │   │       MemberSaveDto.java
+    │   │           │   │   │       MemberViewDto.java
+    │   │           │   │   │       
+    │   │           │   │   ├───entity
+    │   │           │   │   │       NorMember.java
+    │   │           │   │   │       
+    │   │           │   │   ├───repository
+    │   │           │   │   │       NorMemberRepository.java
+    │   │           │   │   │       
+    │   │           │   │   └───service
+    │   │           │   │           NorMemberService.java
+    │   │           │   │           
+    │   │           │   ├───ptmembership
+    │   │           │   │   ├───controller
+    │   │           │   │   │       PtMembershipApiController.java
+    │   │           │   │   │       
+    │   │           │   │   ├───dto
+    │   │           │   │   │       PtMembershipSaveDto.java
+    │   │           │   │   │       PtMembershipViewDto.java
+    │   │           │   │   │       
+    │   │           │   │   ├───entity
+    │   │           │   │   │       PtMembership.java
+    │   │           │   │   │       
+    │   │           │   │   ├───repository
+    │   │           │   │   │       PtMembershipRepository.java
+    │   │           │   │   │       
+    │   │           │   │   └───service
+    │   │           │   │           PtMembershipService.java
+    │   │           │   │           
+    │   │           │   ├───review
+    │   │           │   │   ├───controller
+    │   │           │   │   │       ReviewApiController.java
+    │   │           │   │   │       
+    │   │           │   │   ├───dto
+    │   │           │   │   │       ReviewEditDto.java
+    │   │           │   │   │       ReviewSaveDto.java
+    │   │           │   │   │       ReviewViewDto.java
+    │   │           │   │   │       
+    │   │           │   │   ├───entity
+    │   │           │   │   │       Review.java
+    │   │           │   │   │       
+    │   │           │   │   ├───repository
+    │   │           │   │   │       ReviewRepository.java
+    │   │           │   │   │       
+    │   │           │   │   └───service
+    │   │           │   │           ReviewService.java
+    │   │           │   │           
+    │   │           │   └───trainer
+    │   │           │       ├───controller
+    │   │           │       │       TrainerApiController.java
+    │   │           │       │       
+    │   │           │       ├───dto
+    │   │           │       │       TrainerEditDto.java
+    │   │           │       │       TrainerSaveDto.java
+    │   │           │       │       TrainerViewDto.java
+    │   │           │       │       
+    │   │           │       ├───entity
+    │   │           │       │       Trainer.java
+    │   │           │       │       
+    │   │           │       ├───repository
+    │   │           │       │       TrainerRepository.java
+    │   │           │       │       
+    │   │           │       └───service
+    │   │           │               TrainerService.java
+    │   │           │               
+    │   │           └───testdata
+    │   │                   TestData.java
+    │   │                   
+    │   └───resources
+    │       │   application.yml
+    │       │   
+    │       ├───static
+    │       └───templates
+    └───test
+        ├───java
+        │   └───project
+        │       └───gymnawa
+        │           ├───auth
+        │           │   ├───filter
+        │           │   │       CustomLoginFilterTest.java
+        │           │   │       CustomLogoutFilterTest.java
+        │           │   │       JwtAuthenticationFilterTest.java
+        │           │   │       
+        │           │   ├───jwt
+        │           │   │   └───service
+        │           │   │           ReissueServiceImplTest.java
+        │           │   │           
+        │           │   └───oauth
+        │           │       └───service
+        │           │               CustomUserDetailsServiceTest.java
+        │           │               
+        │           ├───config
+        │           │       SecurityTestConfig.java
+        │           │       
+        │           └───domain
+        │               ├───email
+        │               │   └───service
+        │               │           EmailServiceTest.java
+        │               │           
+        │               ├───gymtrainer
+        │               │   └───service
+        │               │           GymTrainerServiceTest.java
+        │               │           
+        │               ├───member
+        │               │   ├───controller
+        │               │   │       MemberApiControllerTest.java
+        │               │   │       
+        │               │   └───service
+        │               │           MemberServiceTest.java
+        │               │           
+        │               ├───normember
+        │               │   ├───controller
+        │               │   │       NorMemberApiControllerTest.java
+        │               │   │       
+        │               │   └───service
+        │               │           NorMemberServiceTest.java
+        │               │           
+        │               ├───review
+        │               │   ├───controller
+        │               │   │       ReviewApiControllerTest.java
+        │               │   │       
+        │               │   └───service
+        │               │           ReviewServiceTest.java
+        │               │           
+        │               └───trainer
+        │                   ├───controller
+        │                   │       TrainerApiControllerTest.java
+        │                   │       
+        │                   ├───repository
+        │                   │       TrainerRepositoryTest.java
+        │                   │       
+        │                   └───service
+        │                           TrainerServiceTest.java
+        │                           
+        └───resources
+                application.yml
 ```
