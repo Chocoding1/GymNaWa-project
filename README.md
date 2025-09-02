@@ -40,6 +40,9 @@
 <img width="90%" src="https://github.com/user-attachments/assets/4c0d8952-2f51-4c9b-ab87-82229fce9d9d">
 
 ---
+### 시스템 아키텍처
+
+---
 ### API 명세서
 #### 회원 공통
 |기능|URL|HTTP Method|인증 여부|
