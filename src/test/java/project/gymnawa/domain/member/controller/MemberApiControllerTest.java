@@ -82,7 +82,7 @@ class MemberApiControllerTest {
         mockMvc.perform(get("/api/members/info")
                         .with(user(createCustomUserDetails())) // 임의의 인증된 사용자 정보를 SecurityContext에 주입하는 방법
                 )
-                .andExpect(status().isBadRequest());
+                .andExpect(status().isOk());
     }
 
     @Test
