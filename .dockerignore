@@ -1,4 +1,10 @@
-.git
-.gradle
-.idea
+.gitignore
+
+.gradle/
+
+# IDE 관련
+.idea/
 *.iml
+
+# 부하 테스트 스크립트
+load-test/
