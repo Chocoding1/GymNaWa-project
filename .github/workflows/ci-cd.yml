@@ -1,26 +1,79 @@
-name: 자동 테스트
+name: Project CI/CD pipeline
 
 on:
   push:
     branches: [main]
 
+env:
+  IMAGE_NAME: ghcr.io/${{ github.actor }}/gymnawa-server # GHCR 이미지명 규칙 : <레지스트리>/<계정>/<이미지 이름>:<태그> -> 태그 미지정 시 latest
+
 jobs:
   build:
+    name: Build
     runs-on: ubuntu-latest # Github에서 제공하는 최신 ubuntu 리눅스 환경 사용
 
     steps:
+      # 1. 코드 체크 아웃
       - name: Checkout source code
         uses: actions/checkout@v4
 
+      # 2. JDK 설정
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
 
+      # 3. application.yml 파일 추가
+      - name: add application.yml
+        run: |
+          mkdir -p src/main/resources
+          echo "${{ secrets.APPLICATION_YML }}" > ./src/main/resources/application.yml
+          echo "${{ secrets.TEST_APPLICATION_YML }}" > ./src/test/resources/application.yml
+
+      # 3. Gradle 권한 설정
       # 이거 안 하면 권한 오류 발생
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
-      - name: Run tests
-        run: ./gradlew test
+      # 4. Gradle 빌드 & 테스트
+      - name: Build and Test
+        run: ./gradlew clean build
+
+      # 5. GHCR 로그인(GHCR with Personal Access Token) - GHCR에 로그인하면 docker push/pull 사용 가능
+      # GHCR은 Docker 레지스트리 표준 API를 그대로 지원하기 때문에 로그인만 하면 Docker CLI 명령어를 그대로 사용할 수 있다.
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GYMNAWA_ACCESS_TOKEN }}
+          # 실제 처리되는 명령어 : docker login ghcr.io -u <github-actor> -p <PAT>
+
+      # 6. Docker 이미지 빌드 & 푸시
+      - name: Build and Push Docker image
+        run: |
+          docker build -t ${{ env.IMAGE_NAME }}:latest .
+          docker tag ${{ env.IMAGE_NAME }}:latest ${{ env.IMAGE_NAME }}:${{ github.sha }}
+          docker push ${{ env.IMAGE_NAME }}:latest
+          docker push ${{ env.IMAGE_NAME }}:${{ github.sha }}
+          
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy to EC2 server with SSH
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script_stop: true
+          script: |
+            echo ${{ secrets.GYMNAWA_ACCESS_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            docker ps -q | xargs -r docker stop
+            docker ps -aq | xargs -r docker rm
+            docker pull ${{ env.IMAGE_NAME }}:latest
+            docker run -d -p 8080:8080 --name gymnawa-container ${{ env.IMAGE_NAME }}:latest
+            docker image prune -f
