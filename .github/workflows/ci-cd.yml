@@ -5,7 +5,9 @@ on:
     branches: [main]
 
 env:
-  IMAGE_NAME: ghcr.io/${{ github.actor }}/gymnawa-server # GHCR 이미지명 규칙 : <레지스트리>/<계정>/<이미지 이름>:<태그> -> 태그 미지정 시 latest
+  IMAGE_NAME: ghcr.io/chocoding1/gymnawa-server # GHCR 이미지명 규칙 : <레지스트리>/<계정>/<이미지 이름>:<태그> -> 태그 미지정 시 latest
+  # 이미지명에 대문자는 포함될 수 없는데, 내 계정명의 첫 글자(C)가 대문자라서 임의로 소문자로 변경하여 직접 입력
+  # ${{ github.actor }}를 사용하여 소문자로 바꾸는 방법이 있지만, env:에서는 바꿀 수 없고, run: 안에서 변경해야 하기 때문에 수정을 최소화하기 위해 직접 입력했음
 
 jobs:
   build:
