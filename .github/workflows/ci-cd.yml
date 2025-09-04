@@ -12,7 +12,7 @@ env:
 jobs:
   build:
     name: Build
-    runs-on: ubuntu-latest # Github에서 제공하는 최신 ubuntu 리눅스 환경 사용
+    runs-on: ubuntu-latest # Github에서 제공하는 최신 ubuntu 리눅스 환경 사용ㅇ
 
     steps:
       # 1. 코드 체크 아웃
