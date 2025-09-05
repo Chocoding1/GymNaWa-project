@@ -41,7 +41,7 @@
 
 ---
 ### 시스템 아키텍처
-
+![Architecture](./docs/Gymnawa-Architecture.svg)
 
 ---
 ### API 명세서
