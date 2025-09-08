@@ -81,7 +81,7 @@
 ## 트레이너
 |기능|URL|HTTP Method|인증 여부|
 |---|---|---|---|
-|**회원가입**|**/api/trainers**|POST|X|
+|**회원가입**|**/api/trainers**|**POST**|**X**|
 |**마이페이지**|**/api/trainers/{id}**|**GET**|**O**|
 |**회원 정보 수정**|**/api/trainers/{id}**|**PATCH**|**O**|
 |**비밀번호 변경**|**/api/trainers/{id}/password**|**PATCH**|**O**|
@@ -95,7 +95,7 @@
 ## 리뷰
 |기능|URL|HTTP Method|인증 여부|
 |---|---|---|---|
-|**리뷰 작성**|**/api/reviews**|POST|O|
+|**리뷰 작성**|**/api/reviews**|**POST**|**O**|
 |**리뷰 수정**|**/api/reviews/{id}**|**PATCH**|**O**|
 |**리뷰 삭제**|**/api/reviews/{id}**|**DELETE**|**O**|
 |**트레이너 별 리뷰 조회**|**/api/reviews/{trainerId}**|**GET**|**X**|
