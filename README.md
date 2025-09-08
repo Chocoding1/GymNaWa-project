@@ -16,9 +16,9 @@
 
 ---
 # 기술 스택
-- **Spring Boot, JPA, Spring Data JPA, Spring Security**
+- **Spring Boot, Spring Data JPA, Spring Security**
 - **MySQL, Redis**
-- **JWT**
+- **Docker**, **GitHub Actions**
 
 ---
 # ERD
