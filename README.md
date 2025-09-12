@@ -16,10 +16,11 @@
 
 ---
 # 기술 스택
-- **Spring Boot, Spring Data JPA, Spring Security**
-- **MySQL, Redis**
-- **AWS(EC2, RDS)**
-- **Docker**, **GitHub Actions**
+- **Backend : Spring Boot, Spring Data JPA, Spring Security**
+- **Database : MySQL, Redis**
+- **Test : JUnit**
+- **Infra : AWS(EC2, RDS)**
+- **CI/CD : Docker**, **GitHub Actions**
 
 ---
 # ERD
