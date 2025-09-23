@@ -31,10 +31,6 @@ public class ReissueServiceImpl implements ReissueService {
     public ResponseEntity<?> reissue(HttpServletRequest request, HttpServletResponse response) {
         log.info("ReissueServiceImpl");
 
-        // 쿠키의 경우
-//        String refreshToken = cookieUtil.resolveTokenFromCookie(request, "Authorization-Refresh");
-//        String refreshToken = cookieUtil.resolveTokenFromCookie(request, "refresh_token");
-
         String refreshToken = request.getHeader("Authorization-Refresh");
 
         // 헤더에 refresh 토큰 x
@@ -102,13 +98,8 @@ public class ReissueServiceImpl implements ReissueService {
 
         JwtInfoDto jwtInfoDto = jwtUtil.createJwt(userId);
 
-        // 헤더에 AT 저장
         response.setHeader("Authorization", "Bearer " + jwtInfoDto.getAccessToken());
         response.setHeader("Authorization-Refresh", jwtInfoDto.getRefreshToken());
-
-        // 쿠키에 RT 저장
-//        ResponseCookie refreshCookie = cookieUtil.createRT(jwtInfoDto.getRefreshToken());
-//        response.setHeader("Set-Cookie", refreshCookie.toString());
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
