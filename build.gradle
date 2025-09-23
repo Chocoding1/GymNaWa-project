@@ -110,6 +110,9 @@ jacocoTestReport {
 					// ptmembership
 					'**/ptmembership/**',
 
+					// redis
+					'**/redis/**',
+
 					// review
 					'**/review/dto/**',
 					'**/review/repository/**',
