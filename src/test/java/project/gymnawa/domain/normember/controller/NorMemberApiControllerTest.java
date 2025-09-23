@@ -130,7 +130,7 @@ class NorMemberApiControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errorCode").value("VALIDATION_ERROR"))
                 .andExpect(jsonPath("$.errorMessage").value("입력값이 유효하지 않습니다."))
-                .andExpect(jsonPath("$.errors.email").value("이메일은 필수입니다."));
+                .andExpect(jsonPath("$.errorFields.email").value("이메일은 필수입니다."));
     }
 
     @Test
@@ -155,7 +155,7 @@ class NorMemberApiControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errorCode").value("VALIDATION_ERROR"))
                 .andExpect(jsonPath("$.errorMessage").value("입력값이 유효하지 않습니다."))
-                .andExpect(jsonPath("$.errors.password").value("비밀번호는 필수입니다."));
+                .andExpect(jsonPath("$.errorFields.password").value("비밀번호는 필수입니다."));
     }
 
     @Test
@@ -180,7 +180,7 @@ class NorMemberApiControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errorCode").value("VALIDATION_ERROR"))
                 .andExpect(jsonPath("$.errorMessage").value("입력값이 유효하지 않습니다."))
-                .andExpect(jsonPath("$.errors.name").value("이름은 필수입니다."));
+                .andExpect(jsonPath("$.errorFields.name").value("이름은 필수입니다."));
     }
 
     @Test
@@ -205,7 +205,7 @@ class NorMemberApiControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errorCode").value("VALIDATION_ERROR"))
                 .andExpect(jsonPath("$.errorMessage").value("입력값이 유효하지 않습니다."))
-                .andExpect(jsonPath("$.errors.gender").value("성별은 필수입니다."));
+                .andExpect(jsonPath("$.errorFields.gender").value("성별은 필수입니다."));
     }
 
     @Test
@@ -338,7 +338,7 @@ class NorMemberApiControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errorCode").value("VALIDATION_ERROR"))
                 .andExpect(jsonPath("$.errorMessage").value("입력값이 유효하지 않습니다."))
-                .andExpect(jsonPath("$.errors.name").value("이름은 필수입니다."));
+                .andExpect(jsonPath("$.errorFields.name").value("이름은 필수입니다."));
     }
 
     @Test
@@ -440,7 +440,7 @@ class NorMemberApiControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errorCode").value("VALIDATION_ERROR"))
                 .andExpect(jsonPath("$.errorMessage").value("입력값이 유효하지 않습니다."))
-                .andExpect(jsonPath("$.errors.currentPassword").value("현재 비밀번호는 필수입니다."));
+                .andExpect(jsonPath("$.errorFields.currentPassword").value("현재 비밀번호는 필수입니다."));
     }
 
     @Test
@@ -467,7 +467,7 @@ class NorMemberApiControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errorCode").value("VALIDATION_ERROR"))
                 .andExpect(jsonPath("$.errorMessage").value("입력값이 유효하지 않습니다."))
-                .andExpect(jsonPath("$.errors.newPassword").value("새 비밀번호는 필수입니다."));
+                .andExpect(jsonPath("$.errorFields.newPassword").value("새 비밀번호는 필수입니다."));
     }
 
     @Test
@@ -494,7 +494,7 @@ class NorMemberApiControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errorCode").value("VALIDATION_ERROR"))
                 .andExpect(jsonPath("$.errorMessage").value("입력값이 유효하지 않습니다."))
-                .andExpect(jsonPath("$.errors.confirmPassword").value("재입력 비밀번호는 필수입니다."));
+                .andExpect(jsonPath("$.errorFields.confirmPassword").value("재입력 비밀번호는 필수입니다."));
     }
 
     @Test

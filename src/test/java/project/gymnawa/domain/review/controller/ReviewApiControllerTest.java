@@ -88,7 +88,7 @@ class ReviewApiControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errorCode").value("VALIDATION_ERROR"))
                 .andExpect(jsonPath("$.errorMessage").value("입력값이 유효하지 않습니다."))
-                .andExpect(jsonPath("$.errors.content").value("내용은 필수입니다."));
+                .andExpect(jsonPath("$.errorFields.content").value("내용은 필수입니다."));
     }
 
     @Test
@@ -138,7 +138,7 @@ class ReviewApiControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errorCode").value("VALIDATION_ERROR"))
                 .andExpect(jsonPath("$.errorMessage").value("입력값이 유효하지 않습니다."))
-                .andExpect(jsonPath("$.errors.content").value("내용은 필수입니다."));
+                .andExpect(jsonPath("$.errorFields.content").value("내용은 필수입니다."));
     }
 
     private CustomOAuth2UserDetails createCustomUserDetails() {
