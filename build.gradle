@@ -70,7 +70,6 @@ jacocoTestReport {
 					// auth 관련
 					'**/auth/**',
 					'!**/auth/filter/**',
-					'!**/auth/jwt/controller/**',
 					'!**/auth/jwt/service/ReissueServiceImpl.class',
 					'!**/auth/jwt/util/**',
 					'!**/auth/oauth/handler/**',
