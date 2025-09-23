@@ -108,7 +108,7 @@ public class NorMemberApiController {
             throw new CustomException(ACCESS_DENIED);
         }
 
-        norMemberService.changePassword(id, updatePasswordDto);
+        norMemberService.changePassword(userId, updatePasswordDto);
 
         return ResponseEntity.ok().body(ApiResponse.of("비밀번호 변경 성공"));
     }
