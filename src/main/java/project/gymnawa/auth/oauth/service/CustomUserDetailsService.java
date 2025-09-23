@@ -6,7 +6,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import project.gymnawa.auth.jwt.error.CustomAuthException;
+import project.gymnawa.auth.jwt.exception.CustomAuthException;
 import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
 import project.gymnawa.domain.member.dto.MemberSessionDto;
 import project.gymnawa.domain.member.entity.Member;

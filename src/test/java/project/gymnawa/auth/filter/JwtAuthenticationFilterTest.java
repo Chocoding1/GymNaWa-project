@@ -17,7 +17,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.AntPathMatcher;
 import project.gymnawa.auth.domain.SecurityWhiteListProperties;
-import project.gymnawa.auth.jwt.error.CustomAuthException;
+import project.gymnawa.auth.jwt.exception.CustomAuthException;
 import project.gymnawa.auth.jwt.util.JwtUtil;
 import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
 

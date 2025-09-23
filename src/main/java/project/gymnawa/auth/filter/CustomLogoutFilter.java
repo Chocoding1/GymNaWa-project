@@ -8,7 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.filter.GenericFilterBean;
-import project.gymnawa.auth.jwt.error.CustomAuthException;
+import project.gymnawa.auth.jwt.exception.CustomAuthException;
 import project.gymnawa.auth.jwt.util.JwtUtil;
 
 import java.io.IOException;

@@ -11,7 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import project.gymnawa.auth.cookie.util.CookieUtil;
 import project.gymnawa.auth.jwt.dto.JwtInfoDto;
-import project.gymnawa.auth.jwt.error.CustomAuthException;
+import project.gymnawa.auth.jwt.exception.CustomAuthException;
 import project.gymnawa.auth.jwt.util.JwtUtil;
 
 import static project.gymnawa.domain.common.error.dto.ErrorCode.*;

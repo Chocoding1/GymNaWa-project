@@ -13,7 +13,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import project.gymnawa.auth.jwt.dto.JwtInfoDto;
-import project.gymnawa.auth.jwt.error.CustomAuthException;
+import project.gymnawa.auth.jwt.exception.CustomAuthException;
 import project.gymnawa.auth.jwt.util.JwtUtil;
 import project.gymnawa.domain.common.error.dto.ErrorCode;
 

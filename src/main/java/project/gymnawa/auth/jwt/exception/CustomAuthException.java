@@ -1,4 +1,4 @@
-package project.gymnawa.auth.jwt.error;
+package project.gymnawa.auth.jwt.exception;
 
 import lombok.Getter;
 import project.gymnawa.domain.common.error.dto.ErrorCode;

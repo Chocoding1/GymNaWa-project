@@ -12,11 +12,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import project.gymnawa.auth.jwt.error.CustomAuthException;
+import project.gymnawa.auth.jwt.exception.CustomAuthException;
 import project.gymnawa.auth.jwt.util.JwtUtil;
 import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
 import project.gymnawa.domain.common.api.ApiResponse;
-import project.gymnawa.domain.common.error.dto.ErrorResponse;
 import project.gymnawa.domain.member.dto.MemberLoginDto;
 
 import java.io.IOException;
