@@ -2,6 +2,7 @@ package project.gymnawa.domain.email.service;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
+import jakarta.validation.constraints.Email;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -11,6 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mail.javamail.JavaMailSender;
 import project.gymnawa.domain.common.error.dto.ErrorCode;
 import project.gymnawa.domain.common.error.exception.CustomException;
+import project.gymnawa.domain.email.dto.EmailDto;
 import project.gymnawa.domain.member.repository.MemberRepository;
 import project.gymnawa.domain.redis.service.RedisService;
 
@@ -41,13 +43,16 @@ class EmailServiceTest {
     void sendMailSuccess() throws MessagingException {
         //given
         String email = "email@test.com";
+        EmailDto emailDto = EmailDto.builder()
+                .email(email)
+                .build();
 
         when(memberRepository.existsByEmailAndDeletedFalse(email)).thenReturn(false);
         when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
         doNothing().when(mailSender).send(mimeMessage);
         
         //when
-        emailService.sendMail(email);
+        emailService.sendMail(emailDto);
 
         //then
         verify(redisService).saveEmailAuthCode(anyString(), anyString());
@@ -58,11 +63,14 @@ class EmailServiceTest {
     void sendMailFail_duplicateMail() {
         //given
         String email = "email@test.com";
+        EmailDto emailDto = EmailDto.builder()
+                .email(email)
+                .build();
 
         when(memberRepository.existsByEmailAndDeletedFalse(email)).thenReturn(true);
 
         //when
-        CustomException customException = assertThrows(CustomException.class, () -> emailService.sendMail(email));
+        CustomException customException = assertThrows(CustomException.class, () -> emailService.sendMail(emailDto));
 
         //then
         assertEquals(ErrorCode.DUPLICATE_EMAIL, customException.getErrorCode());
@@ -73,13 +81,16 @@ class EmailServiceTest {
     void sendMailFail_javaMailSender_internalError() {
         //given
         String email = "email@test.com";
+        EmailDto emailDto = EmailDto.builder()
+                .email(email)
+                .build();
 
         when(memberRepository.existsByEmailAndDeletedFalse(email)).thenReturn(false);
         when(mailSender.createMimeMessage()).thenReturn(mimeMessage);
         doThrow(new RuntimeException()).when(mailSender).send(mimeMessage);
 
         //when
-        CustomException customException = assertThrows(CustomException.class, () -> emailService.sendMail(email));
+        CustomException customException = assertThrows(CustomException.class, () -> emailService.sendMail(emailDto));
 
         //then
         assertEquals(ErrorCode.SEND_EMAIL_FAIL, customException.getErrorCode());
@@ -91,12 +102,16 @@ class EmailServiceTest {
         //given
         String email = "email@test.com";
         String code = "authCode";
+        EmailDto emailDto = EmailDto.builder()
+                .email(email)
+                .code(code)
+                .build();
 
         when(redisService.getEmailAuthCode(email)).thenReturn(code);
         doNothing().when(redisService).saveEmailAuthCode(email, "verified");
 
         //when
-        boolean result = emailService.verifyCode(email, code);
+        boolean result = emailService.verifyCode(emailDto);
 
         //then
         assertTrue(result);
@@ -109,11 +124,15 @@ class EmailServiceTest {
         //given
         String email = "email@test.com";
         String code = "authCode";
+        EmailDto emailDto = EmailDto.builder()
+                .email(email)
+                .code(code)
+                .build();
 
         when(redisService.getEmailAuthCode(anyString())).thenReturn(null);
 
         //when
-        CustomException customException = assertThrows(CustomException.class, () -> emailService.verifyCode(email, code));
+        CustomException customException = assertThrows(CustomException.class, () -> emailService.verifyCode(emailDto));
 
         //then
         assertEquals(ErrorCode.INVALID_EMAIL_CODE, customException.getErrorCode());
@@ -126,11 +145,15 @@ class EmailServiceTest {
         String email = "email@test.com";
         String code = "authCode";
         String findCode = "diffCode";
+        EmailDto emailDto = EmailDto.builder()
+                .email(email)
+                .code(code)
+                .build();
 
         when(redisService.getEmailAuthCode(anyString())).thenReturn(findCode);
 
         //when
-        CustomException customException = assertThrows(CustomException.class, () -> emailService.verifyCode(email, code));
+        CustomException customException = assertThrows(CustomException.class, () -> emailService.verifyCode(emailDto));
 
         //then
         assertEquals(ErrorCode.INVALID_EMAIL_CODE, customException.getErrorCode());
