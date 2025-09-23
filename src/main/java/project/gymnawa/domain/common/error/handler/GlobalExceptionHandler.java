@@ -24,21 +24,21 @@ public class GlobalExceptionHandler {
         ErrorCode errorCode = e.getErrorCode();
         return ResponseEntity
                 .status(errorCode.getStatus())
-                .body(ErrorResponse.of(errorCode.getCode(), errorCode.getErrorMessage()));
+                .body(ErrorResponse.of(errorCode.getStatus(), errorCode.getCode(), errorCode.getErrorMessage()));
     }
 
     @ExceptionHandler
     public ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException e) {
         log.info("GlobalExceptionHandler");
-        Map<String, String> errorMap = new HashMap<>();
+        Map<String, String> errorFields = new HashMap<>();
 
         e.getBindingResult().getFieldErrors().forEach(error -> {
-            errorMap.put(error.getField(), error.getDefaultMessage());
+            errorFields.put(error.getField(), error.getDefaultMessage());
         });
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(ErrorResponse.of("VALIDATION_ERROR", "입력값이 유효하지 않습니다.", errorMap));
+                .body(ErrorResponse.of(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", "입력값이 유효하지 않습니다.", errorFields));
     }
 
     // ReissueController에서 발생하는 인증오류를 해결하기 위해 추가
@@ -48,6 +48,6 @@ public class GlobalExceptionHandler {
         ErrorCode errorCode = e.getErrorCode();
         return ResponseEntity
                 .status(errorCode.getStatus())
-                .body(ErrorResponse.of(errorCode.getCode(), errorCode.getErrorMessage()));
+                .body(ErrorResponse.of(errorCode.getStatus(), errorCode.getCode(), errorCode.getErrorMessage()));
     }
 }

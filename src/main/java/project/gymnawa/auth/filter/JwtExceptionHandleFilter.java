@@ -28,7 +28,7 @@ public class JwtExceptionHandleFilter extends OncePerRequestFilter {
     }
 
     private void sendErrorResponse(HttpServletResponse response, CustomAuthException e) throws IOException {
-        ErrorResponse errorResponse = ErrorResponse.of(e.getErrorCode().getCode(), e.getErrorCode().getErrorMessage());
+        ErrorResponse errorResponse = ErrorResponse.of(e.getErrorCode().getStatus(), e.getErrorCode().getCode(), e.getErrorCode().getErrorMessage());
         ObjectMapper om = new ObjectMapper();
 
         response.setStatus(e.getErrorCode().getStatus().value()); // custom error 도입 필요
