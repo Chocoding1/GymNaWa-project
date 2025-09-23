@@ -35,13 +35,6 @@ public class CustomSuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         String refreshToken = jwtUtil.createRefreshToken(oAuth2UserDetails.getId());
 
-        // 쿠키 방식은 나중에 도메인 일치 후 사용
-//        Cookie accessCookie = cookieUtil.createAT(jwtInfoDto.getAccessToken());
-//        ResponseCookie refreshCookie = cookieUtil.createRT(jwtInfoDto.getRefreshToken());
-
-//        response.addCookie(accessCookie);
-//        response.setHeader("Set-Cookie", refreshCookie.toString());
-
         if (oAuth2UserDetails.getRole() == Role.GUEST) {
             String redirectUrl = "https://chocoding1.github.io/pages/member/addInfoForm.html"
                     + "?refreshToken=" + refreshToken
