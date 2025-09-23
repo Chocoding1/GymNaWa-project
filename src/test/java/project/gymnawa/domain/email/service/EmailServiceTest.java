@@ -12,6 +12,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import project.gymnawa.domain.common.error.dto.ErrorCode;
 import project.gymnawa.domain.common.error.exception.CustomException;
 import project.gymnawa.domain.member.repository.MemberRepository;
+import project.gymnawa.domain.redis.service.RedisService;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;

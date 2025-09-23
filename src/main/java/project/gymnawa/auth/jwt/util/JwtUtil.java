@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import project.gymnawa.auth.jwt.dto.JwtInfoDto;
-import project.gymnawa.domain.email.service.RedisService;
+import project.gymnawa.domain.redis.service.RedisService;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
