@@ -34,8 +34,6 @@ public class JwtUtil {
     // userId로 redis에서 refresh token 조회
     public String getRefreshToken(Long id) {
         return redisService.getRefreshToken(id);
-//        return jwtRepository.findById(id)
-//                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 토큰입니다."));
     }
 
     public void validateToken(String token) {
