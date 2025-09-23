@@ -2,6 +2,11 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.4.3'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'jacoco'
+}
+
+jacoco {
+	toolVersion = "0.8.12"
 }
 
 group = 'project.1st'
@@ -48,4 +53,79 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+	finalizedBy jacocoTestReport // 테스트가 끝난 후 리포트를 생성하도록 설정
+}
+
+jacocoTestReport {
+	dependsOn test
+
+	reports {
+		xml.required = true
+		html.required = true
+	}
+
+	afterEvaluate {
+		classDirectories.setFrom(files(classDirectories.files.collect {
+			fileTree(dir: it, exclude: [
+					// auth 관련
+					'**/auth/**',
+					'!**/auth/filter/**',
+					'!**/auth/jwt/controller/**',
+					'!**/auth/jwt/service/ReissueServiceImpl.class',
+					'!**/auth/jwt/util/**',
+					'!**/auth/oauth/handler/**',
+					'!**/auth/oauth/service/**',
+
+					// Config
+					'**/config/**',
+
+					// common
+					'**/domain/common/**',
+
+					// email
+					'**/email/dto/**',
+
+					// gym
+					'**/gym/dto/**',
+					'**/gym/entity/**',
+					'**/gym/repository/**',
+
+					// gymtrainer
+					'**/gymtrainer/dto/**',
+					'**/gymtrainer/repository/**',
+
+					// kakao
+					'**/kakao/dto/**',
+
+					// member
+					'**/member/dto/**',
+					'**/member/entity/etcfield/**',
+					'!**/member/entity/Member.class',
+					'**/member/repository/**',
+
+					// normember
+					'**/normember/dto/**',
+					'**/normember/entity/**',
+					'**/normember/repository/**',
+
+					// ptmembership
+					'**/ptmembership/**',
+
+					// review
+					'**/review/dto/**',
+					'**/review/repository/**',
+
+					// trainer
+					'**/trainer/dto/**',
+					'**/trainer/entity/**',
+					'**/trainer/repository/**',
+
+					// test data
+					'**/testdata/**',
+
+					// 메인 진입점
+					'**/*Application*',
+			])
+		}))
+	}
 }
