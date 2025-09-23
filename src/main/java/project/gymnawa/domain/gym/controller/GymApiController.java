@@ -24,9 +24,9 @@ public class GymApiController {
     private final KakaoService kakaoService;
 
     @GetMapping("/gyms")
-    public ResponseEntity<ApiResponse<KakaoApiResponse<GymDto>>> findGymsByAddress(@RequestParam(required = false) Double x,
-                                                                                  @RequestParam(required = false) Double y,
-                                                                                   @RequestParam(required = false) String keyword) {
+    public ResponseEntity<ApiResponse<KakaoApiResponse<GymDto>>> findGyms(@RequestParam(required = false) Double x,
+                                                                          @RequestParam(required = false) Double y,
+                                                                          @RequestParam(required = false) String keyword) {
 
         KakaoApiResponse<GymDto> result;
         log.info("x : " + x + ", y : " + y + ", keyword : " + keyword);
