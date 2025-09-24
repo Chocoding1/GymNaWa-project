@@ -18,16 +18,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    /**
-     * 로그인 (spring mvc 전용 - 추후에 mvc 코드도 login 프로세스 삭제 예정(spring security 적용))
-     * 로그인 아이디로 회원을 찾아서 그 회원의 비밀번호와 입력받은 비밀번호가 같은지 확인
-     * 애초에 초그인 아이디가 존재하지 않을 경우, 즉 findByEmail의 리턴값이 null일 경우도 예외처리 해줘야 됨 -> 스트림 사용하여 해결
-     */
-    public Member login(String email, String password) {
-        return memberRepository.findByEmail(email)
-                .filter(m -> m.getPassword().equals(password))
-                .orElse(null);
-    }
+
 
     /**
      * 회원 조회
