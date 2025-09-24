@@ -50,21 +50,7 @@ public class MemberApiController {
          * security filter에서 access token 확인 후, security context에 회원 정보 넣고 controller 진입
          */
         Long userId = customOAuth2UserDetails.getId();
-        Member loginedMember = memberService.findOne(userId);
-
-        String name = loginedMember.getName();
-        boolean isTrainer;
-        if (loginedMember instanceof NorMember) {
-            isTrainer = false;
-        } else {
-            isTrainer = true;
-        }
-
-        MemberHomeInfoDto memberHomeInfoDto = MemberHomeInfoDto.builder()
-                .id(userId)
-                .name(name)
-                .trainer(isTrainer)
-                .build();
+        MemberHomeInfoDto memberHomeInfoDto = memberService.getMemberInfo(userId);
 
         return ResponseEntity.ok().body(ApiResponse.of("회원 조회 성공", memberHomeInfoDto));
     }

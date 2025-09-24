@@ -4,9 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
+import project.gymnawa.domain.member.dto.MemberHomeInfoDto;
 import project.gymnawa.domain.member.entity.Member;
 import project.gymnawa.domain.common.error.exception.CustomException;
 import project.gymnawa.domain.member.repository.MemberRepository;
+import project.gymnawa.domain.trainer.entity.Trainer;
 
 import static project.gymnawa.domain.common.error.dto.ErrorCode.*;
 
@@ -18,7 +21,22 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
+    /**
+     * 홈 화면용 DTO 반환
+     */
+    public MemberHomeInfoDto getMemberInfo(Long id) {
+        Member member = memberRepository.findById(id)
+                .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
 
+        String name = member.getName();
+        boolean isTrainer = member instanceof Trainer;
+
+        return MemberHomeInfoDto.builder()
+                .id(id)
+                .name(name)
+                .trainer(isTrainer)
+                .build();
+    }
 
     /**
      * 회원 조회
