@@ -9,11 +9,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+import project.gymnawa.domain.common.error.dto.ErrorCode;
+import project.gymnawa.domain.common.error.exception.CustomException;
 import project.gymnawa.domain.gym.dto.GymDto;
+import project.gymnawa.domain.gym.dto.GymSearchRequestDto;
 import project.gymnawa.domain.kakao.dto.KakaoApiResponse;
 
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+
+import static project.gymnawa.domain.common.error.dto.ErrorCode.*;
 
 /**
  * 1. 주소 검색하면 그 주변 헬스장 조회 (O)
@@ -34,31 +39,39 @@ public class KakaoService {
     private String baseUrl = "https://dapi.kakao.com/v2/local/search/keyword.json";
     private int radius = 1000;
 
-    public ResponseEntity<KakaoApiResponse<GymDto>> getGymsByAddress(double x, double y) {
+    public KakaoApiResponse<GymDto> getGyms(GymSearchRequestDto gymSearchRequestDto) {
+        Double x = gymSearchRequestDto.getX();
+        Double y = gymSearchRequestDto.getY();
+        String keyword = gymSearchRequestDto.getKeyword();
+        log.info("x : " + x + ", y : " + y + ", keyword : " + keyword);
 
+        if ((x == null || y == null) && (keyword == null || keyword.isBlank())) {
+            throw new CustomException(INVALID_SEARCH_REQUEST);
+        }
+
+        if (x != null & y != null) {
+            return getGymsByAddress(x, y);
+        } else {
+            return getGymsByKeyword(keyword);
+        }
+    }
+
+    private KakaoApiResponse<GymDto> getGymsByAddress(double x, double y) {
         // URI 생성
         URI uri = createUri("헬스장", x, y);
 
-        // 요청 객체 생성
-        HttpEntity<Object> entity = setHttpEntity();
-
-        // 요청 후 응답
-        ResponseEntity<KakaoApiResponse<GymDto>> response =
-                restTemplate.exchange(uri, HttpMethod.GET, entity, new ParameterizedTypeReference<>() {});
-
-        // 정상 응답이면, 데이터 반환
-        if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
-            return ResponseEntity.ok(response.getBody());
-        }
-
-        // 문제 있으면 null 반환
-        return ResponseEntity.badRequest().body(null);
+        return requestToUri(uri);
     }
 
-    public ResponseEntity<KakaoApiResponse<GymDto>> getGymsByKeyword(String keyword) {
+    private KakaoApiResponse<GymDto> getGymsByKeyword(String keyword) {
         // URI 생성
+        keyword += " 헬스장";
         URI uri = createUri(keyword, null, null);
 
+        return requestToUri(uri);
+    }
+
+    private KakaoApiResponse<GymDto> requestToUri(URI uri) {
         // 요청 객체 생성
         HttpEntity<Object> entity = setHttpEntity();
 
@@ -66,13 +79,13 @@ public class KakaoService {
         ResponseEntity<KakaoApiResponse<GymDto>> response =
                 restTemplate.exchange(uri, HttpMethod.GET, entity, new ParameterizedTypeReference<>() {});
 
-        // 정상 응답이면, 데이터 반환
-        if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
-            return ResponseEntity.ok(response.getBody());
+        // 문제 있으면 오류 반환
+        if (response.getStatusCode() != HttpStatus.OK || response.getBody() == null) {
+            throw new CustomException(GYMS_NOT_FOUND);
         }
 
-        // 문제 있으면 null 반환
-        return ResponseEntity.badRequest().body(null);
+        // 정상 응답이면, 데이터 반환
+        return response.getBody();
     }
 
     private URI createUri(String query, Double x, Double y) {
