@@ -7,8 +7,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import project.gymnawa.domain.member.dto.MemberHomeInfoDto;
 import project.gymnawa.domain.member.dto.MemberOauthInfoDto;
+import project.gymnawa.domain.member.dto.PasswordDto;
 import project.gymnawa.domain.member.entity.etcfield.Gender;
 import project.gymnawa.domain.member.entity.Member;
 import project.gymnawa.domain.common.error.dto.ErrorCode;
@@ -41,6 +43,9 @@ public class MemberServiceTest {
 
     @Mock
     TrainerService trainerService;
+
+    @Mock
+    BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Test
     @DisplayName("홈 화면용 회원 정보를 조회할 수 있다.")
@@ -284,6 +289,84 @@ public class MemberServiceTest {
         assertThat(errorCode.getCode()).isEqualTo("DEACTIVATE_MEMBER");
         assertThat(errorCode.getStatus()).isEqualTo(HttpStatus.NOT_FOUND);
         assertThat(errorCode.getErrorMessage()).isEqualTo("탈퇴한 회원입니다.");
+    }
+
+    @Test
+    @DisplayName("비밀번호 검증에 성공한다.")
+    void verifyPasssword_success() {
+        //given
+        Long id = 1L;
+        PasswordDto passwordDto = PasswordDto.builder().password("1234").build();
+        Member member = Member.builder()
+                .password("1234")
+                .build();
+
+        when(memberRepository.findById(id)).thenReturn(Optional.of(member));
+        when(bCryptPasswordEncoder.matches(anyString(), anyString())).thenReturn(true);
+
+        //when & then
+        assertDoesNotThrow(() -> memberService.verifyPassword(id, passwordDto));
+    }
+
+    @Test
+    @DisplayName("회원이 존재하지 않아서 비밀번호 검증에 실패한다.")
+    void verifyPassword_fail_whenMemberNotFound() {
+        //given
+        Long id = 1L;
+        PasswordDto passwordDto = PasswordDto.builder().password("1234").build();
+
+        when(memberRepository.findById(id)).thenReturn(Optional.empty());
+
+        //when
+        CustomException customException = assertThrows(CustomException.class, () -> memberService.verifyPassword(id, passwordDto));
+
+        // then
+        ErrorCode errorCode = customException.getErrorCode();
+        assertEquals(MEMBER_NOT_FOUND, errorCode);
+        verify(bCryptPasswordEncoder, never()).matches(anyString(), anyString());
+    }
+
+    @Test
+    @DisplayName("회원이 탈퇴해서 비밀번호 검증에 실패한다.")
+    void verifyPassword_fail_whenMemberIsDeleted() {
+        //given
+        Long id = 1L;
+        PasswordDto passwordDto = PasswordDto.builder().password("1234").build();
+        Member member = Member.builder()
+                .deleted(true)
+                .build();
+
+        when(memberRepository.findById(id)).thenReturn(Optional.of(member));
+
+        //when
+        CustomException customException = assertThrows(CustomException.class, () -> memberService.verifyPassword(id, passwordDto));
+
+        // then
+        ErrorCode errorCode = customException.getErrorCode();
+        assertEquals(DEACTIVATE_MEMBER, errorCode);
+        verify(bCryptPasswordEncoder, never()).matches(anyString(), anyString());
+    }
+
+    @Test
+    @DisplayName("비밀번호가 달라서 비밀번호 검증에 실패한다.")
+    void verifyPassword_fail_whenInvalidPassword() {
+        //given
+        Long id = 1L;
+        PasswordDto passwordDto = PasswordDto.builder().password("1234").build();
+        Member member = Member.builder()
+                .password("invalidPw")
+                .build();
+
+        when(memberRepository.findById(id)).thenReturn(Optional.of(member));
+        when(bCryptPasswordEncoder.matches(anyString(), anyString())).thenReturn(false);
+
+        //when
+        CustomException customException = assertThrows(CustomException.class, () -> memberService.verifyPassword(id, passwordDto));
+
+        // then
+        ErrorCode errorCode = customException.getErrorCode();
+        assertEquals(INVALID_PASSWORD, errorCode);
+        verify(bCryptPasswordEncoder).matches(anyString(), anyString());
     }
 
     @Test
