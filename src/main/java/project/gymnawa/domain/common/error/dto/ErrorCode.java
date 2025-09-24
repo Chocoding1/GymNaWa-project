@@ -25,6 +25,7 @@ public enum ErrorCode {
     // 헬스장
     GYM_NOT_FOUND("GYM_NOT_FOUND", HttpStatus.NOT_FOUND, "존재하지 않는 헬스장입니다."),
     GYMS_NOT_FOUND("GYMS_NOT_FOUND", HttpStatus.NOT_FOUND, "헬스장 조회에 실패했습니다."),
+    INVALID_SEARCH_REQUEST("INVALID_SEARCH_REQUEST", HttpStatus.BAD_REQUEST, "좌표 또는 키워드 중 하나는 입력되어야 합니다."),
 
     // 리뷰
     REVIEW_NOT_FOUND("REVIEW_NOT_FOUND", HttpStatus.NOT_FOUND, "존재하지 않는 리뷰입니다."),
