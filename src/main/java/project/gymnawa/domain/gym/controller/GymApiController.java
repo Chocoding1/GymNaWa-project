@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import project.gymnawa.domain.common.api.ApiResponse;
 import project.gymnawa.domain.gym.dto.GymDto;
+import project.gymnawa.domain.gym.dto.GymSearchRequestDto;
 import project.gymnawa.domain.kakao.dto.KakaoApiResponse;
 import project.gymnawa.domain.common.error.exception.CustomException;
 import project.gymnawa.domain.kakao.service.KakaoService;
@@ -24,23 +25,8 @@ public class GymApiController {
     private final KakaoService kakaoService;
 
     @GetMapping("/gyms")
-    public ResponseEntity<ApiResponse<KakaoApiResponse<GymDto>>> findGyms(@RequestParam(required = false) Double x,
-                                                                          @RequestParam(required = false) Double y,
-                                                                          @RequestParam(required = false) String keyword) {
-
-        KakaoApiResponse<GymDto> result;
-        log.info("x : " + x + ", y : " + y + ", keyword : " + keyword);
-
-        if (x != null && y != null) {
-            result = kakaoService.getGymsByAddress(x, y).getBody();
-        } else {
-            result = kakaoService.getGymsByKeyword(keyword).getBody();
-        }
-
-        if (result == null) {
-            throw new CustomException(GYMS_NOT_FOUND);
-        }
-
+    public ResponseEntity<ApiResponse<KakaoApiResponse<GymDto>>> findGyms(GymSearchRequestDto gymSearchRequestDto) {
+        KakaoApiResponse<GymDto> result = kakaoService.getGyms(gymSearchRequestDto);
         return ResponseEntity.ok().body(ApiResponse.of("헬스장 조회 성공", result));
     }
 }
