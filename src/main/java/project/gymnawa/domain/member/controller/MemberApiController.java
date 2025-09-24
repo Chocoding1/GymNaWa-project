@@ -90,13 +90,9 @@ public class MemberApiController {
             throw new CustomException(ACCESS_DENIED);
         }
 
-        Member loginedMember = memberService.findOne(userId);
+        memberService.verifyPassword(userId, passwordDto);
 
-        if (memberService.verifyPassword(passwordDto.getPassword(), loginedMember.getPassword())) {
-            return ResponseEntity.ok().body(ApiResponse.of("비밀번호 검증 성공"));
-        } else {
-            throw new CustomException(INVALID_PASSWORD);
-        }
+        return ResponseEntity.ok(ApiResponse.of("비밀번호 검증 성공"));
     }
 
     @DeleteMapping("/{id}")

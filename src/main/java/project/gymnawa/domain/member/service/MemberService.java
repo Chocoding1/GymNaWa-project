@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
 import project.gymnawa.domain.member.dto.MemberHomeInfoDto;
 import project.gymnawa.domain.member.dto.MemberOauthInfoDto;
+import project.gymnawa.domain.member.dto.PasswordDto;
 import project.gymnawa.domain.member.entity.Member;
 import project.gymnawa.domain.common.error.exception.CustomException;
 import project.gymnawa.domain.member.repository.MemberRepository;
@@ -103,8 +104,12 @@ public class MemberService {
     /**
      * 비밀번호 검증
      */
-    public boolean verifyPassword(String rawPw, String encodedPw) {
-        return bCryptPasswordEncoder.matches(rawPw, encodedPw);
+    public void verifyPassword(Long id, PasswordDto passwordDto) {
+        Member member = findOne(id);
+
+        if (!bCryptPasswordEncoder.matches(passwordDto.getPassword(), member.getPassword())) {
+            throw new CustomException(INVALID_PASSWORD);
+        }
     }
 
     /**
