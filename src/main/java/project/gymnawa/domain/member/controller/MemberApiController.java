@@ -68,44 +68,8 @@ public class MemberApiController {
          */
         String refreshToken = request.getHeader("Authorization-Refresh");
         Long userId = jwtUtil.getId(refreshToken);
-        Member guestMember = memberService.findOne(userId);
 
-        // 기존 회원의 타입을 바꿀 수 없어서(@DiscriminatorColumn 사용했기 때문) 게스트 회원 지우고 새롭게 회원 객체 다시 생성
-        Long newJoinId;
-        if (memberOauthInfoDto.getIsTrainer()) {
-            TrainerSaveDto trainerSaveDto = TrainerSaveDto.builder()
-                    .name(guestMember.getName())
-                    .email(guestMember.getEmail())
-                    .loginType(guestMember.getLoginType())
-                    .provider(guestMember.getProvider())
-                    .providerId(guestMember.getProviderId())
-                    .gender(memberOauthInfoDto.getGender())
-                    .zoneCode(memberOauthInfoDto.getZoneCode())
-                    .address(memberOauthInfoDto.getAddress())
-                    .detailAddress(memberOauthInfoDto.getDetailAddress())
-                    .buildingName(memberOauthInfoDto.getBuildingName())
-                    .build();
-
-            memberService.deleteOne(userId);
-            newJoinId = trainerService.join(trainerSaveDto);
-        } else {
-            MemberSaveDto memberSaveDto = MemberSaveDto.builder()
-                    .name(guestMember.getName())
-                    .email(guestMember.getEmail())
-                    .loginType(guestMember.getLoginType())
-                    .provider(guestMember.getProvider())
-                    .providerId(guestMember.getProviderId())
-                    .gender(memberOauthInfoDto.getGender())
-                    .zoneCode(memberOauthInfoDto.getZoneCode())
-                    .address(memberOauthInfoDto.getAddress())
-                    .detailAddress(memberOauthInfoDto.getDetailAddress())
-                    .buildingName(memberOauthInfoDto.getBuildingName())
-                    .build();
-
-            memberService.deleteOne(userId);
-            newJoinId = norMemberService.join(memberSaveDto);
-        }
-
+        Long newJoinId = memberService.convertGuestToMember(userId, memberOauthInfoDto);
         ResponseEntity<?> reissue = reissueServiceImpl.reissue(request, response, newJoinId);
 
         return reissue;
