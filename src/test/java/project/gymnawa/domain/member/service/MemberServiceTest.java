@@ -8,12 +8,17 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import project.gymnawa.domain.member.dto.MemberHomeInfoDto;
+import project.gymnawa.domain.member.dto.MemberOauthInfoDto;
 import project.gymnawa.domain.member.entity.etcfield.Gender;
 import project.gymnawa.domain.member.entity.Member;
 import project.gymnawa.domain.common.error.dto.ErrorCode;
 import project.gymnawa.domain.common.error.exception.CustomException;
 import project.gymnawa.domain.member.repository.MemberRepository;
+import project.gymnawa.domain.normember.dto.MemberSaveDto;
 import project.gymnawa.domain.normember.entity.NorMember;
+import project.gymnawa.domain.normember.service.NorMemberService;
+import project.gymnawa.domain.trainer.dto.TrainerSaveDto;
+import project.gymnawa.domain.trainer.service.TrainerService;
 
 import java.util.*;
 
@@ -30,6 +35,12 @@ public class MemberServiceTest {
 
     @Mock // 실제 테스트하고자 하는 클래스가 의존성을 주입받고 있는 클래스 지정(Mock 객체)
     MemberRepository memberRepository;
+
+    @Mock
+    NorMemberService norMemberService;
+
+    @Mock
+    TrainerService trainerService;
 
     @Test
     @DisplayName("홈 화면용 회원 정보를 조회할 수 있다.")
@@ -64,6 +75,101 @@ public class MemberServiceTest {
         //then
         ErrorCode errorCode = customException.getErrorCode();
         assertEquals(MEMBER_NOT_FOUND, errorCode);
+    }
+
+    @Test
+    @DisplayName("게스트 회원을 일반 회원으로 승격시킨다.")
+    void convertGuestToNorMember_success() {
+        //given
+        Long guestId = 1L;
+        Member guestMember = Member.builder()
+                .id(guestId)
+                .build();
+        MemberOauthInfoDto memberOauthInfoDto = MemberOauthInfoDto.builder()
+                .isTrainer(false)
+                .build();
+
+        when(memberRepository.findById(guestId)).thenReturn(Optional.of(guestMember));
+        when(norMemberService.join(any(MemberSaveDto.class))).thenReturn(100L);
+
+        //when
+        Long newJoinId = memberService.convertGuestToMember(guestId, memberOauthInfoDto);
+
+        //then
+        assertEquals(100L, newJoinId);
+        verify(memberRepository).deleteById(guestId);
+        verify(norMemberService).join(any(MemberSaveDto.class));
+        verify(trainerService, never()).join(any());
+    }
+
+    @Test
+    @DisplayName("게스트 회원을 트레이너 회원으로 승격시킨다.")
+    void convertGuestToTrainer_success() {
+        //given
+        Long guestId = 1L;
+        Member guestMember = Member.builder()
+                .id(guestId)
+                .build();
+        MemberOauthInfoDto memberOauthInfoDto = MemberOauthInfoDto.builder()
+                .isTrainer(true)
+                .build();
+
+        when(memberRepository.findById(guestId)).thenReturn(Optional.of(guestMember));
+        when(trainerService.join(any(TrainerSaveDto.class))).thenReturn(100L);
+
+        //when
+        Long newJoinId = memberService.convertGuestToMember(guestId, memberOauthInfoDto);
+
+        //then
+        assertEquals(100L, newJoinId);
+        verify(memberRepository).deleteById(guestId);
+        verify(trainerService).join(any(TrainerSaveDto.class));
+        verify(norMemberService, never()).join(any());
+    }
+
+    @Test
+    @DisplayName("게스트 회원 정보가 존재하지 않으면 에외를 발생시킨다.")
+    void convertGuestToMember_throwsException_whenMemberNotFound() {
+        //given
+        Long guestId = 1L;
+        MemberOauthInfoDto memberOauthInfoDto = MemberOauthInfoDto.builder()
+                .build();
+
+        when(memberRepository.findById(guestId)).thenReturn(Optional.empty());
+
+        //when
+        CustomException customException = assertThrows(CustomException.class, () -> memberService.convertGuestToMember(guestId, memberOauthInfoDto));
+
+        //then
+        ErrorCode errorCode = customException.getErrorCode();
+        assertEquals(MEMBER_NOT_FOUND, errorCode);
+        verify(memberRepository, never()).deleteById(guestId);
+        verify(trainerService, never()).join(any());
+        verify(norMemberService, never()).join(any());
+    }
+
+    @Test
+    @DisplayName("게스트 회원이 탈퇴한 상태면 에외를 발생시킨다.")
+    void convertGuestToMember_throwsException_whenMemberIsDeleted() {
+        //given
+        Long guestId = 1L;
+        MemberOauthInfoDto memberOauthInfoDto = MemberOauthInfoDto.builder()
+                .build();
+        Member guestMember = Member.builder()
+                .deleted(true)
+                .build();
+
+        when(memberRepository.findById(guestId)).thenReturn(Optional.of(guestMember));
+
+        //when
+        CustomException customException = assertThrows(CustomException.class, () -> memberService.convertGuestToMember(guestId, memberOauthInfoDto));
+
+        //then
+        ErrorCode errorCode = customException.getErrorCode();
+        assertEquals(DEACTIVATE_MEMBER, errorCode);
+        verify(memberRepository, never()).deleteById(guestId);
+        verify(trainerService, never()).join(any());
+        verify(norMemberService, never()).join(any());
     }
 
     @Test
