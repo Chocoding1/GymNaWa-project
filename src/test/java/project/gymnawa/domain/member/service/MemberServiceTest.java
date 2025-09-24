@@ -7,17 +7,20 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
+import project.gymnawa.domain.member.dto.MemberHomeInfoDto;
 import project.gymnawa.domain.member.entity.etcfield.Gender;
 import project.gymnawa.domain.member.entity.Member;
 import project.gymnawa.domain.common.error.dto.ErrorCode;
 import project.gymnawa.domain.common.error.exception.CustomException;
 import project.gymnawa.domain.member.repository.MemberRepository;
+import project.gymnawa.domain.normember.entity.NorMember;
 
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
+import static project.gymnawa.domain.common.error.dto.ErrorCode.*;
 
 @ExtendWith(MockitoExtension.class) // MockitoExtension : 가짜 객체를 사용할 수 있도록 지원하는 모듈
 public class MemberServiceTest {
@@ -27,6 +30,41 @@ public class MemberServiceTest {
 
     @Mock // 실제 테스트하고자 하는 클래스가 의존성을 주입받고 있는 클래스 지정(Mock 객체)
     MemberRepository memberRepository;
+
+    @Test
+    @DisplayName("홈 화면용 회원 정보를 조회할 수 있다.")
+    void findMemberHomeInfo_success() {
+        //given
+        Long memberId = 1L;
+        Member member = NorMember.builder()
+                .id(memberId)
+                .name("조성진")
+                .build();
+
+        when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
+
+        //when
+        MemberHomeInfoDto memberHomeInfoDto = memberService.getMemberInfo(memberId);
+
+        //then
+        assertEquals(memberHomeInfoDto.getName(), "조성진");
+        assertFalse(memberHomeInfoDto.isTrainer());
+    }
+
+    @Test
+    @DisplayName("회원이 존재하지 않을 경우 예외를 발생시킨다.")
+    void findMemberHomeInfo_throwsException_whenMemberNotFound() {
+        //given
+        Long memberId = 1L;
+        when(memberRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        //when
+        CustomException customException = assertThrows(CustomException.class, () -> memberService.getMemberInfo(memberId));
+
+        //then
+        ErrorCode errorCode = customException.getErrorCode();
+        assertEquals(MEMBER_NOT_FOUND, errorCode);
+    }
 
     @Test
     @DisplayName("회원을 조회할 수 있다.")
