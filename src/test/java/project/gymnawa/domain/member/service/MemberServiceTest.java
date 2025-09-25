@@ -450,65 +450,6 @@ public class MemberServiceTest {
         assertThat(errorCode.getErrorMessage()).isEqualTo("탈퇴한 회원입니다.");
     }
 
-    /**
-     * 로그인 기능 주석 처리 (spring security 사용)
-     */
-/*
-    @Test
-    @DisplayName("로그인 성공")
-    void loginSuccess() {
-        //given
-        String email = "galmeagi2@naver.com";
-        String password = "1234";
-        Address address = new Address("12345", "서울", "강서구", "마곡동");
-        Member member = createMember(password, "조성진", email, address, Gender.MALE);
-
-        when(memberRepository.findByEmail(email)).thenReturn(Optional.of(member));
-
-        //when
-        Member loginedMember = memberService.login(email, password);
-
-        //then
-        assertThat(loginedMember).isNotNull();
-        verify(memberRepository, times(1)).findByEmail(email);
-    }
-
-    @Test
-    @DisplayName("로그인 실패 - 존재하지 않는 이메일")
-    void loginFail_Wrongemail() {
-        //given
-        String email = "galmeagi2@naver.com";
-        String password = "1234";
-
-        when(memberRepository.findByEmail(email)).thenReturn(Optional.empty());
-
-        //when
-        Member loginedMember = memberService.login(email, password);
-
-        //then
-        assertThat(loginedMember).isNull();
-        verify(memberRepository, times(1)).findByEmail(email);
-    }
-
-    @Test
-    @DisplayName("로그인 실패 - 잘못된 비밀번호")
-    void loginFail_WrongPassword() {
-        //given
-        String email = "galmeagi2@naver.com";
-        String password = "1234";
-        Address address = new Address("12345", "서울", "강서구", "마곡동");
-        Member member = createMember("123456", "조성진", "galmeagi2@naver.com", address, Gender.MALE);
-
-        when(memberRepository.findByEmail(email)).thenReturn(Optional.of(member));
-
-        //when
-        Member loginedMember = memberService.login(email, password);
-
-        //then
-        assertThat(loginedMember).isNull();
-        verify(memberRepository, times(1)).findByEmail(email);
-    }
-*/
 
     private Member createMember(String password, String name, String email, Gender gender) {
         return Member.builder()
