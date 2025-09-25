@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import project.gymnawa.auth.jwt.dto.JwtInfoDto;
 import project.gymnawa.auth.jwt.service.ReissueServiceImpl;
 import project.gymnawa.auth.jwt.util.JwtUtil;
 import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
@@ -47,10 +48,10 @@ public class MemberApiController {
     }
 
     /**
-     * 최초 소셜 로그인 시, 추가 정보 입력
+     * 최초 소셜 로그인 시, 추가 정보 입력 후 토큰 발급
      */
     @PostMapping("/add-info")
-    public ResponseEntity<?> addInfo(@RequestBody @Validated MemberOauthInfoDto memberOauthInfoDto,
+    public ResponseEntity<ApiResponse<Void>> addInfo(@RequestBody @Validated MemberOauthInfoDto memberOauthInfoDto,
                           HttpServletRequest request, HttpServletResponse response) {
 
         /**
@@ -61,13 +62,16 @@ public class MemberApiController {
         Long userId = jwtUtil.getId(refreshToken);
 
         Long newJoinId = memberService.convertGuestToMember(userId, memberOauthInfoDto);
-        ResponseEntity<?> reissue = reissueServiceImpl.reissue(request, response, newJoinId);
+        JwtInfoDto jwtInfoDto = reissueServiceImpl.reissue(refreshToken, newJoinId);
 
-        return reissue;
+        response.setHeader("Authorization", "Bearer " + jwtInfoDto.getAccessToken());
+        response.setHeader("Authorization-Refresh", jwtInfoDto.getRefreshToken());
+
+        return ResponseEntity.ok(ApiResponse.of("토큰이 재발급되었습니다."));
     }
 
     /**
-     * 회원 정보 수정 시, 비밀번호 확인
+     * 회원 정보 수정 시, 비밀번호 검증
      */
     @PostMapping("/{id}/verify-password")
     public ResponseEntity<ApiResponse<String>> verifyPassword(@PathVariable Long id,
