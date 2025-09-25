@@ -5,7 +5,6 @@ import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import project.gymnawa.auth.cookie.util.CookieUtil;
 import project.gymnawa.auth.jwt.dto.JwtInfoDto;
 import project.gymnawa.auth.jwt.exception.CustomAuthException;
 import project.gymnawa.auth.jwt.util.JwtUtil;
@@ -17,7 +16,6 @@ import static project.gymnawa.domain.common.error.dto.ErrorCode.*;
 @Slf4j
 public class ReissueServiceImpl implements ReissueService {
 
-    private final CookieUtil cookieUtil;
     private final JwtUtil jwtUtil;
 
     /**
