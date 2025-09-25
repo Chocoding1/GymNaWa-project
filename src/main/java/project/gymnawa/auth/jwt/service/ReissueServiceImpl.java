@@ -2,12 +2,8 @@ package project.gymnawa.auth.jwt.service;
 
 import  io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import project.gymnawa.auth.cookie.util.CookieUtil;
 import project.gymnawa.auth.jwt.dto.JwtInfoDto;
@@ -28,10 +24,8 @@ public class ReissueServiceImpl implements ReissueService {
      * 일반 로그인 시 호출 메서드
      */
     @Override
-    public ResponseEntity<?> reissue(HttpServletRequest request, HttpServletResponse response) {
+    public JwtInfoDto reissue(String refreshToken) {
         log.info("ReissueServiceImpl");
-
-        String refreshToken = request.getHeader("Authorization-Refresh");
 
         // 헤더에 refresh 토큰 x
         if (refreshToken == null) {
@@ -40,28 +34,29 @@ public class ReissueServiceImpl implements ReissueService {
 
         Long userId = jwtUtil.getId(refreshToken);
 
-        return reissueProcess(response, refreshToken, userId);
+        validateToken(refreshToken, userId);
+
+        return jwtUtil.createJwt(userId);
     }
 
     /**
      * 소셜 로그인 시 호출 메서드
      */
     @Override
-    public ResponseEntity<?> reissue(HttpServletRequest request, HttpServletResponse response, Long userId) {
+    public JwtInfoDto reissue(String refreshToken, Long userId) {
         log.info("ReissueServiceImpl");
-
-        String refreshToken = request.getHeader("Authorization-Refresh");
 
         // 헤더에 refresh 토큰 x
         if (refreshToken == null) {
             throw new CustomAuthException(TOKEN_NULL);
         }
 
-        return reissueProcess(response, refreshToken, userId);
+        validateToken(refreshToken, userId);
+
+        return jwtUtil.createJwt(userId);
     }
 
-    private ResponseEntity<Object> reissueProcess(HttpServletResponse response, String refreshToken, Long userId) {
-
+    private void validateToken(String refreshToken, Long userId) {
         // 만료된 토큰은 payload 읽을 수 없음 -> ExpiredJwtException 발생
         try {
             jwtUtil.validateToken(refreshToken);
@@ -95,12 +90,5 @@ public class ReissueServiceImpl implements ReissueService {
         if(!findRefreshToken.equals(refreshToken)) {
             throw new CustomAuthException(INVALID_TOKEN);
         }
-
-        JwtInfoDto jwtInfoDto = jwtUtil.createJwt(userId);
-
-        response.setHeader("Authorization", "Bearer " + jwtInfoDto.getAccessToken());
-        response.setHeader("Authorization-Refresh", jwtInfoDto.getRefreshToken());
-
-        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
