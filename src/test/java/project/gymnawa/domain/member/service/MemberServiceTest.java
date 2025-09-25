@@ -83,6 +83,27 @@ public class MemberServiceTest {
     }
 
     @Test
+    @DisplayName("회원이 탈퇴한 경우 예외를 발생시킨다.")
+    void findMemberHomeInfo_throwsException_whenMemberIsDeleted() {
+        //given
+        Long memberId = 1L;
+        Member member = NorMember.builder()
+                .id(memberId)
+                .name("조성진")
+                .deleted(true)
+                .build();
+
+        when(memberRepository.findById(anyLong())).thenReturn(Optional.of(member));
+
+        //when
+        CustomException customException = assertThrows(CustomException.class, () -> memberService.getMemberInfo(memberId));
+
+        //then
+        ErrorCode errorCode = customException.getErrorCode();
+        assertEquals(DEACTIVATE_MEMBER, errorCode);
+    }
+
+    @Test
     @DisplayName("게스트 회원을 일반 회원으로 승격시킨다.")
     void convertGuestToNorMember_success() {
         //given
