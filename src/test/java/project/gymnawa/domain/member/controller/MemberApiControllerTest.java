@@ -1,18 +1,15 @@
 package project.gymnawa.domain.member.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import project.gymnawa.auth.jwt.dto.JwtInfoDto;
 import project.gymnawa.auth.jwt.service.ReissueServiceImpl;
 import project.gymnawa.auth.jwt.util.JwtUtil;
 import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
@@ -143,9 +140,14 @@ class MemberApiControllerTest {
                 .isTrainer(false)
                 .build();
 
+        JwtInfoDto jwtInfoDto = JwtInfoDto.builder()
+                .accessToken("reissueAT")
+                .refreshToken("reissueRT")
+                .build();
+
         when(jwtUtil.getId(refreshToken)).thenReturn(userId);
         when(memberService.convertGuestToMember(userId, memberOauthInfoDto)).thenReturn(newJoinId);
-        when(reissueServiceImpl.reissue(any(HttpServletRequest.class), any(), eq(newJoinId))).thenReturn(new ResponseEntity<>(HttpStatus.OK));
+        when(reissueServiceImpl.reissue(anyString(), eq(newJoinId))).thenReturn(jwtInfoDto);
 
         //when & then
         mockMvc.perform(post("/api/members/add-info")
@@ -154,7 +156,13 @@ class MemberApiControllerTest {
                         .header("Authorization-Refresh", refreshToken)
                         .content(objectMapper.writeValueAsString(memberOauthInfoDto))
                 )
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(header().string("Authorization", "Bearer " + jwtInfoDto.getAccessToken()))
+                .andExpect(header().string("Authorization-Refresh", jwtInfoDto.getRefreshToken()))
+                .andExpect(jsonPath("$.message").value("토큰이 재발급되었습니다."));
+
+        verify(memberService).convertGuestToMember(userId, memberOauthInfoDto);
+        verify(reissueServiceImpl).reissue(refreshToken, newJoinId);
     }
 
     @Test
@@ -186,7 +194,7 @@ class MemberApiControllerTest {
                 .andExpect(jsonPath("$.errorCode").value("MEMBER_NOT_FOUND"))
                 .andExpect(jsonPath("$.errorMessage").value("존재하지 않는 회원입니다."));
 
-        verify(reissueServiceImpl, never()).reissue(any(HttpServletRequest.class), any(HttpServletResponse.class), anyLong());
+        verify(reissueServiceImpl, never()).reissue(anyString(), anyLong());
     }
 
     @Test
@@ -218,7 +226,7 @@ class MemberApiControllerTest {
                 .andExpect(jsonPath("$.errorCode").value("DEACTIVATE_MEMBER"))
                 .andExpect(jsonPath("$.errorMessage").value("탈퇴한 회원입니다."));
 
-        verify(reissueServiceImpl, never()).reissue(any(HttpServletRequest.class), any(HttpServletResponse.class), anyLong());
+        verify(reissueServiceImpl, never()).reissue(anyString(), anyLong());
     }
 
     @Test
@@ -239,7 +247,7 @@ class MemberApiControllerTest {
         when(jwtUtil.getId(refreshToken)).thenReturn(userId);
         when(memberService.convertGuestToMember(userId, memberOauthInfoDto)).thenReturn(newJoinId);
         doThrow(new CustomException(TOKEN_NULL))
-                .when(reissueServiceImpl).reissue(any(HttpServletRequest.class), any(HttpServletResponse.class), eq(newJoinId));
+                .when(reissueServiceImpl).reissue(anyString(), eq(newJoinId));
 
         //when & then
         mockMvc.perform(post("/api/members/add-info")
@@ -278,6 +286,10 @@ class MemberApiControllerTest {
                 .andExpect(jsonPath("$.errorCode").value("VALIDATION_ERROR"))
                 .andExpect(jsonPath("$.errorMessage").value("입력값이 유효하지 않습니다."))
                 .andExpect(jsonPath("$.errorFields.gender").value("성별은 필수입니다."));
+
+        verify(jwtUtil, never()).getId(anyString());
+        verify(memberService, never()).convertGuestToMember(anyLong(), any());
+        verify(reissueServiceImpl, never()).reissue(anyString(), anyLong());
     }
 
     @Test
@@ -305,6 +317,10 @@ class MemberApiControllerTest {
                 .andExpect(jsonPath("$.errorMessage").value("입력값이 유효하지 않습니다."))
                 .andExpect(jsonPath("$.errorFields.zoneCode").value("주소는 필수입니다."))
                 .andExpect(jsonPath("$.errorFields.address").value("주소는 필수입니다."));
+
+        verify(jwtUtil, never()).getId(anyString());
+        verify(memberService, never()).convertGuestToMember(anyLong(), any());
+        verify(reissueServiceImpl, never()).reissue(anyString(), anyLong());
     }
 
     @Test
@@ -333,6 +349,9 @@ class MemberApiControllerTest {
                 .andExpect(jsonPath("$.errorMessage").value("입력값이 유효하지 않습니다."))
                 .andExpect(jsonPath("$.errorFields.isTrainer").value("트레이너 여부는 필수입니다."));
 
+        verify(jwtUtil, never()).getId(anyString());
+        verify(memberService, never()).convertGuestToMember(anyLong(), any());
+        verify(reissueServiceImpl, never()).reissue(anyString(), anyLong());
     }
 
     @Test
