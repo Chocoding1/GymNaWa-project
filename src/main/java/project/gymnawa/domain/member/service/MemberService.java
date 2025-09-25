@@ -116,12 +116,7 @@ public class MemberService {
      */
     @Transactional
     public void deactivateMember(Long id) {
-        Member member = memberRepository.findById(id)
-                .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
-
-        if (member.isDeleted()) {
-            throw new CustomException(DEACTIVATE_MEMBER);
-        }
+        Member member = findOne(id);
 
         member.deactivate();
     }
