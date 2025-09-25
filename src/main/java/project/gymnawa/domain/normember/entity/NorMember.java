@@ -23,20 +23,4 @@ public class NorMember extends Member {
     public NorMember(Long id, String password, String name, String email, Gender gender, Address address, String provider, String providerId, String loginType, Role role, boolean deleted) {
         super(id, password, name, email, gender, address, provider, providerId, loginType, role, deleted);
     }
-
-    /**
-     * 회원 정보 수정
-     */
-    @Override
-    public void updateInfo(String name, Address address) {
-        super.updateInfo(name, address);
-    }
-
-    /**
-     * 비밀번호 변경
-     */
-    @Override
-    public void changePassword(String newPassword) {
-        super.changePassword(newPassword);
-    }
 }

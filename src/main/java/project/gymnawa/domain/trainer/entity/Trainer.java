@@ -23,12 +23,4 @@ public class Trainer extends Member {
     public Trainer(Long id, String password, String name, String email, Gender gender, Address address, String provider, String providerId, String loginType, Role role, boolean deleted) {
         super(id, password, name, email, gender, address, provider, providerId, loginType, role, deleted);
     }
-
-    /**
-     * 트레이너 정보 수정
-     */
-    @Override
-    public void updateInfo( String name, Address address) {
-        super.updateInfo(name, address);
-    }
 }
