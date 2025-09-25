@@ -33,8 +33,7 @@ public class MemberService {
      * 홈 화면용 DTO 반환
      */
     public MemberHomeInfoDto getMemberInfo(Long id) {
-        Member member = memberRepository.findById(id) // 그냥 같은 서비스 내 함수 호출로 변경
-                .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
+        Member member = findOne(id);
 
         String name = member.getName();
         boolean isTrainer = member instanceof Trainer;
