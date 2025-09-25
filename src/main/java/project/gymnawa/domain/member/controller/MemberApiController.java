@@ -6,24 +6,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.stereotype.Controller;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import project.gymnawa.auth.jwt.service.ReissueServiceImpl;
 import project.gymnawa.auth.jwt.util.JwtUtil;
 import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
 import project.gymnawa.domain.member.dto.PasswordDto;
-import project.gymnawa.domain.member.entity.Member;
 import project.gymnawa.domain.member.service.MemberService;
 import project.gymnawa.domain.member.dto.MemberHomeInfoDto;
 import project.gymnawa.domain.member.dto.MemberOauthInfoDto;
-import project.gymnawa.domain.normember.dto.MemberSaveDto;
-import project.gymnawa.domain.trainer.dto.TrainerSaveDto;
 import project.gymnawa.domain.common.api.ApiResponse;
-import project.gymnawa.domain.normember.entity.NorMember;
 import project.gymnawa.domain.common.error.exception.CustomException;
-import project.gymnawa.domain.normember.service.NorMemberService;
-import project.gymnawa.domain.trainer.service.TrainerService;
 
 import static project.gymnawa.domain.common.error.dto.ErrorCode.*;
 
@@ -34,15 +27,13 @@ import static project.gymnawa.domain.common.error.dto.ErrorCode.*;
 public class MemberApiController {
 
     private final MemberService memberService;
-    private final TrainerService trainerService;
-    private final NorMemberService norMemberService;
     private final ReissueServiceImpl reissueServiceImpl;
     private final JwtUtil jwtUtil;
 
     /**
      * acess token으로 회원 정보 반환
      * 홈 화면에서 로그인, 비로그인 구분하여 렌더링하기 위해 만든 api
-     * 로그인 회원의 정보를 추출해서 반환(화면 출력용)
+     * 로그인 회원의 정보를 추출해서 반환(로그인 시 화면 출력용 정보)
      */
     @GetMapping("/info")
     public ResponseEntity<ApiResponse<MemberHomeInfoDto>> memberInfo(@AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
