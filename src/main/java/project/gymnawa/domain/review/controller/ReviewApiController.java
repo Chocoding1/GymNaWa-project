@@ -8,16 +8,11 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
-import project.gymnawa.domain.normember.entity.NorMember;
-import project.gymnawa.domain.review.entity.Review;
 import project.gymnawa.domain.common.api.ApiResponse;
 import project.gymnawa.domain.review.dto.ReviewEditDto;
 import project.gymnawa.domain.review.dto.ReviewSaveDto;
 import project.gymnawa.domain.review.dto.ReviewViewDto;
-import project.gymnawa.domain.trainer.entity.Trainer;
-import project.gymnawa.domain.normember.service.NorMemberService;
 import project.gymnawa.domain.review.service.ReviewService;
-import project.gymnawa.domain.trainer.service.TrainerService;
 
 import java.util.List;
 
@@ -28,8 +23,6 @@ import java.util.List;
 public class ReviewApiController {
 
     private final ReviewService reviewService;
-    private final NorMemberService norMemberService;
-    private final TrainerService trainerService;
 
     /**
      * 리뷰 추가
@@ -39,9 +32,7 @@ public class ReviewApiController {
                                                         @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
         Long userId = customOAuth2UserDetails.getId();
-        NorMember loginedMember = norMemberService.findOne(userId);
-
-        Long savedId = reviewService.save(reviewSaveDto, loginedMember);
+        Long savedId = reviewService.save(reviewSaveDto, userId);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.of("리뷰 등록 성공", savedId));
     }
@@ -55,13 +46,8 @@ public class ReviewApiController {
                                                                  @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
         Long userId = customOAuth2UserDetails.getId();
-        NorMember loginedMember = norMemberService.findOne(userId);
 
-        reviewService.updateReview(id, loginedMember, reviewEditDto.getContent());
-
-        Review review = reviewService.findByIdAndNorMember(id, loginedMember);
-
-        ReviewViewDto reviewViewDto = createReviewViewDto(review);
+        ReviewViewDto reviewViewDto = reviewService.updateReview(id, userId, reviewEditDto);
 
         return ResponseEntity.ok().body(ApiResponse.of("리뷰 수정 성공", reviewViewDto));
     }
@@ -74,9 +60,8 @@ public class ReviewApiController {
                                                             @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
         Long userId = customOAuth2UserDetails.getId();
-        NorMember loginedMember = norMemberService.findOne(userId);
 
-        reviewService.deleteReview(id, loginedMember);
+        reviewService.deleteReview(id, userId);
 
         return ResponseEntity.ok().body(ApiResponse.of("리뷰 삭제 성공"));
     }
@@ -87,22 +72,8 @@ public class ReviewApiController {
     @GetMapping("/{trainerId}")
     public ResponseEntity<ApiResponse<List<ReviewViewDto>>> getReviewList(@PathVariable Long trainerId) {
 
-        Trainer trainer = trainerService.findOne(trainerId);
-
-        List<ReviewViewDto> reviewList = reviewService.findByTrainer(trainer).stream()
-                .map(Review::of)
-                .toList();
+        List<ReviewViewDto> reviewList = reviewService.findByTrainer(trainerId);
 
         return ResponseEntity.ok().body(ApiResponse.of("리뷰 조회 성공", reviewList));
-    }
-
-    private ReviewViewDto createReviewViewDto(Review review) {
-        return ReviewViewDto.builder()
-                .memberName(review.getNorMember().getName())
-                .trainerName(review.getTrainer().getName())
-                .content(review.getContent())
-                .createdDateTime(review.getCreatedDateTime())
-                .modifiedDateTime(review.getModifiedDateTime())
-                .build();
     }
 }
