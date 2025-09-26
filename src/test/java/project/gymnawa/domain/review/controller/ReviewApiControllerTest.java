@@ -10,23 +10,20 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
+import project.gymnawa.domain.common.error.exception.CustomException;
 import project.gymnawa.domain.member.dto.MemberSessionDto;
-import project.gymnawa.domain.member.entity.etcfield.Gender;
 import project.gymnawa.domain.member.entity.etcfield.Role;
-import project.gymnawa.domain.normember.entity.NorMember;
-import project.gymnawa.domain.normember.service.NorMemberService;
 import project.gymnawa.domain.review.dto.ReviewEditDto;
 import project.gymnawa.domain.review.dto.ReviewSaveDto;
-import project.gymnawa.domain.review.entity.Review;
+import project.gymnawa.domain.review.dto.ReviewViewDto;
 import project.gymnawa.domain.review.service.ReviewService;
-import project.gymnawa.domain.trainer.entity.Trainer;
-import project.gymnawa.domain.trainer.service.TrainerService;
 import project.gymnawa.config.SecurityTestConfig;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static project.gymnawa.domain.common.error.dto.ErrorCode.*;
 
 @WebMvcTest(ReviewApiController.class)
 @Import(SecurityTestConfig.class)
@@ -41,24 +38,17 @@ class ReviewApiControllerTest {
     @MockitoBean
     private ReviewService reviewService;
 
-    @MockitoBean
-    private NorMemberService norMemberService;
-
-    @MockitoBean
-    private TrainerService trainerService;
-
     @Test
     @DisplayName("리뷰 저장 성공")
     void addReviewSuccess() throws Exception {
         //given
-        NorMember norMember = createNorMember();
+        Long userId = 1L;
         ReviewSaveDto reviewSaveDto = ReviewSaveDto.builder()
                 .content("content")
                 .trainerId(100L)
                 .build();
 
-        when(norMemberService.findOne(1L)).thenReturn(norMember);
-        when(reviewService.save(reviewSaveDto, norMember)).thenReturn(50L);
+        when(reviewService.save(reviewSaveDto, userId)).thenReturn(50L);
 
         //when & then
         mockMvc.perform(post("/api/reviews")
@@ -89,6 +79,8 @@ class ReviewApiControllerTest {
                 .andExpect(jsonPath("$.errorCode").value("VALIDATION_ERROR"))
                 .andExpect(jsonPath("$.errorMessage").value("입력값이 유효하지 않습니다."))
                 .andExpect(jsonPath("$.errorFields.content").value("내용은 필수입니다."));
+
+        verify(reviewService, never()).save(eq(reviewSaveDto), anyLong());
     }
 
     @Test
@@ -96,19 +88,12 @@ class ReviewApiControllerTest {
     void editReviewSuccess() throws Exception {
         //given
         Long reviewId = 50L;
-        NorMember norMember = createNorMember();
         ReviewEditDto reviewEditDto = ReviewEditDto.builder()
                 .content("content")
                 .build();
-        Review review = Review.builder()
-                .norMember(norMember)
-                .trainer(Trainer.builder().name("trainer").build())
-                .content("content")
-                .build();
+        ReviewViewDto reviewViewDto = ReviewViewDto.builder().build();
 
-        when(norMemberService.findOne(1L)).thenReturn(norMember);
-        doNothing().when(reviewService).updateReview(reviewId, norMember, reviewEditDto.getContent());
-        when(reviewService.findByIdAndNorMember(reviewId, norMember)).thenReturn(review);
+        when(reviewService.updateReview(reviewId, 1L, reviewEditDto)).thenReturn(reviewViewDto);
 
         //when & then
         mockMvc.perform(patch("/api/reviews/{id}", reviewId)
@@ -139,23 +124,74 @@ class ReviewApiControllerTest {
                 .andExpect(jsonPath("$.errorCode").value("VALIDATION_ERROR"))
                 .andExpect(jsonPath("$.errorMessage").value("입력값이 유효하지 않습니다."))
                 .andExpect(jsonPath("$.errorFields.content").value("내용은 필수입니다."));
+
+        verify(reviewService, never()).updateReview(eq(reviewId), anyLong(), eq(reviewEditDto));
+    }
+
+    @Test
+    @DisplayName("리뷰 수정 실패(404) - 존재하지 않는 리뷰")
+    void editReview_fail_reviewNotFound() throws Exception {
+        //given
+        Long reviewId = 50L;
+        Long userId = 1L;
+        // 리뷰 내용 필드 제거
+        ReviewEditDto reviewEditDto = ReviewEditDto.builder()
+                .content("oldContent")
+                .build();
+
+        when(reviewService.updateReview(reviewId, userId, reviewEditDto))
+                .thenThrow(new CustomException(REVIEW_NOT_FOUND));
+
+        //when & then
+        mockMvc.perform(patch("/api/reviews/{id}", reviewId)
+                        .with(user(createCustomUserDetails()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(reviewEditDto))
+                )
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.errorCode").value("REVIEW_NOT_FOUND"))
+                .andExpect(jsonPath("$.errorMessage").value("존재하지 않는 리뷰입니다."));
+    }
+
+    @Test
+    @DisplayName("리뷰 삭제 성공")
+    void reviewDelete_success() throws Exception {
+        //given
+        Long reviewId = 50L;
+
+        //when & then
+        mockMvc.perform(delete("/api/reviews/{id}", reviewId)
+                        .with(user(createCustomUserDetails()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("리뷰 삭제 성공"));
+    }
+
+    @Test
+    @DisplayName("리뷰 삭제 실패 - 존재하지 않는 리뷰")
+    void reviewDelete_fail_reviewNotFound() throws Exception {
+        //given
+        Long reviewId = 50L;
+        Long userId = 1L;
+
+        doThrow(new CustomException(REVIEW_NOT_FOUND))
+                .when(reviewService).deleteReview(eq(reviewId), anyLong());
+
+        //when & then
+        mockMvc.perform(delete("/api/reviews/{id}", reviewId)
+                        .with(user(createCustomUserDetails()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.errorCode").value("REVIEW_NOT_FOUND"))
+                .andExpect(jsonPath("$.errorMessage").value("존재하지 않는 리뷰입니다."));
     }
 
     private CustomOAuth2UserDetails createCustomUserDetails() {
         MemberSessionDto memberSessionDto = createMemberSessionDto();
 
         return new CustomOAuth2UserDetails(memberSessionDto);
-    }
-
-    private NorMember createNorMember() {
-        return NorMember.builder()
-                .id(1L)
-                .email("test@naver.com")
-                .password("testPw")
-                .name("testUser")
-                .gender(Gender.MALE)
-                .deleted(false)
-                .build();
     }
 
     private MemberSessionDto createMemberSessionDto() {
