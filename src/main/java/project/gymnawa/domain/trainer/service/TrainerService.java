@@ -4,9 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import project.gymnawa.domain.email.service.EmailService;
 import project.gymnawa.domain.member.dto.UpdatePasswordDto;
 import project.gymnawa.domain.trainer.dto.TrainerEditDto;
 import project.gymnawa.domain.trainer.dto.TrainerSaveDto;
+import project.gymnawa.domain.trainer.dto.TrainerViewDto;
 import project.gymnawa.domain.trainer.entity.Trainer;
 import project.gymnawa.domain.trainer.repository.TrainerRepository;
 import project.gymnawa.domain.common.etcfield.Address;
@@ -28,15 +30,19 @@ public class TrainerService {
     private final TrainerRepository trainerRepository;
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final EmailService emailService;
 
     /**
      * 회원가입
      */
     @Transactional
     public Long join(TrainerSaveDto trainerSaveDto) {
+
+        checkEmailVerified(trainerSaveDto);
+
         validateDuplicateTrainer(trainerSaveDto); // 중복 회원가입 방지
 
-        if (trainerSaveDto.getLoginType() == null) {
+        if (trainerSaveDto.getLoginType() == null) { // 일반 로그인 유저일 경우
             // 비밀번호 암호화
             trainerSaveDto.setPassword(bCryptPasswordEncoder.encode(trainerSaveDto.getPassword()));
 
@@ -46,6 +52,15 @@ public class TrainerService {
 
         Trainer joinedTrainer = trainerRepository.save(trainerSaveDto.toEntity());
         return joinedTrainer.getId();
+    }
+
+    /**
+     * 이메일 인증 확인
+     */
+    private void checkEmailVerified(TrainerSaveDto trainerSaveDto) {
+        if (!emailService.isEmailVerified(trainerSaveDto.getEmail())) {
+            throw new CustomException(EMAIL_VERIFY_FAILED);
+        }
     }
 
     /**
@@ -72,6 +87,15 @@ public class TrainerService {
     }
 
     /**
+     * 마이페이지
+     */
+    public TrainerViewDto getMyPage(Long id) {
+        Trainer trainer = findOne(id);
+
+        return createTrainerViewDto(trainer);
+    }
+
+    /**
      * 이름으로 검색
      */
     public List<Trainer> findByName(String name) {
@@ -90,12 +114,7 @@ public class TrainerService {
      */
     @Transactional
     public void updateTrainer(Long id, TrainerEditDto trainerEditDto) {
-        Trainer trainer = trainerRepository.findById(id)
-                .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
-
-        if (trainer.isDeleted()) {
-            throw new CustomException(DEACTIVATE_MEMBER);
-        }
+        Trainer trainer = findOne(id);
 
         String name = trainerEditDto.getName();
         Address address = new Address(trainerEditDto.getZoneCode(), trainerEditDto.getAddress(), trainerEditDto.getDetailAddress(), trainerEditDto.getBuildingName());
@@ -108,12 +127,7 @@ public class TrainerService {
      */
     @Transactional
     public void changePassword(Long id, UpdatePasswordDto updatePasswordDto) {
-        Trainer trainer = trainerRepository.findById(id)
-                .orElseThrow(() -> new CustomException(MEMBER_NOT_FOUND));
-
-        if (trainer.isDeleted()) {
-            throw new CustomException(DEACTIVATE_MEMBER);
-        }
+        Trainer trainer = findOne(id);
 
         // 현재 비밀번호 일치 확인
         if (!bCryptPasswordEncoder.matches(updatePasswordDto.getCurrentPassword(), trainer.getPassword())) {
@@ -127,5 +141,15 @@ public class TrainerService {
 
         String newPassword = bCryptPasswordEncoder.encode(updatePasswordDto.getNewPassword());
         trainer.changePassword(newPassword);
+    }
+
+    private TrainerViewDto createTrainerViewDto(Trainer trainer) {
+        return TrainerViewDto.builder()
+                .password(trainer.getPassword())
+                .name(trainer.getName())
+                .email(trainer.getEmail())
+                .gender(trainer.getGender().getExp())
+                .address(trainer.getAddress())
+                .build();
     }
 }

@@ -35,7 +35,6 @@ import static project.gymnawa.domain.common.error.dto.ErrorCode.*;
 public class TrainerApiController {
 
     private final TrainerService trainerService;
-    private final EmailService emailService;
     private final ReviewService reviewService;
     private final PtMembershipService ptMembershipService;
 
@@ -44,10 +43,6 @@ public class TrainerApiController {
      */
     @PostMapping
     public ResponseEntity<ApiResponse<?>> addTrainer(@Validated @RequestBody TrainerSaveDto trainerSaveDto) {
-
-        if (!emailService.isEmailVerified(trainerSaveDto.getEmail())) {
-            throw new CustomException(EMAIL_VERIFY_FAILED);
-        }
 
         Long joinId = trainerService.join(trainerSaveDto);
 
@@ -67,9 +62,7 @@ public class TrainerApiController {
             throw new CustomException(ACCESS_DENIED);
         }
 
-        Trainer loginedTrainer = trainerService.findOne(userId);
-
-        TrainerViewDto trainerViewDto = createTrainerViewDto(loginedTrainer);
+        TrainerViewDto trainerViewDto = trainerService.getMyPage(userId);
 
         return ResponseEntity.ok().body(ApiResponse.of("회원 정보 조회 성공", trainerViewDto));
     }
@@ -107,7 +100,7 @@ public class TrainerApiController {
             throw new CustomException(ACCESS_DENIED);
         }
 
-        trainerService.changePassword(id, updatePasswordDto);
+        trainerService.changePassword(userId, updatePasswordDto);
 
         return ResponseEntity.ok().body(ApiResponse.of("비밀번호 변경 성공"));
     }
@@ -125,11 +118,7 @@ public class TrainerApiController {
             throw new CustomException(ACCESS_DENIED);
         }
 
-        Trainer loginedTrainer = trainerService.findOne(userId);
-
-        List<ReviewViewDto> reviewList = reviewService.findByTrainer(loginedTrainer).stream()
-                .map(Review::of)
-                .toList();
+        List<ReviewViewDto> reviewList = reviewService.findByTrainer(userId);
 
         return ResponseEntity.ok().body(ApiResponse.of("리뷰 조회 성공", reviewList));
     }
@@ -146,22 +135,9 @@ public class TrainerApiController {
             throw new CustomException(ACCESS_DENIED);
         }
 
-        Trainer loginedTrainer = trainerService.findOne(userId);
-
-        List<PtMembershipViewDto> ptMembershipList = ptMembershipService.findByTrainer(loginedTrainer).stream()
-                .map(PtMembership::of)
-                .toList();
+        List<PtMembershipViewDto> ptMembershipList = ptMembershipService.findByTrainer(userId);
 
         return ResponseEntity.ok().body(ApiResponse.of("진행 중인 PT 조회 성공", ptMembershipList));
     }
 
-    private TrainerViewDto createTrainerViewDto(Trainer loginedTrainer) {
-        return TrainerViewDto.builder()
-                .password(loginedTrainer.getPassword())
-                .name(loginedTrainer.getName())
-                .email(loginedTrainer.getEmail())
-                .gender(loginedTrainer.getGender().getExp())
-                .address(loginedTrainer.getAddress())
-                .build();
-    }
 }
