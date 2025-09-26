@@ -3,6 +3,9 @@ package project.gymnawa.domain.review.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import project.gymnawa.domain.normember.service.NorMemberService;
+import project.gymnawa.domain.review.dto.ReviewEditDto;
+import project.gymnawa.domain.review.dto.ReviewViewDto;
 import project.gymnawa.domain.review.entity.Review;
 import project.gymnawa.domain.review.dto.ReviewSaveDto;
 import project.gymnawa.domain.normember.entity.NorMember;
@@ -21,24 +24,46 @@ import static project.gymnawa.domain.common.error.dto.ErrorCode.*;
 public class ReviewService {
 
     private final ReviewRepository reviewRepository;
+    private final NorMemberService norMemberService;
     private final TrainerService trainerService;
 
     /**
      * 리뷰 저장
      */
     @Transactional
-    public Long save(ReviewSaveDto reviewSaveDto, NorMember norMember) {
+    public Long save(ReviewSaveDto reviewSaveDto, Long id) {
+        NorMember norMember = norMemberService.findOne(id);
         Trainer trainer = trainerService.findOne(reviewSaveDto.getTrainerId());
         Review review = reviewRepository.save(reviewSaveDto.toEntity(norMember, trainer));
         return review.getId();
     }
 
     /**
-     * 특정 회원의 리뷰 단 건 조회
+     * 리뷰 수정
      */
-    public Review findByIdAndNorMember(Long id, NorMember norMember) {
-        return reviewRepository.findByIdAndNorMember(id, norMember)
+    @Transactional
+    public ReviewViewDto updateReview(Long id, Long userId, ReviewEditDto reviewEditDto) {
+        NorMember norMember = norMemberService.findOne(userId);
+
+        Review review = reviewRepository.findByIdAndNorMember(id, norMember)
                 .orElseThrow(() -> new CustomException(REVIEW_NOT_FOUND));
+
+        review.updateContent(reviewEditDto.getContent());
+
+        return createReviewViewDto(review);
+    }
+
+    /**
+     * 리뷰 삭제
+     */
+    @Transactional
+    public void deleteReview(Long id, Long userId) {
+        NorMember norMember = norMemberService.findOne(userId);
+
+        Review review = reviewRepository.findByIdAndNorMember(id, norMember)
+                .orElseThrow(() -> new CustomException(REVIEW_NOT_FOUND));
+
+        reviewRepository.delete(review);
     }
 
     /**
@@ -51,29 +76,21 @@ public class ReviewService {
     /**
      * 트레이너 별 리뷰 조회
      */
-    public List<Review> findByTrainer(Trainer trainer) {
-        return reviewRepository.findByTrainer(trainer);
+    public List<ReviewViewDto> findByTrainer(Long trainerId) {
+        Trainer trainer = trainerService.findOne(trainerId);
+
+        return reviewRepository.findByTrainer(trainer).stream()
+                .map(Review::of)
+                .toList();
     }
 
-    /**
-     * 리뷰 수정
-     */
-    @Transactional
-    public void updateReview(Long id, NorMember norMember, String newContent) {
-        Review review = reviewRepository.findByIdAndNorMember(id, norMember)
-                .orElseThrow(() -> new CustomException(REVIEW_NOT_FOUND));
-
-        review.updateContent(newContent);
-    }
-
-    /**
-     * 리뷰 삭제
-     */
-    @Transactional
-    public void deleteReview(Long id, NorMember norMember) {
-        Review review = reviewRepository.findByIdAndNorMember(id, norMember)
-                .orElseThrow(() -> new CustomException(REVIEW_NOT_FOUND));
-
-        reviewRepository.delete(review);
+    private ReviewViewDto createReviewViewDto(Review review) {
+        return ReviewViewDto.builder()
+                .memberName(review.getNorMember().getName())
+                .trainerName(review.getTrainer().getName())
+                .content(review.getContent())
+                .createdDateTime(review.getCreatedDateTime())
+                .modifiedDateTime(review.getModifiedDateTime())
+                .build();
     }
 }
