@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import project.gymnawa.domain.email.service.EmailService;
 import project.gymnawa.domain.member.dto.UpdatePasswordDto;
 import project.gymnawa.domain.trainer.dto.TrainerEditDto;
 import project.gymnawa.domain.trainer.dto.TrainerSaveDto;
@@ -39,6 +40,8 @@ class TrainerServiceTest {
     @Mock
     MemberRepository memberRepository;
     @Mock
+    EmailService emailService;
+    @Mock
     BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Test
@@ -52,6 +55,7 @@ class TrainerServiceTest {
                 .gender(Gender.MALE)
                 .build();
 
+        when(emailService.isEmailVerified(anyString())).thenReturn(true);
         when(memberRepository.existsByEmailAndDeletedFalse(anyString())).thenReturn(false);
         when(trainerRepository.save(any(Trainer.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -84,6 +88,7 @@ class TrainerServiceTest {
                 .loginType("social")
                 .build();
 
+        when(emailService.isEmailVerified(anyString())).thenReturn(true);
         when(memberRepository.existsByEmailAndDeletedFalse(anyString())).thenReturn(false);
         when(trainerRepository.save(any(Trainer.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -92,7 +97,7 @@ class TrainerServiceTest {
 
         //then
         verify(memberRepository, times(1)).existsByEmailAndDeletedFalse(anyString());
-        verify(bCryptPasswordEncoder, times(0)).encode(anyString());
+        verify(bCryptPasswordEncoder, never()).encode(anyString());
         verify(trainerRepository, times(1)).save(any(Trainer.class));
 
         assertThat(trainerSaveDto.getRole()).isEqualTo(Role.USER);
@@ -103,7 +108,34 @@ class TrainerServiceTest {
     }
 
     @Test
-    @DisplayName("회원가입 실패 - 이미 가입된 이메일 입력 시 오류 발생")
+    @DisplayName("회원가입 실패 - 인증되지 않은 이메일")
+    void join_fail_emailVerifyFailed() {
+        //given
+        TrainerSaveDto trainerSaveDto = TrainerSaveDto.builder()
+                .email("galmeagi2@naver.com")
+                .password("aadfad")
+                .name("조성진")
+                .build();
+
+        when(emailService.isEmailVerified(anyString())).thenReturn(false);
+
+        //when & then
+        CustomException customException = assertThrows(CustomException.class,
+                () -> trainerService.join(trainerSaveDto));
+        ErrorCode errorCode = customException.getErrorCode();
+
+        assertThat(errorCode.getCode()).isEqualTo("EMAIL_VERIFY_FAILED");
+        assertThat(errorCode.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(errorCode.getErrorMessage()).isEqualTo("이메일 인증이 되지 않았습니다.");
+
+        verify(emailService, times(1)).isEmailVerified(anyString());
+        verify(memberRepository, never()).existsByEmailAndDeletedFalse(anyString());
+        verify(bCryptPasswordEncoder, never()).encode(anyString());
+        verify(trainerRepository, never()).save(any(Trainer.class));
+    }
+
+    @Test
+    @DisplayName("회원가입 실패 - 이미 가입된 이메일")
     void joinFail_duplicateEmail() {
         //given
         TrainerSaveDto trainerSaveDto = TrainerSaveDto.builder()
@@ -112,6 +144,7 @@ class TrainerServiceTest {
                 .name("조성진")
                 .build();
 
+        when(emailService.isEmailVerified(anyString())).thenReturn(true);
         when(memberRepository.existsByEmailAndDeletedFalse(anyString())).thenReturn(true);
 
         //when & then
@@ -119,11 +152,14 @@ class TrainerServiceTest {
                 () -> trainerService.join(trainerSaveDto));
         ErrorCode errorCode = customException.getErrorCode();
 
-        verify(memberRepository, times(1)).existsByEmailAndDeletedFalse(anyString());
-
         assertThat(errorCode.getCode()).isEqualTo("DUPLICATE_EMAIL");
         assertThat(errorCode.getStatus()).isEqualTo(HttpStatus.CONFLICT);
         assertThat(errorCode.getErrorMessage()).isEqualTo("이미 가입된 이메일입니다.");
+
+        verify(emailService, times(1)).isEmailVerified(anyString());
+        verify(memberRepository, times(1)).existsByEmailAndDeletedFalse(anyString());
+        verify(bCryptPasswordEncoder, never()).encode(anyString());
+        verify(trainerRepository, never()).save(any(Trainer.class));
     }
 
     @Test
@@ -419,14 +455,5 @@ class TrainerServiceTest {
         verify(trainerRepository, times(1)).findById(anyLong());
         verify(bCryptPasswordEncoder, times(1)).matches(anyString(), anyString());
         verify(bCryptPasswordEncoder, never()).encode(anyString());
-    }
-
-    private Trainer createTrainer(String email, String password, String name, boolean deleted) {
-        return Trainer.builder()
-                .email(email)
-                .password(password)
-                .name(name)
-                .deleted(deleted)
-                .build();
     }
 }
