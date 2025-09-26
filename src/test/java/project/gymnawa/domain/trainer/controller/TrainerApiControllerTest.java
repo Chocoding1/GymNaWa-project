@@ -10,18 +10,19 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
+import project.gymnawa.domain.common.error.exception.CustomException;
 import project.gymnawa.domain.member.dto.MemberSessionDto;
 import project.gymnawa.domain.member.dto.UpdatePasswordDto;
 import project.gymnawa.domain.member.entity.etcfield.Gender;
 import project.gymnawa.domain.member.entity.etcfield.Role;
-import project.gymnawa.domain.ptmembership.entity.PtMembership;
+import project.gymnawa.domain.ptmembership.dto.PtMembershipViewDto;
 import project.gymnawa.domain.ptmembership.service.PtMembershipService;
-import project.gymnawa.domain.review.entity.Review;
+import project.gymnawa.domain.review.dto.ReviewViewDto;
 import project.gymnawa.domain.review.service.ReviewService;
 import project.gymnawa.domain.trainer.dto.TrainerSaveDto;
+import project.gymnawa.domain.trainer.dto.TrainerViewDto;
 import project.gymnawa.domain.trainer.entity.Trainer;
 import project.gymnawa.domain.trainer.dto.TrainerEditDto;
-import project.gymnawa.domain.email.service.EmailService;
 import project.gymnawa.domain.trainer.service.TrainerService;
 import project.gymnawa.config.SecurityTestConfig;
 
@@ -34,6 +35,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static project.gymnawa.domain.common.error.dto.ErrorCode.*;
 
 @WebMvcTest(TrainerApiController.class)
 @Import(SecurityTestConfig.class)
@@ -47,9 +49,6 @@ class TrainerApiControllerTest {
 
     @MockitoBean
     private TrainerService trainerService;
-
-    @MockitoBean
-    private EmailService emailService;
 
     @MockitoBean
     private ReviewService reviewService;
@@ -71,7 +70,6 @@ class TrainerApiControllerTest {
                 .emailCode("testEmailCode")
                 .build();
 
-        when(emailService.isEmailVerified(trainerSaveDto.getEmail())).thenReturn(true);
         when(trainerService.join(trainerSaveDto)).thenReturn(1L);
 
         //when & then
@@ -84,7 +82,7 @@ class TrainerApiControllerTest {
     }
 
     @Test
-    @DisplayName("회원가입 실패(400) - 이메일 인증 실패")
+    @DisplayName("회원가입 실패(400) - 이메일 인증 미완료")
     void addTrainerFail_invalidEmail() throws Exception {
         //given
         // email 필드 제거
@@ -98,7 +96,8 @@ class TrainerApiControllerTest {
                 .emailCode("testEmailCode")
                 .build();
 
-        when(emailService.isEmailVerified(trainerSaveDto.getEmail())).thenReturn(false);
+        when(trainerService.join(trainerSaveDto))
+                .thenThrow(new CustomException(EMAIL_VERIFY_FAILED));
 
         //when & then
         mockMvc.perform(post("/api/trainers")
@@ -108,6 +107,34 @@ class TrainerApiControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errorCode").value("EMAIL_VERIFY_FAILED"))
                 .andExpect(jsonPath("$.errorMessage").value("이메일 인증이 되지 않았습니다."));
+    }
+
+    @Test
+    @DisplayName("회원가입 실패(400) - 이미 가입된 이메일")
+    void addTrainer_fail_duplicateEmail() throws Exception {
+        //given
+        // email 필드 제거
+        TrainerSaveDto trainerSaveDto = TrainerSaveDto.builder()
+                .email("testEmail")
+                .password("testPassword")
+                .name("testName")
+                .gender(Gender.MALE)
+                .zoneCode("testZoneCode")
+                .address("testAddress")
+                .emailCode("testEmailCode")
+                .build();
+
+        when(trainerService.join(trainerSaveDto))
+                .thenThrow(new CustomException(DUPLICATE_EMAIL));
+
+        //when & then
+        mockMvc.perform(post("/api/trainers")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(trainerSaveDto))
+                )
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.errorCode").value("DUPLICATE_EMAIL"))
+                .andExpect(jsonPath("$.errorMessage").value("이미 가입된 이메일입니다."));
     }
 
     @Test
@@ -238,9 +265,9 @@ class TrainerApiControllerTest {
     void myPageSuccess() throws Exception {
         //given
         Long userId = 1L;
-        Trainer trainer = createTrainer();
+        TrainerViewDto trainerViewDto = TrainerViewDto.builder().id(userId).build();
 
-        when(trainerService.findOne(userId)).thenReturn(trainer);
+        when(trainerService.getMyPage(userId)).thenReturn(trainerViewDto);
 
         //when & then
         mockMvc.perform(get("/api/trainers/{id}", userId)
@@ -249,7 +276,7 @@ class TrainerApiControllerTest {
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("회원 정보 조회 성공"))
-                .andExpect(jsonPath("$.data.email").value("test@naver.com"));
+                .andExpect(jsonPath("$.data.id").value(userId));
     }
 
     @Test
@@ -258,9 +285,6 @@ class TrainerApiControllerTest {
         //given
         Long userId = 1L;
         Long invalidId = 100L;
-        Trainer trainer = createTrainer();
-
-        when(trainerService.findOne(userId)).thenReturn(trainer);
 
         //when & then
         mockMvc.perform(get("/api/trainers/{id}", invalidId)
@@ -270,6 +294,28 @@ class TrainerApiControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errorCode").value("ACCESS_DENIED"))
                 .andExpect(jsonPath("$.errorMessage").value("잘못된 접근입니다."));
+
+        verify(trainerService, never()).getMyPage(userId);
+    }
+
+    @Test
+    @DisplayName("마이페이지 조회 실패(404) - 존재하지 않는 회원")
+    void myPage_fail_() throws Exception {
+        //given
+        Long userId = 1L;
+
+        when(trainerService.getMyPage(userId)).thenThrow(new CustomException(MEMBER_NOT_FOUND));
+
+        //when & then
+        mockMvc.perform(get("/api/trainers/{id}", userId)
+                        .with(user(createCustomUserDetails()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.errorCode").value("MEMBER_NOT_FOUND"))
+                .andExpect(jsonPath("$.errorMessage").value("존재하지 않는 회원입니다."));
+
+        verify(trainerService, times(1)).getMyPage(userId);
     }
 
     @Test
@@ -277,14 +323,12 @@ class TrainerApiControllerTest {
     void editTrainerSuccess() throws Exception {
         //given
         Long userId = 1L;
-        Trainer trainer = createTrainer();
         TrainerEditDto trainerEditDto = TrainerEditDto.builder()
                 .name("editName")
                 .zoneCode("newZoneCode")
                 .address("newAddress")
                 .build();
 
-        when(trainerService.findOne(userId)).thenReturn(trainer);
         doNothing().when(trainerService).updateTrainer(userId, trainerEditDto);
 
         //when & then
@@ -301,20 +345,24 @@ class TrainerApiControllerTest {
     @DisplayName("회원 정보 수정 실패(400) - 유효하지 않은 id pathVariable")
     void editTrainerFail_invalidId() throws Exception {
         //given
-        Long userId = 1L;
         Long invalidId = 100L;
-        Trainer trainer = createTrainer();
-
-        when(trainerService.findOne(userId)).thenReturn(trainer);
+        TrainerEditDto trainerEditDto = TrainerEditDto.builder()
+                .name("editName")
+                .zoneCode("newZoneCode")
+                .address("newAddress")
+                .build();
 
         //when & then
-        mockMvc.perform(get("/api/trainers/{id}", invalidId)
+        mockMvc.perform(patch("/api/trainers/{id}", invalidId)
                         .with(user(createCustomUserDetails()))
                         .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(trainerEditDto))
                 )
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errorCode").value("ACCESS_DENIED"))
                 .andExpect(jsonPath("$.errorMessage").value("잘못된 접근입니다."));
+
+        verify(trainerService, never()).updateTrainer(anyLong(), any(TrainerEditDto.class));
     }
 
     @Test
@@ -322,15 +370,12 @@ class TrainerApiControllerTest {
     void editTrainerFail_name() throws Exception {
         //given
         Long userId = 1L;
-        Trainer trainer = createTrainer();
 
         // name 필드 제거
         TrainerEditDto trainerEditDto = TrainerEditDto.builder()
                 .zoneCode("newZoneCode")
                 .address("newAddress")
                 .build();
-
-        when(trainerService.findOne(userId)).thenReturn(trainer);
 
         //when & then
         mockMvc.perform(patch("/api/trainers/{id}", userId)
@@ -348,14 +393,11 @@ class TrainerApiControllerTest {
     void editTrainerFail_address() throws Exception {
         //given
         Long userId = 1L;
-        Trainer trainer = createTrainer();
 
         // zoneCode, address 필드 제거
         TrainerEditDto trainerEditDto = TrainerEditDto.builder()
                 .name("editName")
                 .build();
-
-        when(trainerService.findOne(userId)).thenReturn(trainer);
 
         //when & then
         mockMvc.perform(patch("/api/trainers/{id}", userId)
@@ -372,14 +414,12 @@ class TrainerApiControllerTest {
     void updatePwSuccess() throws Exception {
         //given
         Long userId = 1L;
-        Trainer trainer = createTrainer();
         UpdatePasswordDto updatePasswordDto = UpdatePasswordDto.builder()
                 .currentPassword("testPw")
                 .newPassword("newPw")
                 .confirmPassword("confirmPw")
                 .build();
 
-        when(trainerService.findOne(userId)).thenReturn(trainer);
         doNothing().when(trainerService).changePassword(userId, updatePasswordDto);
 
         //when & then
@@ -398,14 +438,11 @@ class TrainerApiControllerTest {
         //given
         Long userId = 1L;
         Long invalidId = 100L;
-        Trainer trainer = createTrainer();
         UpdatePasswordDto updatePasswordDto = UpdatePasswordDto.builder()
                 .currentPassword("testPw")
                 .newPassword("newPw")
                 .confirmPassword("confirmPw")
                 .build();
-
-        when(trainerService.findOne(userId)).thenReturn(trainer);
 
         //when & then
         mockMvc.perform(post("/api/trainers/{id}/password", invalidId)
@@ -423,15 +460,12 @@ class TrainerApiControllerTest {
     void updatePwFail_currentPw() throws Exception {
         //given
         Long userId = 1L;
-        Trainer trainer = createTrainer();
 
         // currentPw 필드 제거
         UpdatePasswordDto updatePasswordDto = UpdatePasswordDto.builder()
                 .newPassword("newPw")
                 .confirmPassword("confirmPw")
                 .build();
-
-        when(trainerService.findOne(userId)).thenReturn(trainer);
 
         //when & then
         mockMvc.perform(post("/api/trainers/{id}/password", userId)
@@ -450,15 +484,12 @@ class TrainerApiControllerTest {
     void updatePwFail_newPw() throws Exception {
         //given
         Long userId = 1L;
-        Trainer trainer = createTrainer();
 
         // newPw 필드 제거
         UpdatePasswordDto updatePasswordDto = UpdatePasswordDto.builder()
                 .currentPassword("testPw")
                 .confirmPassword("confirmPw")
                 .build();
-
-        when(trainerService.findOne(userId)).thenReturn(trainer);
 
         //when & then
         mockMvc.perform(post("/api/trainers/{id}/password", userId)
@@ -477,15 +508,12 @@ class TrainerApiControllerTest {
     void updatePwFail_confirmPw() throws Exception {
         //given
         Long userId = 1L;
-        Trainer trainer = createTrainer();
 
         // confirmPw 필드 제거
         UpdatePasswordDto updatePasswordDto = UpdatePasswordDto.builder()
                 .currentPassword("testPw")
                 .newPassword("newPw")
                 .build();
-
-        when(trainerService.findOne(userId)).thenReturn(trainer);
 
         //when & then
         mockMvc.perform(post("/api/trainers/{id}/password", userId)
@@ -500,15 +528,39 @@ class TrainerApiControllerTest {
     }
 
     @Test
+    @DisplayName("비밀번호 변경 실패(400) - 현재 비밀번호 불일치")
+    void updatePw_fail_pwNotEqual() throws Exception {
+        //given
+        Long userId = 1L;
+
+        UpdatePasswordDto updatePasswordDto = UpdatePasswordDto.builder()
+                .currentPassword("testPw")
+                .newPassword("newPw")
+                .confirmPassword("confirmPw")
+                .build();
+
+        doThrow(new CustomException(INVALID_PASSWORD))
+                .when(trainerService).changePassword(userId, updatePasswordDto);
+
+        //when & then
+        mockMvc.perform(post("/api/trainers/{id}/password", userId)
+                        .with(user(createCustomUserDetails()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updatePasswordDto))
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errorCode").value("INVALID_PASSWORD"))
+                .andExpect(jsonPath("$.errorMessage").value("비밀번호가 일치하지 않습니다."));
+    }
+
+    @Test
     @DisplayName("나에게 달린 리뷰 조회 성공")
     void getReviewsSuccess() throws Exception {
         //given
         Long userId = 1L;
-        Trainer trainer = createTrainer();
-        List<Review> reviews = new ArrayList<>();
+        List<ReviewViewDto> reviewViewDto = new ArrayList<>();
 
-        when(trainerService.findOne(userId)).thenReturn(trainer);
-        when(reviewService.findByTrainer(trainer)).thenReturn(reviews);
+        when(reviewService.findByTrainer(userId)).thenReturn(reviewViewDto);
 
         //when & then
         mockMvc.perform(get("/api/trainers/{id}/reviews", userId)
@@ -525,9 +577,6 @@ class TrainerApiControllerTest {
         //given
         Long userId = 1L;
         Long invalidId = 100L;
-        Trainer trainer = createTrainer();
-
-        when(trainerService.findOne(userId)).thenReturn(trainer);
 
         //when & then
         mockMvc.perform(get("/api/trainers/{id}/reviews", invalidId)
@@ -537,6 +586,8 @@ class TrainerApiControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errorCode").value("ACCESS_DENIED"))
                 .andExpect(jsonPath("$.errorMessage").value("잘못된 접근입니다."));
+
+        verify(reviewService, never()).findByTrainer(userId);
     }
 
     @Test
@@ -544,11 +595,9 @@ class TrainerApiControllerTest {
     void getPtMembershipsSuccess() throws Exception {
         //given
         Long userId = 1L;
-        Trainer trainer = createTrainer();
-        List<PtMembership> ptMemberships = new ArrayList<>();
+        List<PtMembershipViewDto> ptMembershipViewDto = new ArrayList<>();
 
-        when(trainerService.findOne(userId)).thenReturn(trainer);
-        when(ptMembershipService.findByTrainer(trainer)).thenReturn(ptMemberships);
+        when(ptMembershipService.findByTrainer(userId)).thenReturn(ptMembershipViewDto);
 
         //when & then
         mockMvc.perform(get("/api/trainers/{id}/ptmemberships", userId)
@@ -563,11 +612,7 @@ class TrainerApiControllerTest {
     @DisplayName("진행 중인 PT 조회 실패(400) - 유효하지 않은 id pathVariable")
     void getPtMembershipsFail_invalidId() throws Exception {
         //given
-        Long userId = 1L;
         Long invalidId = 100L;
-        Trainer trainer = createTrainer();
-
-        when(trainerService.findOne(userId)).thenReturn(trainer);
 
         //when & then
         mockMvc.perform(get("/api/trainers/{id}/ptmemberships", invalidId)
@@ -577,6 +622,8 @@ class TrainerApiControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errorCode").value("ACCESS_DENIED"))
                 .andExpect(jsonPath("$.errorMessage").value("잘못된 접근입니다."));
+
+        verify(ptMembershipService, never()).findByTrainer(anyLong());
     }
 
     private CustomOAuth2UserDetails createCustomUserDetails() {
