@@ -39,13 +39,13 @@ public class TestData {
                 .content("운동 잘 가르치십니다:)")
                 .trainerId(trainerId)
                 .build();
-        reviewService.save(reviewSaveDto1, joinedMember);
+        reviewService.save(reviewSaveDto1, joinId);
 
         ReviewSaveDto reviewSaveDto2 = ReviewSaveDto.builder()
                 .content("친절하게 잘 가르져주세요ㅎㅎ")
                 .trainerId(trainerId)
                 .build();
-        reviewService.save(reviewSaveDto2, joinedMember);
+        reviewService.save(reviewSaveDto2, joinId);
 
         PtMembership ptMembership = createPtMembership(joinedMember, trainer, 10, 7, 490000);
         ptMembershipService.save(ptMembership);
