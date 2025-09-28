@@ -38,11 +38,12 @@ public class TrainerService {
     @Transactional
     public Long join(TrainerSaveDto trainerSaveDto) {
 
-        checkEmailVerified(trainerSaveDto);
-
         validateDuplicateTrainer(trainerSaveDto); // 중복 회원가입 방지
 
         if (trainerSaveDto.getLoginType() == null) { // 일반 로그인 유저일 경우
+            // 이메일 인증 여부 확인
+            checkEmailVerified(trainerSaveDto);
+
             // 비밀번호 암호화
             trainerSaveDto.setPassword(bCryptPasswordEncoder.encode(trainerSaveDto.getPassword()));
 
@@ -55,20 +56,20 @@ public class TrainerService {
     }
 
     /**
-     * 이메일 인증 확인
-     */
-    private void checkEmailVerified(TrainerSaveDto trainerSaveDto) {
-        if (!emailService.isEmailVerified(trainerSaveDto.getEmail())) {
-            throw new CustomException(EMAIL_VERIFY_FAILED);
-        }
-    }
-
-    /**
      * 이메일 중복 체크
      */
     private void validateDuplicateTrainer(TrainerSaveDto trainerSaveDto) {
         if (memberRepository.existsByEmailAndDeletedFalse(trainerSaveDto.getEmail())) {
             throw new CustomException(DUPLICATE_EMAIL);
+        }
+    }
+
+    /**
+     * 이메일 인증 여부 확인
+     */
+    private void checkEmailVerified(TrainerSaveDto trainerSaveDto) {
+        if (!emailService.isEmailVerified(trainerSaveDto.getEmail())) {
+            throw new CustomException(EMAIL_VERIFY_FAILED);
         }
     }
 
