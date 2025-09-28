@@ -55,8 +55,8 @@ class TrainerServiceTest {
                 .gender(Gender.MALE)
                 .build();
 
-        when(emailService.isEmailVerified(anyString())).thenReturn(true);
         when(memberRepository.existsByEmailAndDeletedFalse(anyString())).thenReturn(false);
+        when(emailService.isEmailVerified(anyString())).thenReturn(true);
         when(trainerRepository.save(any(Trainer.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         //when
@@ -64,6 +64,7 @@ class TrainerServiceTest {
 
         //then
         verify(memberRepository, times(1)).existsByEmailAndDeletedFalse(anyString());
+        verify(emailService, times(1)).isEmailVerified(anyString());
         verify(bCryptPasswordEncoder, times(1)).encode(anyString());
         verify(trainerRepository, times(1)).save(any(Trainer.class));
 
@@ -88,7 +89,6 @@ class TrainerServiceTest {
                 .loginType("social")
                 .build();
 
-        when(emailService.isEmailVerified(anyString())).thenReturn(true);
         when(memberRepository.existsByEmailAndDeletedFalse(anyString())).thenReturn(false);
         when(trainerRepository.save(any(Trainer.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -97,6 +97,7 @@ class TrainerServiceTest {
 
         //then
         verify(memberRepository, times(1)).existsByEmailAndDeletedFalse(anyString());
+        verify(emailService, never()).isEmailVerified(anyString());
         verify(bCryptPasswordEncoder, never()).encode(anyString());
         verify(trainerRepository, times(1)).save(any(Trainer.class));
 
@@ -105,33 +106,6 @@ class TrainerServiceTest {
         InOrder inOrder = inOrder(memberRepository, trainerRepository);
         inOrder.verify(memberRepository).existsByEmailAndDeletedFalse(anyString());
         inOrder.verify(trainerRepository).save(any(Trainer.class));
-    }
-
-    @Test
-    @DisplayName("회원가입 실패 - 인증되지 않은 이메일")
-    void join_fail_emailVerifyFailed() {
-        //given
-        TrainerSaveDto trainerSaveDto = TrainerSaveDto.builder()
-                .email("galmeagi2@naver.com")
-                .password("aadfad")
-                .name("조성진")
-                .build();
-
-        when(emailService.isEmailVerified(anyString())).thenReturn(false);
-
-        //when & then
-        CustomException customException = assertThrows(CustomException.class,
-                () -> trainerService.join(trainerSaveDto));
-        ErrorCode errorCode = customException.getErrorCode();
-
-        assertThat(errorCode.getCode()).isEqualTo("EMAIL_VERIFY_FAILED");
-        assertThat(errorCode.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
-        assertThat(errorCode.getErrorMessage()).isEqualTo("이메일 인증이 되지 않았습니다.");
-
-        verify(emailService, times(1)).isEmailVerified(anyString());
-        verify(memberRepository, never()).existsByEmailAndDeletedFalse(anyString());
-        verify(bCryptPasswordEncoder, never()).encode(anyString());
-        verify(trainerRepository, never()).save(any(Trainer.class));
     }
 
     @Test
@@ -144,7 +118,6 @@ class TrainerServiceTest {
                 .name("조성진")
                 .build();
 
-        when(emailService.isEmailVerified(anyString())).thenReturn(true);
         when(memberRepository.existsByEmailAndDeletedFalse(anyString())).thenReturn(true);
 
         //when & then
@@ -156,8 +129,36 @@ class TrainerServiceTest {
         assertThat(errorCode.getStatus()).isEqualTo(HttpStatus.CONFLICT);
         assertThat(errorCode.getErrorMessage()).isEqualTo("이미 가입된 이메일입니다.");
 
-        verify(emailService, times(1)).isEmailVerified(anyString());
         verify(memberRepository, times(1)).existsByEmailAndDeletedFalse(anyString());
+        verify(emailService, never()).isEmailVerified(anyString());
+        verify(bCryptPasswordEncoder, never()).encode(anyString());
+        verify(trainerRepository, never()).save(any(Trainer.class));
+    }
+
+    @Test
+    @DisplayName("회원가입 실패 - 인증되지 않은 이메일(일반 회원가입일 경우)")
+    void join_fail_emailVerifyFailed() {
+        //given
+        TrainerSaveDto trainerSaveDto = TrainerSaveDto.builder()
+                .email("galmeagi2@naver.com")
+                .password("aadfad")
+                .name("조성진")
+                .build();
+
+        when(memberRepository.existsByEmailAndDeletedFalse(anyString())).thenReturn(false);
+        when(emailService.isEmailVerified(anyString())).thenReturn(false);
+
+        //when & then
+        CustomException customException = assertThrows(CustomException.class,
+                () -> trainerService.join(trainerSaveDto));
+        ErrorCode errorCode = customException.getErrorCode();
+
+        assertThat(errorCode.getCode()).isEqualTo("EMAIL_VERIFY_FAILED");
+        assertThat(errorCode.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(errorCode.getErrorMessage()).isEqualTo("이메일 인증이 되지 않았습니다.");
+
+        verify(memberRepository, times(1)).existsByEmailAndDeletedFalse(anyString());
+        verify(emailService, times(1)).isEmailVerified(anyString());
         verify(bCryptPasswordEncoder, never()).encode(anyString());
         verify(trainerRepository, never()).save(any(Trainer.class));
     }
