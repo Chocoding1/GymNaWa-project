@@ -2,7 +2,6 @@ package project.gymnawa.domain.email.service;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
-import jakarta.validation.constraints.Email;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -157,5 +156,32 @@ class EmailServiceTest {
 
         //then
         assertEquals(ErrorCode.INVALID_EMAIL_CODE, customException.getErrorCode());
+    }
+
+    @Test
+    @DisplayName("이메일 인증 여부 확인 - 인증된 경우 true 반환")
+    void isEmailVerified_returnTrue() {
+        //given
+        String data = "verified";
+        when(redisService.getEmailAuthCode(anyString())).thenReturn(data);
+
+        //when
+        boolean result = emailService.isEmailVerified(anyString());
+
+        //then
+        assertTrue(result);
+    }
+
+    @Test
+    @DisplayName("이메일 인증 여부 확인 - 인증되지 않은 경우 false 반환")
+    void isEmailVerified_returnFalse() {
+        //given
+        when(redisService.getEmailAuthCode(anyString())).thenReturn(null);
+
+        //when
+        boolean result = emailService.isEmailVerified(anyString());
+
+        //then
+        assertFalse(result);
     }
 }
