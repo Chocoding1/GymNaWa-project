@@ -68,9 +68,7 @@ public class NorMemberApiController {
             throw new CustomException(ACCESS_DENIED);
         }
 
-        NorMember loginedMember = norMemberService.findOne(userId);
-
-        MemberViewDto memberViewDto = createMemberViewDto(loginedMember);
+        MemberViewDto memberViewDto = norMemberService.getMyPage(userId);
 
         return ResponseEntity.ok().body(ApiResponse.of("회원 정보 조회 성공", memberViewDto));
     }
@@ -126,11 +124,7 @@ public class NorMemberApiController {
             throw new CustomException(ACCESS_DENIED);
         }
 
-        NorMember loginedMember = norMemberService.findOne(userId);
-
-        List<ReviewViewDto> reviewList = reviewService.findByMember(loginedMember).stream()
-                .map(Review::of)
-                .toList();
+        List<ReviewViewDto> reviewList = reviewService.findByMember(userId);
 
         return ResponseEntity.ok().body(ApiResponse.of("리뷰 조회 성공", reviewList));
     }
@@ -148,21 +142,8 @@ public class NorMemberApiController {
             throw new CustomException(ACCESS_DENIED);
         }
 
-        NorMember loginedMember = norMemberService.findOne(userId);
-
-        List<PtMembershipViewDto> ptMembershipList = ptMembershipService.findByMember(loginedMember).stream()
-                .map(PtMembership::of)
-                .toList();
+        List<PtMembershipViewDto> ptMembershipList = ptMembershipService.findByMember(userId);
 
         return ResponseEntity.ok().body(ApiResponse.of("진행 중인 PT 조회 성공", ptMembershipList));
-    }
-
-    private MemberViewDto createMemberViewDto(NorMember loginedMember) {
-        return MemberViewDto.builder()
-                .name(loginedMember.getName())
-                .email(loginedMember.getEmail())
-                .gender(loginedMember.getGender().getExp())
-                .address(loginedMember.getAddress())
-                .build();
     }
 }
