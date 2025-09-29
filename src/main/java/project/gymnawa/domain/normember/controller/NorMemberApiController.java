@@ -10,17 +10,13 @@ import org.springframework.web.bind.annotation.*;
 import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
 import project.gymnawa.domain.member.dto.UpdatePasswordDto;
 import project.gymnawa.domain.normember.dto.MemberSaveDto;
-import project.gymnawa.domain.normember.entity.NorMember;
 import project.gymnawa.domain.normember.service.NorMemberService;
 import project.gymnawa.domain.ptmembership.dto.PtMembershipViewDto;
 import project.gymnawa.domain.review.dto.ReviewViewDto;
 import project.gymnawa.domain.common.api.ApiResponse;
 import project.gymnawa.domain.normember.dto.MemberEditDto;
 import project.gymnawa.domain.normember.dto.MemberViewDto;
-import project.gymnawa.domain.ptmembership.entity.PtMembership;
-import project.gymnawa.domain.review.entity.Review;
 import project.gymnawa.domain.common.error.exception.CustomException;
-import project.gymnawa.domain.email.service.EmailService;
 import project.gymnawa.domain.ptmembership.service.PtMembershipService;
 import project.gymnawa.domain.review.service.ReviewService;
 
@@ -35,7 +31,6 @@ import static project.gymnawa.domain.common.error.dto.ErrorCode.*;
 public class NorMemberApiController {
 
     private final NorMemberService norMemberService;
-    private final EmailService emailService;
     private final ReviewService reviewService;
     private final PtMembershipService ptMembershipService;
 
@@ -44,10 +39,6 @@ public class NorMemberApiController {
      */
     @PostMapping
     public ResponseEntity<ApiResponse<?>> addMember(@Validated @RequestBody MemberSaveDto memberSaveDto) {
-
-        if (!emailService.isEmailVerified(memberSaveDto.getEmail())) {
-            throw new CustomException(EMAIL_VERIFY_FAILED);
-        }
 
         Long joinId = norMemberService.join(memberSaveDto);
 
