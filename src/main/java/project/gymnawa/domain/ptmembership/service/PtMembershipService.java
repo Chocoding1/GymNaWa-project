@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import project.gymnawa.domain.normember.entity.NorMember;
+import project.gymnawa.domain.normember.service.NorMemberService;
 import project.gymnawa.domain.ptmembership.dto.PtMembershipViewDto;
 import project.gymnawa.domain.ptmembership.repository.PtMembershipRepository;
 import project.gymnawa.domain.ptmembership.entity.PtMembership;
@@ -18,6 +19,7 @@ import java.util.List;
 public class PtMembershipService {
 
     private final PtMembershipRepository ptMembershipRepository;
+    private final NorMemberService norMemberService;
     private final TrainerService trainerService;
 
     /**
@@ -32,8 +34,12 @@ public class PtMembershipService {
     /**
      * 회원별 PT 등록 정보 조회
      */
-    public List<PtMembership> findByMember(NorMember norMember) {
-        return ptMembershipRepository.findByNorMember(norMember);
+    public List<PtMembershipViewDto> findByMember(Long id) {
+        NorMember norMember = norMemberService.findOne(id);
+
+        return ptMembershipRepository.findByNorMember(norMember).stream()
+                .map(PtMembership::of)
+                .toList();
     }
 
     /**

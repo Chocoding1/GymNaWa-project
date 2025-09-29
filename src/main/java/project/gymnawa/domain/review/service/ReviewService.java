@@ -69,8 +69,12 @@ public class ReviewService {
     /**
      * 회원 별 리뷰 조회
      */
-    public List<Review> findByMember(NorMember norMember) {
-        return reviewRepository.findByNorMember(norMember);
+    public List<ReviewViewDto> findByMember(Long memberId) {
+        NorMember norMember = norMemberService.findOne(memberId);
+
+        return reviewRepository.findByNorMember(norMember).stream()
+                .map(Review::of)
+                .toList();
     }
 
     /**
