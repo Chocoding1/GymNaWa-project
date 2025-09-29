@@ -10,18 +10,18 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
+import project.gymnawa.domain.common.error.exception.CustomException;
 import project.gymnawa.domain.member.dto.MemberSessionDto;
 import project.gymnawa.domain.member.dto.UpdatePasswordDto;
 import project.gymnawa.domain.member.entity.etcfield.Gender;
 import project.gymnawa.domain.member.entity.etcfield.Role;
-import project.gymnawa.domain.normember.entity.NorMember;
+import project.gymnawa.domain.normember.dto.MemberViewDto;
 import project.gymnawa.domain.normember.dto.MemberEditDto;
 import project.gymnawa.domain.normember.dto.MemberSaveDto;
-import project.gymnawa.domain.email.service.EmailService;
 import project.gymnawa.domain.normember.service.NorMemberService;
-import project.gymnawa.domain.ptmembership.entity.PtMembership;
+import project.gymnawa.domain.ptmembership.dto.PtMembershipViewDto;
 import project.gymnawa.domain.ptmembership.service.PtMembershipService;
-import project.gymnawa.domain.review.entity.Review;
+import project.gymnawa.domain.review.dto.ReviewViewDto;
 import project.gymnawa.domain.review.service.ReviewService;
 import project.gymnawa.config.SecurityTestConfig;
 
@@ -32,6 +32,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static project.gymnawa.domain.common.error.dto.ErrorCode.*;
 
 @WebMvcTest(NorMemberApiController.class)
 @Import(SecurityTestConfig.class)
@@ -45,9 +46,6 @@ class NorMemberApiControllerTest {
 
     @MockitoBean
     private NorMemberService norMemberService;
-
-    @MockitoBean
-    private EmailService emailService;
 
     @MockitoBean
     private ReviewService reviewService;
@@ -69,7 +67,6 @@ class NorMemberApiControllerTest {
                 .emailCode("testEmailCode")
                 .build();
 
-        when(emailService.isEmailVerified(memberSaveDto.getEmail())).thenReturn(true);
         when(norMemberService.join(memberSaveDto)).thenReturn(1L);
 
         //when & then
@@ -82,7 +79,7 @@ class NorMemberApiControllerTest {
     }
 
     @Test
-    @DisplayName("회원가입 실패(400) - 이메일 인증 실패")
+    @DisplayName("회원가입 실패(400) - 이메일 인증 미완료")
     void addMemberFail_invalidEmail() throws Exception {
         //given
         // email 필드 제거
@@ -96,7 +93,8 @@ class NorMemberApiControllerTest {
                 .emailCode("testEmailCode")
                 .build();
 
-        when(emailService.isEmailVerified(memberSaveDto.getEmail())).thenReturn(false);
+        when(norMemberService.join(memberSaveDto))
+                .thenThrow(new CustomException(EMAIL_VERIFY_FAILED));
 
         //when & then
         mockMvc.perform(post("/api/normembers")
@@ -106,6 +104,34 @@ class NorMemberApiControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errorCode").value("EMAIL_VERIFY_FAILED"))
                 .andExpect(jsonPath("$.errorMessage").value("이메일 인증이 되지 않았습니다."));
+    }
+
+    @Test
+    @DisplayName("회원가입 실패(400) - 이미 가입된 이메일")
+    void addTrainer_fail_duplicateEmail() throws Exception {
+        //given
+        // email 필드 제거
+        MemberSaveDto memberSaveDto = MemberSaveDto.builder()
+                .email("testEmail")
+                .password("testPassword")
+                .name("testName")
+                .gender(Gender.MALE)
+                .zoneCode("testZoneCode")
+                .address("testAddress")
+                .emailCode("testEmailCode")
+                .build();
+
+        when(norMemberService.join(memberSaveDto))
+                .thenThrow(new CustomException(DUPLICATE_EMAIL));
+
+        //when & then
+        mockMvc.perform(post("/api/normembers")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(memberSaveDto))
+                )
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.errorCode").value("DUPLICATE_EMAIL"))
+                .andExpect(jsonPath("$.errorMessage").value("이미 가입된 이메일입니다."));
     }
 
     @Test
@@ -236,9 +262,9 @@ class NorMemberApiControllerTest {
     void myPageSuccess() throws Exception {
         //given
         Long userId = 1L;
-        NorMember norMember = createNorMember();
+        MemberViewDto norMemberViewDto = MemberViewDto.builder().id(userId).build();
 
-        when(norMemberService.findOne(userId)).thenReturn(norMember);
+        when(norMemberService.getMyPage(userId)).thenReturn(norMemberViewDto);
 
         //when & then
         mockMvc.perform(get("/api/normembers/{id}", userId)
@@ -247,18 +273,14 @@ class NorMemberApiControllerTest {
                 )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.message").value("회원 정보 조회 성공"))
-                .andExpect(jsonPath("$.data.email").value("test@naver.com"));
+                .andExpect(jsonPath("$.data.id").value(userId));
     }
 
     @Test
     @DisplayName("마이페이지 조회 실패(400) - 유효하지 않은 id pathVariable")
     void myPageFail_invalidId() throws Exception {
         //given
-        Long userId = 1L;
         Long invalidId = 100L;
-        NorMember norMember = createNorMember();
-
-        when(norMemberService.findOne(userId)).thenReturn(norMember);
 
         //when & then
         mockMvc.perform(get("/api/normembers/{id}", invalidId)
@@ -271,18 +293,36 @@ class NorMemberApiControllerTest {
     }
 
     @Test
+    @DisplayName("마이페이지 조회 실패(404) - 존재하지 않는 회원")
+    void myPage_fail_() throws Exception {
+        //given
+        Long userId = 1L;
+
+        when(norMemberService.getMyPage(userId)).thenThrow(new CustomException(MEMBER_NOT_FOUND));
+
+        //when & then
+        mockMvc.perform(get("/api/normembers/{id}", userId)
+                        .with(user(createCustomUserDetails()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.errorCode").value("MEMBER_NOT_FOUND"))
+                .andExpect(jsonPath("$.errorMessage").value("존재하지 않는 회원입니다."));
+
+        verify(norMemberService, times(1)).getMyPage(userId);
+    }
+
+    @Test
     @DisplayName("회원 정보 수정 성공")
     void editMemberSuccess() throws Exception {
         //given
         Long userId = 1L;
-        NorMember norMember = createNorMember();
         MemberEditDto memberEditDto = MemberEditDto.builder()
                 .name("editName")
                 .zoneCode("newZoneCode")
                 .address("newAddress")
                 .build();
 
-        when(norMemberService.findOne(userId)).thenReturn(norMember);
         doNothing().when(norMemberService).updateMember(userId, memberEditDto);
 
         //when & then
@@ -299,20 +339,24 @@ class NorMemberApiControllerTest {
     @DisplayName("회원 정보 수정 실패(400) - 유효하지 않은 id pathVariable")
     void editMemberFail_invalidId() throws Exception {
         //given
-        Long userId = 1L;
         Long invalidId = 100L;
-        NorMember norMember = createNorMember();
-
-        when(norMemberService.findOne(userId)).thenReturn(norMember);
+        MemberEditDto memberEditDto = MemberEditDto.builder()
+                .name("editName")
+                .zoneCode("newZoneCode")
+                .address("newAddress")
+                .build();
 
         //when & then
         mockMvc.perform(get("/api/normembers/{id}", invalidId)
                         .with(user(createCustomUserDetails()))
                         .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(memberEditDto))
                 )
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errorCode").value("ACCESS_DENIED"))
                 .andExpect(jsonPath("$.errorMessage").value("잘못된 접근입니다."));
+
+        verify(norMemberService, never()).updateMember(anyLong(), any(MemberEditDto.class));
     }
 
     @Test
@@ -320,15 +364,12 @@ class NorMemberApiControllerTest {
     void editMemberFail_name() throws Exception {
         //given
         Long userId = 1L;
-        NorMember norMember = createNorMember();
 
         // name 필드 제거
         MemberEditDto memberEditDto = MemberEditDto.builder()
                 .zoneCode("newZoneCode")
                 .address("newAddress")
                 .build();
-
-        when(norMemberService.findOne(userId)).thenReturn(norMember);
 
         //when & then
         mockMvc.perform(patch("/api/normembers/{id}", userId)
@@ -339,6 +380,8 @@ class NorMemberApiControllerTest {
                 .andExpect(jsonPath("$.errorCode").value("VALIDATION_ERROR"))
                 .andExpect(jsonPath("$.errorMessage").value("입력값이 유효하지 않습니다."))
                 .andExpect(jsonPath("$.errorFields.name").value("이름은 필수입니다."));
+
+        verify(norMemberService, never()).updateMember(anyLong(), any(MemberEditDto.class));
     }
 
     @Test
@@ -346,14 +389,11 @@ class NorMemberApiControllerTest {
     void editMemberFail_address() throws Exception {
         //given
         Long userId = 1L;
-        NorMember norMember = createNorMember();
 
         // zoneCode, address 필드 제거
         MemberEditDto memberEditDto = MemberEditDto.builder()
                 .name("editName")
                 .build();
-
-        when(norMemberService.findOne(userId)).thenReturn(norMember);
 
         //when & then
         mockMvc.perform(patch("/api/normembers/{id}", userId)
@@ -363,6 +403,8 @@ class NorMemberApiControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errorCode").value("VALIDATION_ERROR"))
                 .andExpect(jsonPath("$.errorMessage").value("입력값이 유효하지 않습니다."));
+
+        verify(norMemberService, never()).updateMember(anyLong(), any(MemberEditDto.class));
     }
     
     @Test
@@ -370,14 +412,12 @@ class NorMemberApiControllerTest {
     void updatePwSuccess() throws Exception {
         //given
         Long userId = 1L;
-        NorMember norMember = createNorMember();
         UpdatePasswordDto updatePasswordDto = UpdatePasswordDto.builder()
                 .currentPassword("testPw")
                 .newPassword("newPw")
                 .confirmPassword("confirmPw")
                 .build();
 
-        when(norMemberService.findOne(userId)).thenReturn(norMember);
         doNothing().when(norMemberService).changePassword(userId, updatePasswordDto);
 
         //when & then
@@ -394,16 +434,12 @@ class NorMemberApiControllerTest {
     @DisplayName("비밀번호 변경 실패(400) - 유효하지 않은 id pathVariable")
     void updatePwFail_invalidId() throws Exception {
         //given
-        Long userId = 1L;
         Long invalidId = 100L;
-        NorMember norMember = createNorMember();
         UpdatePasswordDto updatePasswordDto = UpdatePasswordDto.builder()
                 .currentPassword("testPw")
                 .newPassword("newPw")
                 .confirmPassword("confirmPw")
                 .build();
-
-        when(norMemberService.findOne(userId)).thenReturn(norMember);
 
         //when & then
         mockMvc.perform(post("/api/normembers/{id}/password", invalidId)
@@ -414,6 +450,8 @@ class NorMemberApiControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errorCode").value("ACCESS_DENIED"))
                 .andExpect(jsonPath("$.errorMessage").value("잘못된 접근입니다."));
+
+        verify(norMemberService, never()).changePassword(anyLong(), any(UpdatePasswordDto.class));
     }
 
     @Test
@@ -421,15 +459,12 @@ class NorMemberApiControllerTest {
     void updatePwFail_currentPw() throws Exception {
         //given
         Long userId = 1L;
-        NorMember norMember = createNorMember();
 
         // currentPw 필드 제거
         UpdatePasswordDto updatePasswordDto = UpdatePasswordDto.builder()
                 .newPassword("newPw")
                 .confirmPassword("confirmPw")
                 .build();
-
-        when(norMemberService.findOne(userId)).thenReturn(norMember);
 
         //when & then
         mockMvc.perform(post("/api/normembers/{id}/password", userId)
@@ -441,6 +476,8 @@ class NorMemberApiControllerTest {
                 .andExpect(jsonPath("$.errorCode").value("VALIDATION_ERROR"))
                 .andExpect(jsonPath("$.errorMessage").value("입력값이 유효하지 않습니다."))
                 .andExpect(jsonPath("$.errorFields.currentPassword").value("현재 비밀번호는 필수입니다."));
+
+        verify(norMemberService, never()).changePassword(anyLong(), any(UpdatePasswordDto.class));
     }
 
     @Test
@@ -448,15 +485,12 @@ class NorMemberApiControllerTest {
     void updatePwFail_newPw() throws Exception {
         //given
         Long userId = 1L;
-        NorMember norMember = createNorMember();
 
         // newPw 필드 제거
         UpdatePasswordDto updatePasswordDto = UpdatePasswordDto.builder()
                 .currentPassword("testPw")
                 .confirmPassword("confirmPw")
                 .build();
-
-        when(norMemberService.findOne(userId)).thenReturn(norMember);
 
         //when & then
         mockMvc.perform(post("/api/normembers/{id}/password", userId)
@@ -468,6 +502,8 @@ class NorMemberApiControllerTest {
                 .andExpect(jsonPath("$.errorCode").value("VALIDATION_ERROR"))
                 .andExpect(jsonPath("$.errorMessage").value("입력값이 유효하지 않습니다."))
                 .andExpect(jsonPath("$.errorFields.newPassword").value("새 비밀번호는 필수입니다."));
+
+        verify(norMemberService, never()).changePassword(anyLong(), any(UpdatePasswordDto.class));
     }
 
     @Test
@@ -475,15 +511,12 @@ class NorMemberApiControllerTest {
     void updatePwFail_confirmPw() throws Exception {
         //given
         Long userId = 1L;
-        NorMember norMember = createNorMember();
 
         // confirmPw 필드 제거
         UpdatePasswordDto updatePasswordDto = UpdatePasswordDto.builder()
                 .currentPassword("testPw")
                 .newPassword("newPw")
                 .build();
-
-        when(norMemberService.findOne(userId)).thenReturn(norMember);
 
         //when & then
         mockMvc.perform(post("/api/normembers/{id}/password", userId)
@@ -495,6 +528,34 @@ class NorMemberApiControllerTest {
                 .andExpect(jsonPath("$.errorCode").value("VALIDATION_ERROR"))
                 .andExpect(jsonPath("$.errorMessage").value("입력값이 유효하지 않습니다."))
                 .andExpect(jsonPath("$.errorFields.confirmPassword").value("재입력 비밀번호는 필수입니다."));
+
+        verify(norMemberService, never()).changePassword(anyLong(), any(UpdatePasswordDto.class));
+    }
+
+    @Test
+    @DisplayName("비밀번호 변경 실패(400) - 현재 비밀번호 불일치")
+    void updatePw_fail_pwNotEqual() throws Exception {
+        //given
+        Long userId = 1L;
+
+        UpdatePasswordDto updatePasswordDto = UpdatePasswordDto.builder()
+                .currentPassword("testPw")
+                .newPassword("newPw")
+                .confirmPassword("confirmPw")
+                .build();
+
+        doThrow(new CustomException(INVALID_PASSWORD))
+                .when(norMemberService).changePassword(userId, updatePasswordDto);
+
+        //when & then
+        mockMvc.perform(post("/api/normembers/{id}/password", userId)
+                        .with(user(createCustomUserDetails()))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(updatePasswordDto))
+                )
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.errorCode").value("INVALID_PASSWORD"))
+                .andExpect(jsonPath("$.errorMessage").value("비밀번호가 일치하지 않습니다."));
     }
 
     @Test
@@ -502,11 +563,9 @@ class NorMemberApiControllerTest {
     void getReviewsSuccess() throws Exception {
         //given
         Long userId = 1L;
-        NorMember norMember = createNorMember();
-        List<Review> reviews = new ArrayList<>();
+        List<ReviewViewDto> reviewViewDto = new ArrayList<>();
 
-        when(norMemberService.findOne(userId)).thenReturn(norMember);
-        when(reviewService.findByMember(norMember)).thenReturn(reviews);
+        when(reviewService.findByMember(userId)).thenReturn(reviewViewDto);
 
         //when & then
         mockMvc.perform(get("/api/normembers/{id}/reviews", userId)
@@ -521,11 +580,7 @@ class NorMemberApiControllerTest {
     @DisplayName("내가 쓴 리뷰 조회 실패(400) - 유효하지 않은 id pathVariable")
     void getReviewsFail_invalidId() throws Exception {
         //given
-        Long userId = 1L;
         Long invalidId = 100L;
-        NorMember norMember = createNorMember();
-
-        when(norMemberService.findOne(userId)).thenReturn(norMember);
 
         //when & then
         mockMvc.perform(get("/api/normembers/{id}/reviews", invalidId)
@@ -535,6 +590,8 @@ class NorMemberApiControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errorCode").value("ACCESS_DENIED"))
                 .andExpect(jsonPath("$.errorMessage").value("잘못된 접근입니다."));
+
+        verify(reviewService, never()).findByTrainer(anyLong());
     }
 
     @Test
@@ -542,11 +599,9 @@ class NorMemberApiControllerTest {
     void getPtMembershipsSuccess() throws Exception {
         //given
         Long userId = 1L;
-        NorMember norMember = createNorMember();
-        List<PtMembership> ptMemberships = new ArrayList<>();
+        List<PtMembershipViewDto> ptMembershipViewDto = new ArrayList<>();
 
-        when(norMemberService.findOne(userId)).thenReturn(norMember);
-        when(ptMembershipService.findByMember(norMember)).thenReturn(ptMemberships);
+        when(ptMembershipService.findByMember(userId)).thenReturn(ptMembershipViewDto);
 
         //when & then
         mockMvc.perform(get("/api/normembers/{id}/ptmemberships", userId)
@@ -561,11 +616,7 @@ class NorMemberApiControllerTest {
     @DisplayName("진행 중인 PT 조회 실패(400) - 유효하지 않은 id pathVariable")
     void getPtMembershipsFail_invalidId() throws Exception {
         //given
-        Long userId = 1L;
         Long invalidId = 100L;
-        NorMember norMember = createNorMember();
-
-        when(norMemberService.findOne(userId)).thenReturn(norMember);
 
         //when & then
         mockMvc.perform(get("/api/normembers/{id}/ptmemberships", invalidId)
@@ -575,23 +626,14 @@ class NorMemberApiControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errorCode").value("ACCESS_DENIED"))
                 .andExpect(jsonPath("$.errorMessage").value("잘못된 접근입니다."));
+
+        verify(ptMembershipService, never()).findByTrainer(anyLong());
     }
 
     private CustomOAuth2UserDetails createCustomUserDetails() {
         MemberSessionDto memberSessionDto = createMemberSessionDto();
 
         return new CustomOAuth2UserDetails(memberSessionDto);
-    }
-
-    private NorMember createNorMember() {
-        return NorMember.builder()
-                .id(1L)
-                .email("test@naver.com")
-                .password("testPw")
-                .name("testUser")
-                .gender(Gender.MALE)
-                .deleted(false)
-                .build();
     }
 
     private MemberSessionDto createMemberSessionDto() {

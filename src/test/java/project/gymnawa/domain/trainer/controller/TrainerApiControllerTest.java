@@ -21,7 +21,6 @@ import project.gymnawa.domain.review.dto.ReviewViewDto;
 import project.gymnawa.domain.review.service.ReviewService;
 import project.gymnawa.domain.trainer.dto.TrainerSaveDto;
 import project.gymnawa.domain.trainer.dto.TrainerViewDto;
-import project.gymnawa.domain.trainer.entity.Trainer;
 import project.gymnawa.domain.trainer.dto.TrainerEditDto;
 import project.gymnawa.domain.trainer.service.TrainerService;
 import project.gymnawa.config.SecurityTestConfig;
@@ -283,7 +282,6 @@ class TrainerApiControllerTest {
     @DisplayName("마이페이지 조회 실패(400) - 유효하지 않은 id pathVariable")
     void myPageFail_invalidId() throws Exception {
         //given
-        Long userId = 1L;
         Long invalidId = 100L;
 
         //when & then
@@ -295,7 +293,7 @@ class TrainerApiControllerTest {
                 .andExpect(jsonPath("$.errorCode").value("ACCESS_DENIED"))
                 .andExpect(jsonPath("$.errorMessage").value("잘못된 접근입니다."));
 
-        verify(trainerService, never()).getMyPage(userId);
+        verify(trainerService, never()).getMyPage(anyLong());
     }
 
     @Test
@@ -315,7 +313,7 @@ class TrainerApiControllerTest {
                 .andExpect(jsonPath("$.errorCode").value("MEMBER_NOT_FOUND"))
                 .andExpect(jsonPath("$.errorMessage").value("존재하지 않는 회원입니다."));
 
-        verify(trainerService, times(1)).getMyPage(userId);
+        verify(trainerService, times(1)).getMyPage(anyLong());
     }
 
     @Test
@@ -386,6 +384,8 @@ class TrainerApiControllerTest {
                 .andExpect(jsonPath("$.errorCode").value("VALIDATION_ERROR"))
                 .andExpect(jsonPath("$.errorMessage").value("입력값이 유효하지 않습니다."))
                 .andExpect(jsonPath("$.errorFields.name").value("이름은 필수입니다."));
+
+        verify(trainerService, never()).updateTrainer(anyLong(), any(TrainerEditDto.class));
     }
 
     @Test
@@ -407,6 +407,8 @@ class TrainerApiControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errorCode").value("VALIDATION_ERROR"))
                 .andExpect(jsonPath("$.errorMessage").value("입력값이 유효하지 않습니다."));
+
+        verify(trainerService, never()).updateTrainer(anyLong(), any(TrainerEditDto.class));
     }
 
     @Test
@@ -436,7 +438,6 @@ class TrainerApiControllerTest {
     @DisplayName("비밀번호 변경 실패(400) - 유효하지 않은 id pathVariable")
     void updatePwFail_invalidId() throws Exception {
         //given
-        Long userId = 1L;
         Long invalidId = 100L;
         UpdatePasswordDto updatePasswordDto = UpdatePasswordDto.builder()
                 .currentPassword("testPw")
@@ -453,6 +454,8 @@ class TrainerApiControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errorCode").value("ACCESS_DENIED"))
                 .andExpect(jsonPath("$.errorMessage").value("잘못된 접근입니다."));
+
+        verify(trainerService, never()).changePassword(anyLong(), any(UpdatePasswordDto.class));
     }
 
     @Test
@@ -477,6 +480,8 @@ class TrainerApiControllerTest {
                 .andExpect(jsonPath("$.errorCode").value("VALIDATION_ERROR"))
                 .andExpect(jsonPath("$.errorMessage").value("입력값이 유효하지 않습니다."))
                 .andExpect(jsonPath("$.errorFields.currentPassword").value("현재 비밀번호는 필수입니다."));
+
+        verify(trainerService, never()).changePassword(anyLong(), any(UpdatePasswordDto.class));
     }
 
     @Test
@@ -501,6 +506,8 @@ class TrainerApiControllerTest {
                 .andExpect(jsonPath("$.errorCode").value("VALIDATION_ERROR"))
                 .andExpect(jsonPath("$.errorMessage").value("입력값이 유효하지 않습니다."))
                 .andExpect(jsonPath("$.errorFields.newPassword").value("새 비밀번호는 필수입니다."));
+
+        verify(trainerService, never()).changePassword(anyLong(), any(UpdatePasswordDto.class));
     }
 
     @Test
@@ -525,6 +532,8 @@ class TrainerApiControllerTest {
                 .andExpect(jsonPath("$.errorCode").value("VALIDATION_ERROR"))
                 .andExpect(jsonPath("$.errorMessage").value("입력값이 유효하지 않습니다."))
                 .andExpect(jsonPath("$.errorFields.confirmPassword").value("재입력 비밀번호는 필수입니다."));
+
+        verify(trainerService, never()).changePassword(anyLong(), any(UpdatePasswordDto.class));
     }
 
     @Test
@@ -575,7 +584,6 @@ class TrainerApiControllerTest {
     @DisplayName("나에게 달린 리뷰 조회 실패(400) - 유효하지 않은 id pathVariable")
     void getReviewsFail_invalidId() throws Exception {
         //given
-        Long userId = 1L;
         Long invalidId = 100L;
 
         //when & then
@@ -587,7 +595,7 @@ class TrainerApiControllerTest {
                 .andExpect(jsonPath("$.errorCode").value("ACCESS_DENIED"))
                 .andExpect(jsonPath("$.errorMessage").value("잘못된 접근입니다."));
 
-        verify(reviewService, never()).findByTrainer(userId);
+        verify(reviewService, never()).findByTrainer(anyLong());
     }
 
     @Test
@@ -630,17 +638,6 @@ class TrainerApiControllerTest {
         MemberSessionDto memberSessionDto = createMemberSessionDto();
 
         return new CustomOAuth2UserDetails(memberSessionDto);
-    }
-
-    private Trainer createTrainer() {
-        return Trainer.builder()
-                .id(1L)
-                .email("test@naver.com")
-                .password("testPw")
-                .name("testUser")
-                .gender(Gender.MALE)
-                .deleted(false)
-                .build();
     }
 
     private MemberSessionDto createMemberSessionDto() {
