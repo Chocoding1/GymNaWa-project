@@ -71,6 +71,7 @@ jacocoTestReport {
 					'**/auth/**',
 					'!**/auth/filter/**',
 					'!**/auth/jwt/service/ReissueServiceImpl.class',
+					'!**/auth/jwt/controller/**',
 					'!**/auth/jwt/util/**',
 					'!**/auth/oauth/handler/**',
 					'!**/auth/oauth/service/**',
