@@ -131,6 +131,33 @@ class NorMemberServiceTest {
     }
 
     @Test
+    @DisplayName("회원가입 실패 - 인증되지 않은 이메일일 경우")
+    void joinFail_emailNotVerified() {
+        //given
+        MemberSaveDto memberSaveDto = MemberSaveDto.builder()
+                .email("galmeagi2@naver.com")
+                .password("aadfad")
+                .name("조성진")
+                .build();
+
+        when(memberRepository.existsByEmailAndDeletedFalse(anyString())).thenReturn(false);
+        when(emailService.isEmailVerified(anyString())).thenReturn(false);
+
+
+        //when & then
+        CustomException customException = assertThrows(CustomException.class,
+                () -> norMemberService.join(memberSaveDto));
+        ErrorCode errorCode = customException.getErrorCode();
+
+        verify(memberRepository, times(1)).existsByEmailAndDeletedFalse(anyString());
+        verify(emailService, times(1)).isEmailVerified(anyString());
+
+        assertThat(errorCode.getCode()).isEqualTo("EMAIL_VERIFY_FAILED");
+        assertThat(errorCode.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST);
+        assertThat(errorCode.getErrorMessage()).isEqualTo("이메일 인증이 되지 않았습니다.");
+    }
+
+    @Test
     @DisplayName("회원 정보 수정 성공")
     void updateMemberSuccess() {
         //given

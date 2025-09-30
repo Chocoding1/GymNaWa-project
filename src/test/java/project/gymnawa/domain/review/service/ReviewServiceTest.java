@@ -223,6 +223,38 @@ class ReviewServiceTest {
     }
 
     @Test
+    @DisplayName("회원 별 리뷰 조회 성공")
+    void findByMember_success() {
+        //given
+        Long userId = 2L;
+        NorMember norMember = NorMember.builder().id(userId).build();
+        Long trainerId = 1L;
+        Trainer trainer = Trainer.builder().id(trainerId).build();
+        Review review1 = Review.builder()
+                .content("review1")
+                .norMember(norMember)
+                .trainer(trainer)
+                .build();
+        Review review2 = Review.builder()
+                .content("review2")
+                .norMember(norMember)
+                .trainer(trainer)
+                .build();
+
+        when(norMemberService.findOne(userId)).thenReturn(norMember);
+        when(reviewRepository.findByNorMember(norMember)).thenReturn(List.of(review1, review2));
+
+        //when
+        List<ReviewViewDto> result = reviewService.findByMember(userId);
+
+        //then
+        assertEquals(2, result.size());
+
+        verify(norMemberService, times(1)).findOne(userId);
+        verify(reviewRepository, times(1)).findByNorMember(norMember);
+    }
+
+    @Test
     @DisplayName("트레이너 별 리뷰 조회 성공")
     void findByTrainer_success() {
         //given
