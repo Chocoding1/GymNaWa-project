@@ -9,6 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import project.gymnawa.domain.email.service.EmailService;
 import project.gymnawa.domain.member.dto.UpdatePasswordDto;
 import project.gymnawa.domain.normember.dto.MemberEditDto;
 import project.gymnawa.domain.normember.dto.MemberSaveDto;
@@ -38,6 +39,8 @@ class NorMemberServiceTest {
     @Mock
     MemberRepository memberRepository;
     @Mock
+    EmailService emailService;
+    @Mock
     BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Test
@@ -52,6 +55,7 @@ class NorMemberServiceTest {
                 .build();
 
         when(memberRepository.existsByEmailAndDeletedFalse(anyString())).thenReturn(false);
+        when(emailService.isEmailVerified(anyString())).thenReturn(true);
         when(norMemberRepository.save(any(NorMember.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         //when
@@ -59,6 +63,7 @@ class NorMemberServiceTest {
 
         //then
         verify(memberRepository, times(1)).existsByEmailAndDeletedFalse(anyString());
+        verify(emailService, times(1)).isEmailVerified(anyString());
         verify(bCryptPasswordEncoder, times(1)).encode(anyString());
         verify(norMemberRepository, times(1)).save(any(NorMember.class));
 
