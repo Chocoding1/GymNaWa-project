@@ -8,7 +8,6 @@ import project.gymnawa.domain.review.entity.Review;
 import project.gymnawa.domain.trainer.entity.Trainer;
 
 @Data
-@AllArgsConstructor
 @Builder
 public class ReviewSaveDto {
 

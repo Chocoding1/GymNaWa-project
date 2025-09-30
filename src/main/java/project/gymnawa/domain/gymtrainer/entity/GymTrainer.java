@@ -1,10 +1,7 @@
 package project.gymnawa.domain.gymtrainer.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import project.gymnawa.domain.common.etcfield.ContractStatus;
 import project.gymnawa.domain.trainer.entity.Trainer;
 
@@ -12,6 +9,8 @@ import java.time.LocalDate;
 
 @Entity(name = "gym_trainer")
 @Getter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class GymTrainer {
 
@@ -37,15 +36,6 @@ public class GymTrainer {
 
     @Enumerated(value = EnumType.STRING)
     private ContractStatus contractStatus; // 계약 상태 [유효, 만료]
-
-    @Builder
-    public GymTrainer(Long id, Trainer trainer, String gymId, LocalDate hireDate, ContractStatus contractStatus) {
-        this.id = id;
-        this.trainer = trainer;
-        this.gymId = gymId;
-        this.hireDate = hireDate;
-        this.contractStatus = contractStatus;
-    }
 
     public void expireContract(LocalDate expireDate) {
         this.contractStatus = ContractStatus.EXPIRED;

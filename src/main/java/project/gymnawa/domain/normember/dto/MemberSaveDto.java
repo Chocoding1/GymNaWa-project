@@ -2,7 +2,6 @@ package project.gymnawa.domain.normember.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import project.gymnawa.domain.normember.entity.NorMember;
@@ -11,7 +10,6 @@ import project.gymnawa.domain.member.entity.etcfield.Gender;
 import project.gymnawa.domain.member.entity.etcfield.Role;
 
 @Data
-@AllArgsConstructor
 @Builder
 public class MemberSaveDto {
 

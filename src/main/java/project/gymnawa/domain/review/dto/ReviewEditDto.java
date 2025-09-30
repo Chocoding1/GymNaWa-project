@@ -2,12 +2,10 @@ package project.gymnawa.domain.review.dto;
 
 import jakarta.persistence.Lob;
 import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
 @Data
-@AllArgsConstructor
 @Builder
 public class ReviewEditDto {
 

@@ -5,7 +5,6 @@ import project.gymnawa.domain.common.etcfield.Address;
 
 @Data
 @Builder
-@AllArgsConstructor
 public class MemberViewDto {
 
     private Long id;

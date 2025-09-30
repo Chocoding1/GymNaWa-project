@@ -2,13 +2,11 @@ package project.gymnawa.domain.member.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import project.gymnawa.domain.member.entity.etcfield.Gender;
 
 @Data
-@AllArgsConstructor
 @Builder
 public class MemberOauthInfoDto {
 

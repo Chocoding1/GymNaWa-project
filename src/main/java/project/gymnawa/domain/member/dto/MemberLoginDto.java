@@ -5,8 +5,8 @@ import lombok.*;
 
 @Builder
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Data
+@NoArgsConstructor(access = AccessLevel.PROTECTED) // CustomLoginFilter에서 objectMapper 변환하기 때문에 기본 생성자 필수로 있어야 됨
 public class MemberLoginDto {
 
     @NotBlank(message = "이메일은 필수입니다.")

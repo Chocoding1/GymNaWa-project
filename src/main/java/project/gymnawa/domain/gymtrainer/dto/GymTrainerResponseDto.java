@@ -10,7 +10,6 @@ import project.gymnawa.domain.common.etcfield.ContractStatus;
 import java.time.LocalDate;
 
 @Data
-@AllArgsConstructor
 @Builder
 public class GymTrainerResponseDto {
 
