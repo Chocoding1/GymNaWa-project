@@ -233,9 +233,6 @@ class MemberApiControllerTest {
     @DisplayName("최초 소셜 로그인 시, 토큰 재발급 실패 - 헤더에 RT 존재 X")
     void addInfo_tokenIsNull_return401() throws Exception {
         //given
-        String refreshToken = "test-refresh-token";
-        Long userId = 1L;
-        Long newJoinId = 100L;
 
         MemberOauthInfoDto memberOauthInfoDto = MemberOauthInfoDto.builder()
                 .gender(Gender.MALE)
@@ -244,21 +241,19 @@ class MemberApiControllerTest {
                 .isTrainer(false)
                 .build();
 
-        when(jwtUtil.getId(refreshToken)).thenReturn(userId);
-        when(memberService.convertGuestToMember(userId, memberOauthInfoDto)).thenReturn(newJoinId);
-        doThrow(new CustomException(TOKEN_NULL))
-                .when(reissueServiceImpl).reissue(anyString(), eq(newJoinId));
-
         //when & then
         mockMvc.perform(post("/api/members/add-info")
                         .with(user(createCustomUserDetails())) // 임의의 인증된 사용자 정보를 SecurityContext에 주입하는 방법
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("Authorization-Refresh", refreshToken)
                         .content(objectMapper.writeValueAsString(memberOauthInfoDto))
                 )
                 .andExpect(status().isUnauthorized())
                 .andExpect(jsonPath("$.errorCode").value("TOKEN_NULL"))
                 .andExpect(jsonPath("$.errorMessage").value("토큰이 존재하지 않습니다."));
+
+        verify(jwtUtil, never()).getId(anyString());
+        verify(memberService, never()).convertGuestToMember(anyLong(), any(MemberOauthInfoDto.class));
+        verify(reissueServiceImpl, never()).reissue(anyString(), anyLong());
     }
 
     @Test
