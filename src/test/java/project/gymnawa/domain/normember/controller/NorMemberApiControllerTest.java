@@ -347,7 +347,7 @@ class NorMemberApiControllerTest {
                 .build();
 
         //when & then
-        mockMvc.perform(get("/api/normembers/{id}", invalidId)
+        mockMvc.perform(patch("/api/normembers/{id}", invalidId)
                         .with(user(createCustomUserDetails()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(memberEditDto))
