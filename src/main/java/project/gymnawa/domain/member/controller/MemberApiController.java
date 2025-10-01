@@ -9,9 +9,11 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import project.gymnawa.auth.jwt.dto.JwtInfoDto;
+import project.gymnawa.auth.jwt.exception.CustomAuthException;
 import project.gymnawa.auth.jwt.service.ReissueServiceImpl;
 import project.gymnawa.auth.jwt.util.JwtUtil;
 import project.gymnawa.auth.oauth.domain.CustomOAuth2UserDetails;
+import project.gymnawa.domain.common.error.dto.ErrorCode;
 import project.gymnawa.domain.member.dto.PasswordDto;
 import project.gymnawa.domain.member.service.MemberService;
 import project.gymnawa.domain.member.dto.MemberHomeInfoDto;
@@ -59,6 +61,9 @@ public class MemberApiController {
          * 따라서 헤더로 넘어온 RT를 가지고 직접 회원 정보 조회 필요
          */
         String refreshToken = request.getHeader("Authorization-Refresh");
+        if (refreshToken == null) {
+            throw new CustomAuthException(TOKEN_NULL);
+        }
         Long userId = jwtUtil.getId(refreshToken);
 
         Long newJoinId = memberService.convertGuestToMember(userId, memberOauthInfoDto);
