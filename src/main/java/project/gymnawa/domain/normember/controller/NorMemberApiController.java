@@ -38,7 +38,7 @@ public class NorMemberApiController {
      * 회원가입
      */
     @PostMapping
-    public ResponseEntity<ApiResponse<?>> addMember(@Validated @RequestBody MemberSaveDto memberSaveDto) {
+    public ResponseEntity<ApiResponse<Long>> addMember(@Validated @RequestBody MemberSaveDto memberSaveDto) {
 
         Long joinId = norMemberService.join(memberSaveDto);
 
@@ -68,7 +68,7 @@ public class NorMemberApiController {
      * 회원 정보 수정
      */
     @PatchMapping("/{id}")
-    public ResponseEntity<ApiResponse<?>> editMember(@PathVariable Long id,
+    public ResponseEntity<ApiResponse<Void>> editMember(@PathVariable Long id,
                                                           @Validated @RequestBody MemberEditDto memberEditDto,
                                                           @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
@@ -87,7 +87,7 @@ public class NorMemberApiController {
      * 비밀번호 변경
      */
     @PostMapping("/{id}/password")
-    public ResponseEntity<ApiResponse<?>> updatePassword(@PathVariable Long id,
+    public ResponseEntity<ApiResponse<Void>> updatePassword(@PathVariable Long id,
                                                          @Validated @RequestBody UpdatePasswordDto updatePasswordDto,
                                                          @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
