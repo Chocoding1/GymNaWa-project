@@ -58,7 +58,7 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
         CustomOAuth2UserDetails oAuth2UserDetails = (CustomOAuth2UserDetails) authResult.getPrincipal();
         String refreshToken = jwtUtil.createRefreshToken(oAuth2UserDetails.getId());
 
-        ApiResponse<?> apiResponse = ApiResponse.of("로그인 성공");
+        ApiResponse<Void> apiResponse = ApiResponse.of("로그인 성공");
         ObjectMapper om = new ObjectMapper();
 
         response.setHeader("Authorization-Refresh", refreshToken);

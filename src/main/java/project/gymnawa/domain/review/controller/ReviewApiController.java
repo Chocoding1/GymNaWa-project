@@ -28,7 +28,7 @@ public class ReviewApiController {
      * 리뷰 추가
      */
     @PostMapping
-    public ResponseEntity<ApiResponse<?>> addReview(@Validated @RequestBody ReviewSaveDto reviewSaveDto,
+    public ResponseEntity<ApiResponse<Long>> addReview(@Validated @RequestBody ReviewSaveDto reviewSaveDto,
                                                         @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 
         Long userId = customOAuth2UserDetails.getId();
@@ -41,7 +41,7 @@ public class ReviewApiController {
      * 리뷰 수정
      */
     @PatchMapping("/{id}")
-    public ResponseEntity<ApiResponse<?>> reviewEdit(@PathVariable Long id,
+    public ResponseEntity<ApiResponse<ReviewViewDto>> reviewEdit(@PathVariable Long id,
                                                                  @Validated @RequestBody ReviewEditDto reviewEditDto,
                                                                  @AuthenticationPrincipal CustomOAuth2UserDetails customOAuth2UserDetails) {
 

@@ -23,8 +23,8 @@ public class EmailApiController {
     private final EmailService emailService;
 
     @PostMapping("/send-code")
-    public ResponseEntity<ApiResponse<?>> sendCode(@RequestBody EmailDto emailDto) throws MessagingException {
-        HashMap<String, Object> response = new HashMap<>();
+    public ResponseEntity<ApiResponse<HashMap<String, Boolean>>> sendCode(@RequestBody EmailDto emailDto) throws MessagingException {
+        HashMap<String, Boolean> response = new HashMap<>();
 
         emailService.sendMail(emailDto);
         response.put("success", true);
@@ -33,7 +33,7 @@ public class EmailApiController {
     }
 
     @PostMapping("/verify-code")
-    public ResponseEntity<ApiResponse<?>> verifyCode(@RequestBody EmailDto emailDto) {
+    public ResponseEntity<ApiResponse<Void>> verifyCode(@RequestBody EmailDto emailDto) {
          emailService.verifyCode(emailDto);
 
         return ResponseEntity.ok().body(ApiResponse.of("이메일 인증 성공"));
